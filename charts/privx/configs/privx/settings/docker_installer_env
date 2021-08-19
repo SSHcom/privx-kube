@@ -1,0 +1,34 @@
+# Variables for docker installer automation
+# Run docker_create_env.sh to recreate.
+
+#######################
+# appliance addresses #
+#######################
+# Space-separated DNS addresses
+export  PRIVX_DNS_NAMES="{{ .Values.ingress.common.host }}"
+# Space-separated IP addresses
+export  PRIVX_IP_ADDRESSES=" "
+##########################################
+# database (external) + redis (external) #
+##########################################
+# External database configuration
+export  PRIVX_USE_EXTERNAL_DATABASE="1"
+export  PRIVX_POSTGRES_ADDRESS="{{ .Values.dbAddress }}"
+export  PRIVX_POSTGRES_PORT="5432"
+# PostgreSQL username/password
+export  PRIVX_POSTGRES_USER="postgres"
+export  PRIVX_POSTGRES_PASSWORD="test"
+# Database name
+export  PRIVX_DATABASE_NAME="privx"
+# Database-user name
+export  PRIVX_DATABASE_USERNAME="privx"
+# Database-user password
+export  PRIVX_DATABASE_PASSWORD="privx"
+# Database-connection SSL mode
+export  PRIVX_DATABASE_SSLMODE="require"
+# Notification backend, "db" or "redis"
+export  PRIVX_NOTIFICATION_BACKEND="db"
+# Redis-server address
+export  PRIVX_REDIS_ADDRESS="redis"
+# Redis-service port number
+export  PRIVX_REDIS_PORT="6379"

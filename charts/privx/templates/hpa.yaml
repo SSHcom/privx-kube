@@ -1,0 +1,32 @@
+{{- $globalContext := . }}
+{{- range $service := .Values.ms}}
+{{- if $service.autoscaling.enabled }}
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "privx.fullname" . }}-{{ $service.name }}
+  labels:
+    app.kubernetes.io/name: {{ include "privx.name" $globalContext }}-{{ $service.name }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "privx.fullname" $globalContext }}-{{ $service.name }}
+  minReplicas: {{ $service.autoscaling.minReplicas }}
+  maxReplicas: {{ $service.autoscaling.maxReplicas }}
+  metrics:
+    {{- if $service.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: {{ $service.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if $service.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        targetAverageUtilization: {{ $service.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }}
+---
+{{- end }}

@@ -1,0 +1,25 @@
+servicename = "vault"
+
+[vault]
+
+# Keyvault credentials.
+keyvault_id = "@VAULT_ID@"
+keyvault_secret = "@VAULT_SECRET@"
+
+
+# vault REST API listen port
+listen_port = 8098
+
+# Encryption algorithm used to encrypt secrets
+encryption_algorithm = "AES256withGCM"
+
+[db]
+# DB data version number
+# Do not modify
+data_version = "1"
+
+[tls]
+# Microservice https server settings
+enable_https_server = true
+certificate = "/opt/privx/cert/vault.crt"
+private_key = "/opt/privx/cert/vault.key"

@@ -1,0 +1,27 @@
+{{- if .Values.cert.selfsigned }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "privx.fullname" . }}-{{ .Values.cert.name }}
+spec:
+  secretName: {{ .Values.cert.secretName }}
+  duration: {{ .Values.cert.duration }}
+  renewBefore: {{ .Values.cert.renewBefore }}
+  {{- with .Values.cert.organizations }}
+  subject:
+    organizations:
+     {{- toYaml . | nindent 6 }}
+  {{- end }}
+  commonName: {{ .Values.ingress.common.host }}
+  isCA: {{ .Values.cert.isAuthority }}
+  {{- with .Values.cert.usages }}
+  usages:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  dnsNames:
+  - {{ .Values.ingress.common.host }}
+  issuerRef:
+    name: selfsigned
+    kind: ClusterIssuer
+    group: cert-manager.io
+{{- end }}

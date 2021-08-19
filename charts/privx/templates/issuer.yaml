@@ -1,0 +1,9 @@
+{{- if .Values.cert.selfsigned }}
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: ca-issuer
+spec:
+  ca:
+    secretName: {{ .Values.cert.secretName }}
+{{- end }}

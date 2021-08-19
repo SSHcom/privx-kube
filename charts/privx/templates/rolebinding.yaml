@@ -1,0 +1,45 @@
+{{- $globalContext := . }}
+{{- range $service := .Values.ms }}
+{{- if $service.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ $service.rbac.name }}
+  namespace: {{ $service.rbac.namespace }}
+  labels:
+    release: "{{ $globalContext.Release.Name }}"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ $service.rbac.role.name }}
+subjects:
+  {{- range $subject := $service.rbac.subjects }}
+- kind: {{ $subject.kind }}
+  name: {{ $subject.kind }}
+  namespace: {{ $service.rbac.namespace }}
+  {{- end }}
+---
+{{- end }}
+{{- end }}
+{{- range $job := .Values.jobs }}
+{{- if $job.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ $job.rbac.name }}
+  namespace: {{ $job.rbac.namespace }}
+  labels:
+    release: "{{ $globalContext.Release.Name }}"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ $job.rbac.role.name }}
+subjects:
+{{- range $subject := $job.rbac.subjects }}
+- kind: {{ $subject.kind }}
+  name: {{ $subject.name }}
+  namespace: {{ $job.rbac.namespace }}
+{{- end }}
+---
+{{- end }}
+{{- end }}

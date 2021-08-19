@@ -1,0 +1,73 @@
+{{- $globalContext := . }}
+{{- range $job := .Values.jobs}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "privx.fullname" $globalContext }}-{{ $job.name }}
+  annotations:
+    "helm.sh/hook": "{{ $job.hook }}"
+    "helm.sh/hook-weight": "{{ $job.weight }}"
+    "helm.sh/hook-delete-policy": "{{ $job.hookDeletePolicy }}"
+spec:
+  template:
+    spec:
+      {{- with $job.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if $job.serviceAccount.create }}
+      serviceAccountName: {{ $job.serviceAccount.name }}
+      {{- end }}
+      securityContext:
+        {{- toYaml $job.podSecurityContext | nindent 8 }}
+      {{- with $job.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ $globalContext.Chart.Name }}-{{ $job.name }}
+          securityContext:
+            {{- toYaml $job.securityContext | nindent 12 }}
+          image: "{{ $job.image.repository }}:{{ $job.image.tag | default "latest" }}"
+          imagePullPolicy: {{ $job.image.pullPolicy }}
+          {{- with $job.environment }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $job.args }}
+          args:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if $job.volumes.enabled }}
+          volumeMounts:
+            {{- range $job.volumes.volumeMounts }}
+            - mountPath: {{ .mountPath }}
+              name: {{ .name }}
+              subPath: {{ .subPath }}
+            {{- end }}
+          {{- end }}
+      restartPolicy: Never
+      {{- if $job.volumes.enabled }}
+      volumes:
+        {{- range $job.volumes.claims }}
+        - name: {{ .name }}
+          persistentVolumeClaim:
+            claimName: {{ .claimName }}
+        {{- end }}
+        {{- range $job.volumes.secrets }}
+        - name: {{ .name }}
+          secret:
+            secretName: {{ .secretName }}
+        {{- end }}
+        {{- range $job.volumes.configMaps }}
+        - name: {{ .name }}
+          configMap:
+            name: {{ .configMap.name }}
+            {{- with .configMap.items }}
+            items:
+              {{- toYaml . | nindent 14 }}
+            {{- end }}
+        {{- end }}
+      {{- end }}
+---
+{{- end }}

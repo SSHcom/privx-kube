@@ -1,0 +1,15 @@
+{{- $globalContext := . }}
+{{- range $role := .Values.roles }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ $role.namespace }}
+  name: {{ $role.name }}
+  labels:
+    release: "{{ $globalContext.Release.Name }}"
+{{- with $role.rules }}
+rules:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+---
+{{- end }}

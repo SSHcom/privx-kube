@@ -1,0 +1,123 @@
+{{- $globalContext := . }}
+{{- range $service := .Values.ms}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "privx.fullname" $globalContext }}-{{ $service.name }}
+  labels:
+    app.kubernetes.io/name: {{ include "privx.name" $globalContext }}-{{ $service.name }}
+spec:
+  {{- if not $service.autoscaling.enabled }}
+  replicas: {{ $service.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "privx.name" $globalContext }}-{{ $service.name }}
+  template:
+    metadata:
+      {{- with $service.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        app.kubernetes.io/name: {{ include "privx.name" $globalContext }}-{{ $service.name }}
+    spec:
+      {{- with $service.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $service.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ $service.serviceAccount.name }}
+      securityContext:
+        {{- toYaml $service.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ $globalContext.Chart.Name }}-{{ $service.name }}
+          securityContext:
+            {{- toYaml $service.securityContext | nindent 12 }}
+          image: "{{ $service.image.repository }}:{{ $service.image.tag | default "latest" }}"
+          imagePullPolicy: {{ $service.image.pullPolicy }}
+          env:
+            - name: IS_DOCKER_ENV
+              value: "yes"
+            - name: KUBERNETES_MODE
+              value: "true"
+            - name: SSH_LOG_LEVEL
+              value: "{{ $service.level.log | default "INFO" }}"
+            - name: SSH_TRACE
+              value: "{{ $service.level.trace | default "1" }}"
+            {{- if $service.licenseCode }}
+            {{- if $service.licenseCode.dev.enabled }}
+            - name: LICBE_PROFILE
+              value: dev
+            - name: PRIVX_LICENSE_CODE
+              value: {{ $service.licenseCode.dev.value }}
+            {{- else if $service.licenseCode.prod.enabled }}
+            - name: LICBE_PROFILE
+              value: prod
+            - name: PRIVX_LICENSE_CODE
+              value: {{ $service.licenseCode.prod.value }}
+            {{- end }}
+            {{- end }}
+            {{- with $service.environment }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+          ports:
+            {{- if $service.service.enabled }}
+            - name: http
+              containerPort: {{ $service.service.port }}
+              protocol: TCP
+            {{- range $service.service.internal }}
+            - name: {{ .name }}
+              containerPort: {{ .port }}
+              protocol: {{ .protocol }}
+            {{- end }}
+            {{- end }}
+          resources:
+            {{- toYaml $service.resources | nindent 12 }}
+          {{- if $service.volumes.enabled }}
+          volumeMounts:
+            {{- range $service.volumes.volumeMounts }}
+            - mountPath: {{ .mountPath }}
+              name: {{ .name }}
+              subPath: {{ .subPath }}
+            {{- end }}
+          {{- end }}
+      {{- if $service.volumes.enabled }}
+      volumes:
+        {{- range $service.volumes.claims }}
+        - name: {{ .name }}
+          persistentVolumeClaim:
+            claimName: {{ .claimName }}
+        {{- end }}
+        {{- range $service.volumes.secrets }}
+        - name: {{ .name }}
+          secret:
+            secretName: {{ .secretName }}
+        {{- end }}
+        {{- range $service.volumes.configMaps }}
+        - name: {{ .name }}
+          configMap:
+            name: {{ .configMap.name }}
+            {{- with .configMap.items }}
+            items:
+              {{- toYaml . | nindent 14 }}
+            {{- end }}
+        {{- end }}
+      {{- end }}
+      {{- with $service.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $service.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $service.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+{{- end }}

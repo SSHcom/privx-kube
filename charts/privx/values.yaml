@@ -1,0 +1,2436 @@
+# Default values for privx.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+fullnameOverride: ""
+nameOverride: ""
+ingress:
+  common:
+    host: localhost
+    annotations:
+      nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+      nginx.ingress.kubernetes.io/proxy-ssl-secret: "privx/proxy-ca-secret"
+      nginx.ingress.kubernetes.io/proxy-ssl-verify: "on"
+      nginx.ingress.kubernetes.io/proxy-ssl-server-name: "on"
+      nginx.ingress.kubernetes.io/ssl-ciphers: "AESGCM+EECDH:AESGCM+EDH:AES+EECDH:AES+EDH:AES128-GCM-SHA256:AES128-SHA256:AES128-SHA:-DSS:-EDH"
+      nginx.ingress.kubernetes.io/ssl-prefer-server-ciphers: "true"
+      nginx.ingress.kubernetes.io/proxy-ssl-protocols: "TLSv1.2"
+      nginx.ingress.kubernetes.io/proxy-body-size: 1m
+      nginx.ingress.kubernetes.io/affinity: "cookie"
+      nginx.ingress.kubernetes.io/affinity-mode: "persistent"
+      nginx.ingress.kubernetes.io/session-cookie-change-on-failure: "true"
+
+dbAddress: db-psql.db
+
+#==============Config values (TOMLS, RDPMITM and NGINX configs)
+configs:
+  nginx:
+    name: nginx
+    hook: pre-install
+    weight: "-2"
+    files: "configs/nginx/*"
+  rdpmitm:
+    name: rdpmitm
+    hook: pre-install
+    weight: "-2"
+    files: "configs/rdpmitm/*"
+  settings:
+    name: settings
+    hook: pre-install
+    weight: "-2"
+    files: "configs/privx/settings/*"
+  templates:
+    name: templates
+    hook: pre-install
+    weight: "-2"
+    files: "configs/privx/templates/*"
+
+jobs:
+# ==========Full Installer Job===============
+  installer:
+    name: installer
+    hook: pre-install
+    weight: "-1"
+    hookDeletePolicy: before-hook-creation
+    image:
+      repository: <placeholder>/installer
+      pullPolicy: IfNotPresent
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: ""
+    imagePullSecrets:
+      - name: docker-pull-secret
+    podSecurityContext:
+      fsGroup: 5111
+      runAsUser: 5111
+    securityContext: {}
+    environment:
+      - name: INSTALLER_CMD
+        value: full-install
+    volumes:
+      enabled: true
+      volumeMounts:
+        - mountPath: /opt/privx/temp
+          name: privx-config
+          subPath: privxtmp
+        - mountPath: /opt/privx/keyvault
+          name: privx-config
+          subPath: keyvault
+        - mountPath: /opt/privx/etc
+          name: privx-config
+          subPath: privxetc
+        - mountPath: /var/privx/audit
+          name: privx-config
+          subPath: privxaudit
+        - mountPath: /etc/nginx/privx
+          name: privx-config
+          subPath: nginxprivx
+        - mountPath: /etc/nginx/ssl
+          name: privx-config
+          subPath: nginxssl
+      claims:
+        - name: privx-config
+          claimName: privx-claim
+      configMaps:
+        - name: privx-settings-config
+          configMap:
+            name: settings-config
+        - name: privx-templates-config
+          configMap:
+            name: templates-config
+        - name: privx-nginx-config
+          configMap:
+            name: nginx-config
+        - name: privx-rdpmitm-config
+          configMap:
+            name: rdpmitm-config
+    initContainers:
+      - name: config-copier
+        image: k8s.gcr.io/busybox
+        command: [ "/bin/sh", "-c" ]
+        args:
+          - mkdir -p /opt/privx/etc/new;
+            mkdir -p /opt/privx/etc/rdpmitm;
+            mkdir -p /opt/privx/etc/templates;
+            mkdir -p /opt/privx/etc/locales/workflowengine;
+            echo copying template tomls;
+            cp -f /templates-mount/* /opt/privx/etc/new/;
+            echo copying existing tomls and settings;
+            cp -f /settings-mount/* /opt/privx/etc/;
+            echo copying nginx config;
+            cp -f /nginx-mount/* /etc/nginx/privx/;
+            echo copying rdpmitm config;
+            cp -f /rdpmitm-mount/* /opt/privx/etc/rdpmitm/;
+            rm -rf /opt/privx/keyvault/*;
+            rm -rf /opt/privx/temp/*;
+        securityContext:
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 5111
+          allowPrivilegeEscalation: false
+        volumeMounts:
+          - name: privx-templates-config
+            mountPath: /templates-mount
+          - name: privx-settings-config
+            mountPath: /settings-mount
+          - name: privx-nginx-config
+            mountPath: /nginx-mount
+          - name: privx-rdpmitm-config
+            mountPath: /rdpmitm-mount
+          - name: privx-config
+            mountPath: /opt/privx/etc
+            subPath: privxetc
+          - name: privx-config
+            mountPath: /etc/nginx/privx
+            subPath: nginxprivx
+          - mountPath: /opt/privx/keyvault
+            name: privx-config
+            subPath: keyvault
+          - mountPath: /opt/privx/temp
+            name: privx-config
+            subPath: privxtmp
+
+    serviceAccount:
+      create: false
+      annotations: {}
+      name: installer
+    rbac:
+      create: false
+
+# ==========Internal Cert Updater Job===============
+  internal-cert-updater:
+    name: internal-cert-updater
+    hook: pre-install
+    weight: "-1"
+    hookDeletePolicy: before-hook-creation
+    image:
+      repository: <placeholder>/installer
+      pullPolicy: IfNotPresent
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: ""
+    imagePullSecrets:
+      - name: docker-pull-secret
+    podSecurityContext:
+      fsGroup: 5111
+      runAsUser: 5111
+    securityContext: {}
+    environment:
+      - name: INSTALLER_CMD
+        value: update-internal-cert
+      - name: CNAME
+        value: nginx
+    volumes:
+      enabled: true
+      volumeMounts:
+        - mountPath: /etc/nginx/ssl
+          name: privx-config
+          subPath: nginxssl
+        - mountPath: /opt/privx/keyvault
+          name: privx-config
+          subPath: keyvault
+        - name: privx-config
+          mountPath: /opt/privx/etc
+          subPath: privxetc
+      claims:
+        - name: privx-config
+          claimName: privx-claim
+    serviceAccount:
+      create: false
+      annotations: {}
+      name: internal-cert-updater
+    rbac:
+      create: false
+
+# ==========Job for creating TLS secret between ingress and pod===============
+  proxy-ca-secret-generator:
+    name: proxy-ca-secret-generator
+    hook: post-install
+    weight: "-1"
+    hookDeletePolicy: before-hook-creation,hook-succeeded
+    image:
+      repository: <placeholder>/secrets-generator
+      pullPolicy: Always
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: ""
+    imagePullSecrets:
+      - name: docker-pull-secret
+    podSecurityContext:
+      fsGroup: 5111
+      runAsUser: 5111
+    securityContext: {}
+    args:
+      - --keys=ca.crt
+      - --files=/etc/nginx/ssl/privx-ca.crt
+      - --secret_name=proxy-ca-secret
+      - --namespace=privx
+      - --secret_type=Opaque
+      - --replace=true
+    volumes:
+      enabled: true
+      volumeMounts:
+        - mountPath: /etc/nginx/ssl
+          name: privx-config
+          subPath: nginxssl
+      claims:
+        - name: privx-config
+          claimName: privx-claim
+    serviceAccount:
+      create: true
+      annotations: {}
+      name: proxy-ca-secret-generator
+    rbac:
+      create: true
+      name: create-secrets
+      namespace: privx
+      role:
+        name: secrets-creator
+      subjects:
+        - kind: ServiceAccount
+          name: proxy-ca-secret-generator
+
+# ==========Ingress CA cert values===============
+cert:
+  name: ca-cert
+  secretName: privx-ca-secret
+  duration: 24h
+  renewBefore: 1h
+  organizations:
+    - <PlacholderORG>
+  isAuthority: true
+  usages:
+    - cert sign
+    - crl sign
+  selfsigned: false
+
+# ===================RBAC roles===================
+roles:
+  secrets-creator:
+    name: secrets-creator
+    rules:
+      - apiGroups:
+          - ""
+        resources:
+          - secrets
+        verbs:
+          - create
+          - delete
+
+# ============= PrivX microservices ===============
+ms:
+  # ==========rdp-proxy values===============
+  rdpproxy:
+    name: rdp-proxy
+    replicaCount: 1
+
+    image:
+      repository: <placeholder>/rdp-proxy
+      pullPolicy: IfNotPresent
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: ""
+
+    imagePullSecrets:
+      - name: docker-pull-secret
+    nameOverride: ""
+    fullnameOverride: ""
+
+    initContainers: []
+    serviceAccount:
+      # Specifies whether a service account should be created
+      create: true
+      # Annotations to add to the service account
+      annotations: {}
+      # The name of the service account to use.
+      # If not set and create is true, a name is generated using the fullname template
+      name: rdp-proxy
+
+    podAnnotations: {}
+    podSecurityContext:
+      fsGroup: 5111
+      runAsUser: 5111
+    securityContext: {}
+
+    service:
+      enabled: true
+      type: ClusterIP
+      port: 8087
+
+    ingress:
+      https:
+        name: https
+        useCommonHost: true
+        useCommonAnnotations: false
+        className: ""
+        annotations:
+          nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+          nginx.ingress.kubernetes.io/proxy-ssl-secret: "privx/proxy-ca-secret"
+          nginx.ingress.kubernetes.io/proxy-ssl-verify: "on"
+          nginx.ingress.kubernetes.io/proxy-ssl-name: "rdp-proxy"
+          nginx.ingress.kubernetes.io/proxy-ssl-server-name: "on"
+          nginx.ingress.kubernetes.io/ssl-ciphers: "AESGCM+EECDH:AESGCM+EDH:AES+EECDH:AES+EDH:AES128-GCM-SHA256:AES128-SHA256:AES128-SHA:-DSS:-EDH"
+          nginx.ingress.kubernetes.io/ssl-prefer-server-ciphers: "true"
+          nginx.ingress.kubernetes.io/proxy-ssl-protocols: "TLSv1.2"
+          nginx.ingress.kubernetes.io/proxy-body-size: 0m
+          nginx.ingress.kubernetes.io/affinity: "cookie"
+          nginx.ingress.kubernetes.io/affinity-mode: "persistent"
+          nginx.ingress.kubernetes.io/session-cookie-change-on-failure: "true"
+        hosts:
+          - host: localhost
+            paths:
+              - path: /rdp-proxy
+                pathType: Prefix
+        tls:
+          - secretName: privx-tls
+            hosts:
+              - localhost
+
+    resources: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious
+      # choice for the user. This also increases chances charts run on environments with little
+      # resources, such as Minikube. If you do want to specify resources, uncomment the following
+      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+    rbac:
+      create: false
+
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 100
+      targetCPUUtilizationPercentage: 80
+      # targetMemoryUtilizationPercentage: 80
+
+    nodeSelector: {}
+
+    tolerations: []
+
+    affinity: {}
+    level:
+      log: DEBUG
+      trace: 3
+
+    volumes:
+      enabled: true
+      volumeMounts:
+        - mountPath: /tmp
+          name: privx-config
+          subPath: rdpproxytmp
+        - mountPath: /home/privx
+          name: privx-config
+          subPath: rdpproxyhome
+        - mountPath: /opt/privx/cert
+          name: privx-config
+          subPath: privxcert
+        - mountPath: /opt/privx/keyvault
+          name: privx-config
+          subPath: keyvault
+        - mountPath: /opt/privx/etc
+          name: privx-config
+          subPath: privxetc
+        - mountPath: /etc/nginx/ssl
+          name: privx-config
+          subPath: nginxssl
+        - mountPath: /var/privx/audit
+          name: privx-config
+          subPath: privxaudit
+        - mountPath: /guacamole-server
+          name: privx-config
+          subPath: guacamole
+      claims:
+        - name: privx-config
+          claimName: privx-claim
+
+  # ==========ssh-proxy values===============
+  sshproxy:
+    name: ssh-proxy
+    replicaCount: 1
+
+    image:
+      repository: <placeholder>/ssh-proxy
+      pullPolicy: IfNotPresent
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: ""
+
+    imagePullSecrets:
+      - name: docker-pull-secret
+    nameOverride: ""
+    fullnameOverride: ""
+
+    initContainers: []
+    serviceAccount:
+      # Specifies whether a service account should be created
+      create: true
+      # Annotations to add to the service account
+      annotations: {}
+      # The name of the service account to use.
+      # If not set and create is true, a name is generated using the fullname template
+      name: ssh-proxy
+
+    podAnnotations: {}
+    podSecurityContext:
+      fsGroup: 5111
+      runAsUser: 5111
+    securityContext: {}
+
+    service:
+      enabled: true
+      type: ClusterIP
+      port: 8880
+
+    ingress:
+      https:
+        name: https
+        useCommonHost: true
+        useCommonAnnotations: false
+        className: ""
+        annotations:
+          nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+          nginx.ingress.kubernetes.io/proxy-ssl-secret: "privx/proxy-ca-secret"
+          nginx.ingress.kubernetes.io/proxy-ssl-verify: "on"
+          nginx.ingress.kubernetes.io/proxy-ssl-name: "ssh-proxy"
+          nginx.ingress.kubernetes.io/proxy-ssl-server-name: "on"
+          nginx.ingress.kubernetes.io/ssl-ciphers: "AESGCM+EECDH:AESGCM+EDH:AES+EECDH:AES+EDH:AES128-GCM-SHA256:AES128-SHA256:AES128-SHA:-DSS:-EDH"
+          nginx.ingress.kubernetes.io/ssl-prefer-server-ciphers: "true"
+          nginx.ingress.kubernetes.io/proxy-ssl-protocols: "TLSv1.2"
+          nginx.ingress.kubernetes.io/proxy-body-size: 0m
+          nginx.ingress.kubernetes.io/affinity: "cookie"
+          nginx.ingress.kubernetes.io/affinity-mode: "persistent"
+          nginx.ingress.kubernetes.io/session-cookie-change-on-failure: "true"
+        hosts:
+          - host: localhost
+            paths:
+              - path: /ssh-proxy
+                pathType: Prefix
+        tls:
+          - secretName: privx-tls
+            hosts:
+              - localhost
+
+    resources: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious
+      # choice for the user. This also increases chances charts run on environments with little
+      # resources, such as Minikube. If you do want to specify resources, uncomment the following
+      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+
+    rbac:
+      create: false
+
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 100
+      targetCPUUtilizationPercentage: 80
+      # targetMemoryUtilizationPercentage: 80
+
+    nodeSelector: {}
+
+    tolerations: []
+
+    affinity: {}
+    level:
+      log: DEBUG
+      trace: 3
+
+    volumes:
+      enabled: true
+      volumeMounts:
+        - mountPath: /opt/privx/cert
+          name: privx-config
+          subPath: privxcert
+        - mountPath: /opt/privx/keyvault
+          name: privx-config
+          subPath: keyvault
+        - mountPath: /opt/privx/etc
+          name: privx-config
+          subPath: privxetc
+        - mountPath: /etc/nginx/ssl
+          name: privx-config
+          subPath: nginxssl
+        - mountPath: /var/privx/audit
+          name: privx-config
+          subPath: privxaudit
+      claims:
+        - name: privx-config
+          claimName: privx-claim
+
+  #==========auth values===============
+  auth:
+    name: auth
+    replicaCount: 1
+
+    image:
+      repository: <placeholder>/auth
+      pullPolicy: IfNotPresent
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: ""
+
+    imagePullSecrets:
+      - name: docker-pull-secret
+    nameOverride: ""
+    fullnameOverride: ""
+
+    initContainers: []
+    serviceAccount:
+      # Specifies whether a service account should be created
+      create: true
+      # Annotations to add to the service account
+      annotations: {}
+      # The name of the service account to use.
+      # If not set and create is true, a name is generated using the fullname template
+      name: auth
+
+    podAnnotations: {}
+    podSecurityContext:
+      fsGroup: 5111
+      runAsUser: 5111
+    securityContext: {}
+
+    service:
+      enabled: true
+      type: ClusterIP
+      port: 8083
+
+    ingress:
+      https:
+        name: https
+        useCommonHost: true
+        useCommonAnnotations: true
+        className: ""
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-ssl-name: "auth"
+        hosts:
+          - host: localhost
+            paths:
+              - path: /auth
+                pathType: Prefix
+        tls:
+          - secretName: privx-tls
+            hosts:
+              - localhost
+
+    resources: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious
+      # choice for the user. This also increases chances charts run on environments with little
+      # resources, such as Minikube. If you do want to specify resources, uncomment the following
+      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+
+    rbac:
+      create: false
+
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 100
+      targetCPUUtilizationPercentage: 80
+      # targetMemoryUtilizationPercentage: 80
+
+    nodeSelector: {}
+
+    tolerations: []
+
+    affinity: {}
+    level:
+      log: DEBUG
+      trace: 3
+
+    volumes:
+      enabled: true
+      volumeMounts:
+        - mountPath: /opt/privx/cert
+          name: privx-config
+          subPath: privxcert
+        - mountPath: /opt/privx/keyvault
+          name: privx-config
+          subPath: keyvault
+        - mountPath: /opt/privx/etc
+          name: privx-config
+          subPath: privxetc
+        - mountPath: /etc/nginx/ssl
+          name: privx-config
+          subPath: nginxssl
+      claims:
+        - name: privx-config
+          claimName: privx-claim
+
+
+  #==========keyvault values===============
+  keyvault:
+    name: keyvault
+    replicaCount: 1
+
+    image:
+      repository: <placeholder>/keyvault
+      pullPolicy: IfNotPresent
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: ""
+
+    imagePullSecrets:
+      - name: docker-pull-secret
+    nameOverride: ""
+    fullnameOverride: ""
+
+    initContainers: []
+    serviceAccount:
+      # Specifies whether a service account should be created
+      create: true
+      # Annotations to add to the service account
+      annotations: {}
+      # The name of the service account to use.
+      # If not set and create is true, a name is generated using the fullname template
+      name: keyvault
+
+    podAnnotations: {}
+    podSecurityContext:
+      fsGroup: 5111
+      runAsUser: 5111
+    securityContext: {}
+
+    service:
+      enabled: true
+      type: ClusterIP
+      port: 8090
+
+    ingress:
+      https:
+        name: https
+        useCommonHost: true
+        useCommonAnnotations: true
+        className: ""
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-ssl-name: "keyvault"
+        hosts:
+          - host: localhost
+            paths:
+              - path: /keyvault
+                pathType: Prefix
+        tls:
+          - secretName: privx-tls
+            hosts:
+              - localhost
+
+    resources: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious
+      # choice for the user. This also increases chances charts run on environments with little
+      # resources, such as Minikube. If you do want to specify resources, uncomment the following
+      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+
+    rbac:
+      create: false
+
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 100
+      targetCPUUtilizationPercentage: 80
+      # targetMemoryUtilizationPercentage: 80
+
+    nodeSelector: {}
+
+    tolerations: []
+
+    affinity: {}
+    level:
+      log: DEBUG
+      trace: 3
+
+    volumes:
+      enabled: true
+      volumeMounts:
+        - mountPath: /opt/privx/cert
+          name: privx-config
+          subPath: privxcert
+        - mountPath: /opt/privx/keyvault
+          name: privx-config
+          subPath: keyvault
+        - mountPath: /opt/privx/etc
+          name: privx-config
+          subPath: privxetc
+        - mountPath: /etc/nginx/ssl
+          name: privx-config
+          subPath: nginxssl
+      claims:
+        - name: privx-config
+          claimName: privx-claim
+
+  #==========authorizer values===============
+  authorizer:
+    name: authorizer
+    replicaCount: 1
+
+    image:
+      repository: <placeholder>/authorizer
+      pullPolicy: IfNotPresent
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: ""
+
+    imagePullSecrets:
+      - name: docker-pull-secret
+    nameOverride: ""
+    fullnameOverride: ""
+
+    initContainers: []
+    serviceAccount:
+      # Specifies whether a service account should be created
+      create: true
+      # Annotations to add to the service account
+      annotations: {}
+      # The name of the service account to use.
+      # If not set and create is true, a name is generated using the fullname template
+      name: authorizer
+
+    podAnnotations: {}
+    podSecurityContext:
+      fsGroup: 5111
+      runAsUser: 5111
+    securityContext: {}
+
+    service:
+      enabled: true
+      type: ClusterIP
+      port: 8082
+
+    ingress:
+      https:
+        name: https
+        useCommonHost: true
+        useCommonAnnotations: true
+        className: ""
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-ssl-name: "authorizer"
+        hosts:
+          - host: localhost
+            paths:
+              - path: /authorizer
+                pathType: Prefix
+        tls:
+          - secretName: privx-tls
+            hosts:
+              - localhost
+      http:
+        name: http
+        useCommonHost: true
+        useCommonAnnotations: false
+        className: ""
+        annotations:
+          nginx.ingress.kubernetes.io/ssl-redirect: "false"
+          nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+          nginx.ingress.kubernetes.io/proxy-ssl-secret: "privx/proxy-ca-secret"
+          nginx.ingress.kubernetes.io/proxy-ssl-verify: "on"
+          nginx.ingress.kubernetes.io/proxy-ssl-server-name: "on"
+          nginx.ingress.kubernetes.io/ssl-ciphers: "AESGCM+EECDH:AESGCM+EDH:AES+EECDH:AES+EDH:AES128-GCM-SHA256:AES128-SHA256:AES128-SHA:-DSS:-EDH"
+          nginx.ingress.kubernetes.io/ssl-prefer-server-ciphers: "true"
+          nginx.ingress.kubernetes.io/proxy-ssl-protocols: "TLSv1.2"
+          nginx.ingress.kubernetes.io/proxy-body-size: 1m
+          nginx.ingress.kubernetes.io/proxy-ssl-name: "authorizer"
+        hosts:
+          - host: localhost
+            paths:
+              - path: /authorizer/api/v1/cas
+                pathType: Exact
+              - path: /authorizer/api/v1/extender/cas
+                pathType: Exact
+              - path: /authorizer/api/v1/icap/cas
+                pathType: Exact
+
+    resources: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious
+      # choice for the user. This also increases chances charts run on environments with little
+      # resources, such as Minikube. If you do want to specify resources, uncomment the following
+      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+
+    rbac:
+      create: false
+
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 100
+      targetCPUUtilizationPercentage: 80
+      # targetMemoryUtilizationPercentage: 80
+
+    nodeSelector: {}
+
+    tolerations: []
+
+    affinity: {}
+    level:
+      log: DEBUG
+      trace: 3
+
+    volumes:
+      enabled: true
+      volumeMounts:
+        - mountPath: /opt/privx/cert
+          name: privx-config
+          subPath: privxcert
+        - mountPath: /opt/privx/keyvault
+          name: privx-config
+          subPath: keyvault
+        - mountPath: /opt/privx/etc
+          name: privx-config
+          subPath: privxetc
+        - mountPath: /etc/nginx/ssl
+          name: privx-config
+          subPath: nginxssl
+      claims:
+        - name: privx-config
+          claimName: privx-claim
+
+  #==========connection-manager values===============
+  connectionmanager:
+    name: connection-manager
+    replicaCount: 1
+
+    image:
+      repository: <placeholder>/connection-manager
+      pullPolicy: IfNotPresent
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: ""
+
+    imagePullSecrets:
+      - name: docker-pull-secret
+    nameOverride: ""
+    fullnameOverride: ""
+
+    initContainers: []
+    serviceAccount:
+      # Specifies whether a service account should be created
+      create: true
+      # Annotations to add to the service account
+      annotations: {}
+      # The name of the service account to use.
+      # If not set and create is true, a name is generated using the fullname template
+      name: connection-manager
+
+    podAnnotations: {}
+    podSecurityContext:
+      fsGroup: 5111
+      runAsUser: 5111
+    securityContext: {}
+
+    service:
+      enabled: true
+      type: ClusterIP
+      port: 8091
+
+    ingress:
+      https:
+        name: https
+        useCommonHost: true
+        useCommonAnnotations: true
+        className: ""
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-ssl-name: "connection-manager"
+        hosts:
+          - host: localhost
+            paths:
+              - path: /connection-manager
+                pathType: Prefix
+        tls:
+          - secretName: privx-tls
+            hosts:
+              - localhost
+
+    resources: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious
+      # choice for the user. This also increases chances charts run on environments with little
+      # resources, such as Minikube. If you do want to specify resources, uncomment the following
+      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+
+    rbac:
+      create: false
+
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 100
+      targetCPUUtilizationPercentage: 80
+      # targetMemoryUtilizationPercentage: 80
+
+    nodeSelector: {}
+
+    tolerations: []
+
+    affinity: {}
+    level:
+      log: DEBUG
+      trace: 3
+
+    volumes:
+      enabled: true
+      volumeMounts:
+        - mountPath: /opt/privx/cert
+          name: privx-config
+          subPath: privxcert
+        - mountPath: /opt/privx/keyvault
+          name: privx-config
+          subPath: keyvault
+        - mountPath: /opt/privx/etc
+          name: privx-config
+          subPath: privxetc
+        - mountPath: /etc/nginx/ssl
+          name: privx-config
+          subPath: nginxssl
+        - mountPath: /var/privx/audit
+          name: privx-config
+          subPath: privxaudit
+      claims:
+        - name: privx-config
+          claimName: privx-claim
+
+  #==========host-store values===============
+  hoststore:
+    name: host-store
+    replicaCount: 1
+
+    image:
+      repository: <placeholder>/host-store
+      pullPolicy: IfNotPresent
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: ""
+
+    imagePullSecrets:
+      - name: docker-pull-secret
+    nameOverride: ""
+    fullnameOverride: ""
+
+    initContainers: []
+    serviceAccount:
+      # Specifies whether a service account should be created
+      create: true
+      # Annotations to add to the service account
+      annotations: {}
+      # The name of the service account to use.
+      # If not set and create is true, a name is generated using the fullname template
+      name: host-store
+
+    podAnnotations: {}
+    podSecurityContext:
+      fsGroup: 5111
+      runAsUser: 5111
+    securityContext: {}
+
+    service:
+      enabled: true
+      type: ClusterIP
+      port: 8882
+
+    ingress:
+      https:
+        name: https
+        useCommonHost: true
+        useCommonAnnotations: true
+        className: ""
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-ssl-name: "host-store"
+        hosts:
+          - host: localhost
+            paths:
+              - path: /host-store
+                pathType: Prefix
+        tls:
+          - secretName: privx-tls
+            hosts:
+              - localhost
+
+    resources: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious
+      # choice for the user. This also increases chances charts run on environments with little
+      # resources, such as Minikube. If you do want to specify resources, uncomment the following
+      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+
+    rbac:
+      create: false
+
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 100
+      targetCPUUtilizationPercentage: 80
+      # targetMemoryUtilizationPercentage: 80
+
+    nodeSelector: {}
+
+    tolerations: []
+
+    affinity: {}
+    level:
+      log: DEBUG
+      trace: 3
+
+    volumes:
+      enabled: true
+      volumeMounts:
+        - mountPath: /opt/privx/cert
+          name: privx-config
+          subPath: privxcert
+        - mountPath: /opt/privx/keyvault
+          name: privx-config
+          subPath: keyvault
+        - mountPath: /opt/privx/etc
+          name: privx-config
+          subPath: privxetc
+        - mountPath: /etc/nginx/ssl
+          name: privx-config
+          subPath: nginxssl
+      claims:
+        - name: privx-config
+          claimName: privx-claim
+
+  #==========license-manager values===============
+  licensemanager:
+    name: license-manager
+    replicaCount: 1
+
+    image:
+      repository: <placeholder>/license-manager
+      pullPolicy: IfNotPresent
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: ""
+
+    imagePullSecrets:
+      - name: docker-pull-secret
+    nameOverride: ""
+    fullnameOverride: ""
+
+    initContainers: []
+    licenseCode:
+      dev:
+        enabled: false
+        value: <placeholder>
+      prod:
+        enabled: false
+        value: <placeholder>
+    serviceAccount:
+      # Specifies whether a service account should be created
+      create: true
+      # Annotations to add to the service account
+      annotations: {}
+      # The name of the service account to use.
+      # If not set and create is true, a name is generated using the fullname template
+      name: license-manager
+
+    podAnnotations: {}
+    podSecurityContext:
+      fsGroup: 5111
+      runAsUser: 5111
+    securityContext: {}
+
+    service:
+      enabled: true
+      type: ClusterIP
+      port: 8101
+
+    ingress:
+      https:
+        name: https
+        useCommonHost: true
+        useCommonAnnotations: true
+        className: ""
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-ssl-name: "license-manager"
+        hosts:
+          - host: localhost
+            paths:
+              - path: /license-manager
+                pathType: Prefix
+        tls:
+          - secretName: privx-tls
+            hosts:
+              - localhost
+
+    resources: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious
+      # choice for the user. This also increases chances charts run on environments with little
+      # resources, such as Minikube. If you do want to specify resources, uncomment the following
+      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+
+    rbac:
+      create: false
+
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 100
+      targetCPUUtilizationPercentage: 80
+      # targetMemoryUtilizationPercentage: 80
+
+    nodeSelector: {}
+
+    tolerations: []
+
+    affinity: {}
+    level:
+      log: DEBUG
+      trace: 3
+
+    volumes:
+      enabled: true
+      volumeMounts:
+        - mountPath: /opt/privx/cert
+          name: privx-config
+          subPath: privxcert
+        - mountPath: /opt/privx/keyvault
+          name: privx-config
+          subPath: keyvault
+        - mountPath: /opt/privx/etc
+          name: privx-config
+          subPath: privxetc
+        - mountPath: /etc/nginx/ssl
+          name: privx-config
+          subPath: nginxssl
+      claims:
+        - name: privx-config
+          claimName: privx-claim
+
+  #==========monitor-service values===============
+  monitorservice:
+    name: monitor-service
+    replicaCount: 1
+
+    image:
+      repository: <placeholder>/monitor-service
+      pullPolicy: IfNotPresent
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: ""
+
+    imagePullSecrets:
+      - name: docker-pull-secret
+    nameOverride: ""
+    fullnameOverride: ""
+
+    initContainers: []
+    serviceAccount:
+      # Specifies whether a service account should be created
+      create: true
+      # Annotations to add to the service account
+      annotations: {}
+      # The name of the service account to use.
+      # If not set and create is true, a name is generated using the fullname template
+      name: monitor-service
+
+    podAnnotations: {}
+    podSecurityContext:
+      fsGroup: 5111
+      runAsUser: 5111
+    securityContext: {}
+
+    service:
+      enabled: true
+      type: ClusterIP
+      port: 8092
+
+    ingress:
+      https:
+        name: https
+        useCommonHost: true
+        useCommonAnnotations: true
+        className: ""
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-ssl-name: "monitor-service"
+        hosts:
+          - host: localhost
+            paths:
+              - path: /monitor-service
+                pathType: Prefix
+        tls:
+          - secretName: privx-tls
+            hosts:
+              - localhost
+
+    resources: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious
+      # choice for the user. This also increases chances charts run on environments with little
+      # resources, such as Minikube. If you do want to specify resources, uncomment the following
+      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+
+    rbac:
+      create: false
+
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 100
+      targetCPUUtilizationPercentage: 80
+      # targetMemoryUtilizationPercentage: 80
+
+    nodeSelector: {}
+
+    tolerations: []
+
+    affinity: {}
+    level:
+      log: DEBUG
+      trace: 3
+
+    volumes:
+      enabled: true
+      volumeMounts:
+        - mountPath: /opt/privx/cert
+          name: privx-config
+          subPath: privxcert
+        - mountPath: /opt/privx/keyvault
+          name: privx-config
+          subPath: keyvault
+        - mountPath: /opt/privx/etc
+          name: privx-config
+          subPath: privxetc
+        - mountPath: /etc/nginx/ssl
+          name: privx-config
+          subPath: nginxssl
+      claims:
+        - name: privx-config
+          claimName: privx-claim
+
+  #==========rdp-mitm values===============
+  rdpmitm:
+    name: rdp-mitm
+    replicaCount: 1
+
+    image:
+      repository: <placeholder>/rdp-mitm
+      pullPolicy: IfNotPresent
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: ""
+
+    imagePullSecrets:
+      - name: docker-pull-secret
+    nameOverride: ""
+    fullnameOverride: ""
+
+    initContainers:
+      - name: conf-copier
+        image: <placeholder>/rdp-mitm-conf:latest
+        imagePullPolicy: Always
+        command: [ "/bin/sh", "-c" ]
+        securityContext:
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 5111
+          allowPrivilegeEscalation: false
+
+        env:
+        - name: KEY_PASS
+          value: inquisition
+        args:
+          - echo copying rdpmitm static resources;
+            cp -rf rdpmitm/* /opt/privx/etc/rdpmitm/;
+            echo generating redemption certs;
+            ./rdpmitm/scripts/redemption_cert.sh;
+        volumeMounts:
+        - mountPath: /opt/privx/etc
+          name: privx-config
+          subPath: privxetc
+        - mountPath: /etc/nginx/tls
+          name: privx-tls-vol
+
+    serviceAccount:
+      # Specifies whether a service account should be created
+      create: true
+      # Annotations to add to the service account
+      annotations: {}
+      # The name of the service account to use.
+      # If not set and create is true, a name is generated using the fullname template
+      name: rdp-mitm
+
+    podAnnotations: {}
+    podSecurityContext:
+      fsGroup: 5111
+      runAsUser: 5111
+    securityContext: {}
+
+    service:
+      enabled: true
+      type: ClusterIP
+      port: 8093
+      internal:
+        - name: rdp
+          port: 3389
+          protocol: TCP
+
+    ingress:
+      https:
+        name: https
+        useCommonHost: true
+        useCommonAnnotations: true
+        className: ""
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-ssl-name: "rdp-mitm"
+        hosts:
+          - host: localhost
+            paths:
+              - path: /rdp-mitm
+                pathType: Prefix
+        tls:
+          - secretName: privx-tls
+            hosts:
+              - localhost
+
+    resources: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious
+      # choice for the user. This also increases chances charts run on environments with little
+      # resources, such as Minikube. If you do want to specify resources, uncomment the following
+      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+
+    rbac:
+      create: false
+
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 100
+      targetCPUUtilizationPercentage: 80
+      # targetMemoryUtilizationPercentage: 80
+
+    nodeSelector: {}
+
+    tolerations: []
+
+    affinity: {}
+    level:
+      log: DEBUG
+      trace: 3
+
+    volumes:
+      enabled: true
+      volumeMounts:
+        - mountPath: /tmp
+          name: privx-config
+          subPath: privxrdpmitmtmp
+        - mountPath: /var/run
+          name: privx-config
+          subPath: privxredemption
+        - mountPath: /opt/privx/cert
+          name: privx-config
+          subPath: privxcert
+        - mountPath: /opt/privx/keyvault
+          name: privx-config
+          subPath: keyvault
+        - mountPath: /opt/privx/etc
+          name: privx-config
+          subPath: privxetc
+        - mountPath: /etc/nginx/ssl
+          name: privx-config
+          subPath: nginxssl
+        - mountPath: /var/privx/audit
+          name: privx-config
+          subPath: privxaudit
+        - mountPath: /etc/nginx/tls
+          name: privx-tls-vol
+      claims:
+        - name: privx-config
+          claimName: privx-claim
+      secrets:
+        - name: privx-tls-vol
+          secretName: privx-tls
+
+  #==========ssh-mitm values===============
+  sshmitm:
+    name: ssh-mitm
+    replicaCount: 1
+
+    image:
+      repository: <placeholder>/ssh-mitm
+      pullPolicy: IfNotPresent
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: ""
+
+    imagePullSecrets:
+      - name: docker-pull-secret
+    nameOverride: ""
+    fullnameOverride: ""
+
+    initContainers: []
+    serviceAccount:
+      # Specifies whether a service account should be created
+      create: true
+      # Annotations to add to the service account
+      annotations: {}
+      # The name of the service account to use.
+      # If not set and create is true, a name is generated using the fullname template
+      name: ssh-mitm
+
+    podAnnotations: {}
+    podSecurityContext:
+      fsGroup: 5111
+      runAsUser: 5111
+    securityContext: {}
+
+    service:
+      enabled: true
+      type: ClusterIP
+      port: 8095
+      internal:
+        - name: ssh-proxy
+          port: 2222
+          protocol: TCP
+        - name: socks-proxy
+          port: 1080
+          protocol: TCP
+    ingress:
+      https:
+        name: https
+        useCommonHost: true
+        useCommonAnnotations: true
+        className: ""
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-ssl-name: "ssh-mitm"
+        hosts:
+          - host: localhost
+            paths:
+              - path: /ssh-mitm
+                pathType: Prefix
+        tls:
+          - secretName: privx-tls
+            hosts:
+              - localhost
+
+    resources: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious
+      # choice for the user. This also increases chances charts run on environments with little
+      # resources, such as Minikube. If you do want to specify resources, uncomment the following
+      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+
+    rbac:
+      create: false
+
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 100
+      targetCPUUtilizationPercentage: 80
+      # targetMemoryUtilizationPercentage: 80
+
+    nodeSelector: {}
+
+    tolerations: []
+
+    affinity: {}
+    level:
+      log: DEBUG
+      trace: 3
+
+    volumes:
+      enabled: true
+      volumeMounts:
+        - mountPath: /opt/privx/cert
+          name: privx-config
+          subPath: privxcert
+        - mountPath: /opt/privx/keyvault
+          name: privx-config
+          subPath: keyvault
+        - mountPath: /opt/privx/etc
+          name: privx-config
+          subPath: privxetc
+        - mountPath: /etc/nginx/ssl
+          name: privx-config
+          subPath: nginxssl
+        - mountPath: /var/privx/audit
+          name: privx-config
+          subPath: privxaudit
+      claims:
+        - name: privx-config
+          claimName: privx-claim
+
+  #==========trail-index values===============
+  trailindex:
+    name: trail-index
+    replicaCount: 1
+
+    image:
+      repository: <placeholder>/trail-index
+      pullPolicy: IfNotPresent
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: ""
+
+    imagePullSecrets:
+      - name: docker-pull-secret
+    nameOverride: ""
+    fullnameOverride: ""
+
+    initContainers: []
+    serviceAccount:
+      # Specifies whether a service account should be created
+      create: true
+      # Annotations to add to the service account
+      annotations: {}
+      # The name of the service account to use.
+      # If not set and create is true, a name is generated using the fullname template
+      name: trail-index
+
+    podAnnotations: {}
+    podSecurityContext:
+      fsGroup: 5111
+      runAsUser: 5111
+    securityContext: {}
+
+    service:
+      enabled: true
+      type: ClusterIP
+      port: 8094
+
+    ingress:
+      https:
+        name: https
+        useCommonHost: true
+        useCommonAnnotations: true
+        className: ""
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-ssl-name: "trail-index"
+        hosts:
+          - host: localhost
+            paths:
+              - path: /trail-index
+                pathType: Prefix
+        tls:
+          - secretName: privx-tls
+            hosts:
+              - localhost
+
+    resources: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious
+      # choice for the user. This also increases chances charts run on environments with little
+      # resources, such as Minikube. If you do want to specify resources, uncomment the following
+      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+
+    rbac:
+      create: false
+
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 100
+      targetCPUUtilizationPercentage: 80
+      # targetMemoryUtilizationPercentage: 80
+
+    nodeSelector: {}
+
+    tolerations: []
+
+    affinity: {}
+    level:
+      log: DEBUG
+      trace: 3
+
+    volumes:
+      enabled: true
+      volumeMounts:
+        - mountPath: /opt/privx/cert
+          name: privx-config
+          subPath: privxcert
+        - mountPath: /opt/privx/keyvault
+          name: privx-config
+          subPath: keyvault
+        - mountPath: /opt/privx/etc
+          name: privx-config
+          subPath: privxetc
+        - mountPath: /etc/nginx/ssl
+          name: privx-config
+          subPath: nginxssl
+        - mountPath: /var/privx/audit
+          name: privx-config
+          subPath: privxaudit
+      claims:
+        - name: privx-config
+          claimName: privx-claim
+
+  #==========role-store values===============
+  rolestore:
+    name: role-store
+    replicaCount: 1
+
+    image:
+      repository: <placeholder>/role-store
+      pullPolicy: IfNotPresent
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: ""
+
+    imagePullSecrets:
+      - name: docker-pull-secret
+    nameOverride: ""
+    fullnameOverride: ""
+
+    initContainers: []
+    serviceAccount:
+      # Specifies whether a service account should be created
+      create: true
+      # Annotations to add to the service account
+      annotations: {}
+      # The name of the service account to use.
+      # If not set and create is true, a name is generated using the fullname template
+      name: role-store
+
+    podAnnotations: {}
+    podSecurityContext:
+      fsGroup: 5111
+      runAsUser: 5111
+    securityContext: {}
+
+    service:
+      enabled: true
+      type: ClusterIP
+      port: 8081
+
+    ingress:
+      https:
+        name: https
+        useCommonHost: true
+        useCommonAnnotations: true
+        className: ""
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-ssl-name: "role-store"
+        hosts:
+          - host: localhost
+            paths:
+              - path: /role-store
+                pathType: Prefix
+              - path: /scim
+                pathType: Prefix
+        tls:
+          - secretName: privx-tls
+            hosts:
+              - localhost
+
+    resources: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious
+      # choice for the user. This also increases chances charts run on environments with little
+      # resources, such as Minikube. If you do want to specify resources, uncomment the following
+      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+
+    rbac:
+      create: false
+
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 100
+      targetCPUUtilizationPercentage: 80
+      # targetMemoryUtilizationPercentage: 80
+
+    nodeSelector: {}
+
+    tolerations: []
+
+    affinity: {}
+    level:
+      log: DEBUG
+      trace: 3
+
+    volumes:
+      enabled: true
+      volumeMounts:
+        - mountPath: /opt/privx/cert
+          name: privx-config
+          subPath: privxcert
+        - mountPath: /opt/privx/keyvault
+          name: privx-config
+          subPath: keyvault
+        - mountPath: /opt/privx/etc
+          name: privx-config
+          subPath: privxetc
+        - mountPath: /etc/nginx/ssl
+          name: privx-config
+          subPath: nginxssl
+      claims:
+        - name: privx-config
+          claimName: privx-claim
+
+  #==========settings values===============
+  settings:
+    name: settings
+    replicaCount: 1
+
+    image:
+      repository: <placeholder>/settings
+      pullPolicy: IfNotPresent
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: ""
+
+    imagePullSecrets:
+      - name: docker-pull-secret
+    nameOverride: ""
+    fullnameOverride: ""
+
+    initContainers: []
+    serviceAccount:
+      # Specifies whether a service account should be created
+      create: true
+      # Annotations to add to the service account
+      annotations: {}
+      # The name of the service account to use.
+      # If not set and create is true, a name is generated using the fullname template
+      name: settings
+
+    podAnnotations: {}
+    podSecurityContext:
+      fsGroup: 5111
+      runAsUser: 5111
+    securityContext: {}
+
+    service:
+      enabled: true
+      type: ClusterIP
+      port: 8099
+
+    ingress:
+      https:
+        name: https
+        useCommonHost: true
+        useCommonAnnotations: true
+        className: ""
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-ssl-name: "settings"
+        hosts:
+          - host: localhost
+            paths:
+              - path: /settings
+                pathType: Prefix
+        tls:
+          - secretName: privx-tls
+            hosts:
+              - localhost
+
+    resources: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious
+      # choice for the user. This also increases chances charts run on environments with little
+      # resources, such as Minikube. If you do want to specify resources, uncomment the following
+      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+
+    rbac:
+      create: false
+
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 100
+      targetCPUUtilizationPercentage: 80
+      # targetMemoryUtilizationPercentage: 80
+
+    nodeSelector: {}
+
+    tolerations: []
+
+    affinity: {}
+    level:
+      log: DEBUG
+      trace: 3
+
+    volumes:
+      enabled: true
+      volumeMounts:
+        - mountPath: /opt/privx/cert
+          name: privx-config
+          subPath: privxcert
+        - mountPath: /opt/privx/keyvault
+          name: privx-config
+          subPath: keyvault
+        - mountPath: /opt/privx/etc
+          name: privx-config
+          subPath: privxetc
+        - mountPath: /etc/nginx/ssl
+          name: privx-config
+          subPath: nginxssl
+      claims:
+        - name: privx-config
+          claimName: privx-claim
+
+  #==========userstore values===============
+  userstore:
+    name: userstore
+    replicaCount: 1
+
+    image:
+      repository: <placeholder>/userstore
+      pullPolicy: IfNotPresent
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: ""
+
+    imagePullSecrets:
+      - name: docker-pull-secret
+    nameOverride: ""
+    fullnameOverride: ""
+
+    initContainers: []
+    serviceAccount:
+      # Specifies whether a service account should be created
+      create: true
+      # Annotations to add to the service account
+      annotations: {}
+      # The name of the service account to use.
+      # If not set and create is true, a name is generated using the fullname template
+      name: userstore
+
+    podAnnotations: {}
+    podSecurityContext:
+      fsGroup: 5111
+      runAsUser: 5111
+    securityContext: {}
+
+    service:
+      enabled: true
+      type: ClusterIP
+      port: 8084
+
+    ingress:
+      https:
+        name: https
+        useCommonHost: true
+        useCommonAnnotations: true
+        className: ""
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-ssl-name: "userstore"
+        hosts:
+          - host: localhost
+            paths:
+              - path: /local-user-store
+                pathType: Prefix
+        tls:
+          - secretName: privx-tls
+            hosts:
+              - localhost
+
+    resources: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious
+      # choice for the user. This also increases chances charts run on environments with little
+      # resources, such as Minikube. If you do want to specify resources, uncomment the following
+      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+
+    rbac:
+      create: false
+
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 100
+      targetCPUUtilizationPercentage: 80
+      # targetMemoryUtilizationPercentage: 80
+
+    nodeSelector: {}
+
+    tolerations: []
+
+    affinity: {}
+    level:
+      log: DEBUG
+      trace: 3
+
+    volumes:
+      enabled: true
+      volumeMounts:
+        - mountPath: /opt/privx/cert
+          name: privx-config
+          subPath: privxcert
+        - mountPath: /opt/privx/keyvault
+          name: privx-config
+          subPath: keyvault
+        - mountPath: /opt/privx/etc
+          name: privx-config
+          subPath: privxetc
+        - mountPath: /etc/nginx/ssl
+          name: privx-config
+          subPath: nginxssl
+      claims:
+        - name: privx-config
+          claimName: privx-claim
+
+  #==========vault values===============
+  vault:
+    name: vault
+    replicaCount: 1
+
+    image:
+      repository: <placeholder>/vault
+      pullPolicy: IfNotPresent
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: ""
+
+    imagePullSecrets:
+      - name: docker-pull-secret
+    nameOverride: ""
+    fullnameOverride: ""
+
+    initContainers: []
+    serviceAccount:
+      # Specifies whether a service account should be created
+      create: true
+      # Annotations to add to the service account
+      annotations: {}
+      # The name of the service account to use.
+      # If not set and create is true, a name is generated using the fullname template
+      name: vault
+
+    podSecurityContext:
+      fsGroup: 5111
+      runAsUser: 5111
+    securityContext: {}
+
+    podAnnotations: {}
+
+    service:
+      enabled: true
+      type: ClusterIP
+      port: 8098
+
+    ingress:
+      https:
+        name: https
+        useCommonHost: true
+        useCommonAnnotations: true
+        className: ""
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-ssl-name: "vault"
+        hosts:
+          - host: localhost
+            paths:
+              - path: /vault
+                pathType: Prefix
+        tls:
+          - secretName: privx-tls
+            hosts:
+              - localhost
+
+    resources: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious
+      # choice for the user. This also increases chances charts run on environments with little
+      # resources, such as Minikube. If you do want to specify resources, uncomment the following
+      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+
+    rbac:
+      create: false
+
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 100
+      targetCPUUtilizationPercentage: 80
+      # targetMemoryUtilizationPercentage: 80
+
+    nodeSelector: {}
+
+    tolerations: []
+
+    affinity: {}
+    level:
+      log: DEBUG
+      trace: 3
+
+    volumes:
+      enabled: true
+      volumeMounts:
+        - mountPath: /opt/privx/cert
+          name: privx-config
+          subPath: privxcert
+        - mountPath: /opt/privx/keyvault
+          name: privx-config
+          subPath: keyvault
+        - mountPath: /opt/privx/etc
+          name: privx-config
+          subPath: privxetc
+        - mountPath: /etc/nginx/ssl
+          name: privx-config
+          subPath: nginxssl
+      claims:
+        - name: privx-config
+          claimName: privx-claim
+
+  #==========workflow-engine values===============
+  workflowengine:
+    name: workflow-engine
+    replicaCount: 1
+
+    image:
+      repository: <placeholder>/workflow-engine
+      pullPolicy: IfNotPresent
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: ""
+
+    imagePullSecrets:
+      - name: docker-pull-secret
+    nameOverride: ""
+    fullnameOverride: ""
+
+    initContainers:
+      - name: conf-copier
+        image: <placeholder>/workflow-engine-conf:latest
+        imagePullPolicy: Always
+        command: [ "/bin/sh", "-c" ]
+        args:
+          - echo copying templates;
+            cp -rf templates/* /opt/privx/etc/templates/;
+            echo copying locales;
+            cp -rf locales/* /opt/privx/etc/locales/workflowengine;
+        securityContext:
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 5111
+          allowPrivilegeEscalation: false
+        volumeMounts:
+        - mountPath: /opt/privx/etc
+          name: privx-config
+          subPath: privxetc
+
+    serviceAccount:
+      # Specifies whether a service account should be created
+      create: true
+      # Annotations to add to the service account
+      annotations: {}
+      # The name of the service account to use.
+      # If not set and create is true, a name is generated using the fullname template
+      name: workflow-engine
+
+    podSecurityContext:
+      fsGroup: 5111
+      runAsNonRoot: true
+      runAsUser: 5111
+      runAsGroup: 5111
+    securityContext:
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
+
+    podAnnotations: {}
+
+    service:
+      enabled: true
+      type: ClusterIP
+      port: 8085
+
+    ingress:
+      https:
+        name: https
+        useCommonHost: true
+        useCommonAnnotations: true
+        className: ""
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-ssl-name: "workflow-engine"
+        hosts:
+          - host: localhost
+            paths:
+              - path: /workflow-engine
+                pathType: Prefix
+        tls:
+          - secretName: privx-tls
+            hosts:
+              - localhost
+
+    resources: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious
+      # choice for the user. This also increases chances charts run on environments with little
+      # resources, such as Minikube. If you do want to specify resources, uncomment the following
+      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+
+    rbac:
+      create: false
+
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 100
+      targetCPUUtilizationPercentage: 80
+      # targetMemoryUtilizationPercentage: 80
+
+    nodeSelector: {}
+
+    tolerations: []
+
+    affinity: {}
+    level:
+      log: DEBUG
+      trace: 3
+
+    volumes:
+      enabled: true
+      volumeMounts:
+        - mountPath: /opt/privx/cert
+          name: privx-config
+          subPath: privxcert
+        - mountPath: /opt/privx/keyvault
+          name: privx-config
+          subPath: keyvault
+        - mountPath: /opt/privx/etc
+          name: privx-config
+          subPath: privxetc
+        - mountPath: /etc/nginx/ssl
+          name: privx-config
+          subPath: nginxssl
+      claims:
+        - name: privx-config
+          claimName: privx-claim
+
+  #==========nginx values===============
+  nginx:
+    name: nginx
+    replicaCount: 1
+
+    image:
+      repository: <placeholder>/nginx
+      pullPolicy: IfNotPresent
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: ""
+
+    imagePullSecrets:
+      - name: docker-pull-secret
+    nameOverride: ""
+    fullnameOverride: ""
+
+    initContainers: []
+    serviceAccount:
+      # Specifies whether a service account should be created
+      create: true
+      # Annotations to add to the service account
+      annotations: {}
+      # The name of the service account to use.
+      # If not set and create is true, a name is generated using the fullname template
+      name: nginx
+
+    podAnnotations: {}
+    podSecurityContext:
+      fsGroup: 5111
+      runAsUser: 5111
+    securityContext: {}
+
+    service:
+      enabled: true
+      type: ClusterIP
+      port: 8444
+      internal:
+        - name: non-tls
+          port: 80
+          protocol: TCP
+        - name: client-cert
+          port: 8443
+          protocol: TCP
+
+    ingress:
+      https:
+        name: https
+        useCommonAnnotations: false
+        useCommonHost: true
+        className: ""
+        annotations:
+          nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+          nginx.ingress.kubernetes.io/proxy-ssl-secret: "privx/proxy-ca-secret"
+          nginx.ingress.kubernetes.io/proxy-ssl-verify: "on"
+          nginx.ingress.kubernetes.io/proxy-ssl-name: "nginx"
+          nginx.ingress.kubernetes.io/proxy-ssl-server-name: "on"
+          nginx.ingress.kubernetes.io/ssl-ciphers: "AESGCM+EECDH:AESGCM+EDH:AES+EECDH:AES+EDH:AES128-GCM-SHA256:AES128-SHA256:AES128-SHA:-DSS:-EDH"
+          nginx.ingress.kubernetes.io/ssl-prefer-server-ciphers: "true"
+          nginx.ingress.kubernetes.io/proxy-ssl-protocols: "TLSv1.2"
+        hosts:
+          - host: localhost
+            paths:
+              - path: /
+                pathType: Prefix
+              - path: /auth/login
+                pathType: Prefix
+              - path: /auth/static
+                pathType: Prefix
+              - path: /auth/password
+                pathType: Prefix
+              - path: /auth/change-password
+                pathType: Prefix
+              - path: /auth/mfa
+                pathType: Prefix
+        tls:
+          - secretName: privx-tls
+            hosts:
+              - localhost
+
+    resources: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious
+      # choice for the user. This also increases chances charts run on environments with little
+      # resources, such as Minikube. If you do want to specify resources, uncomment the following
+      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+
+    rbac:
+      create: false
+
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 100
+      targetCPUUtilizationPercentage: 80
+      # targetMemoryUtilizationPercentage: 80
+
+    nodeSelector: {}
+
+    tolerations: []
+
+    affinity: {}
+    level:
+      log: DEBUG
+      trace: 3
+    volumes:
+      enabled: true
+      volumeMounts:
+        - mountPath: /tmp
+          name: privx-config
+          subPath: nginxtmp
+        - mountPath: /var/log/nginx
+          name: privx-config
+          subPath: nginxlog
+        - mountPath: /etc/nginx/privx/
+          name: privx-config
+          subPath: nginxprivx
+        - mountPath: /etc/nginx/ssl
+          name: privx-config
+          subPath: nginxssl
+        - mountPath: /etc/nginx/tls
+          name: privx-tls-vol
+        - mountPath: /etc/nginx/conf.d
+          name: nginx-location-config
+      claims:
+        - name: privx-config
+          claimName: privx-claim
+      secrets:
+        - name: privx-tls-vol
+          secretName: privx-tls
+      configMaps:
+        - name: nginx-location-config
+          configMap:
+            name: nginx-config
+            items:
+              - key: privx.conf
+                path: privx.conf
+
+  #==========cert-updater values===============
+  certupdater:
+    name: cert-updater
+    replicaCount: 1
+
+    image:
+      repository: <placeholder>/installer
+      pullPolicy: IfNotPresent
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: ""
+
+    imagePullSecrets:
+      - name: docker-pull-secret
+    nameOverride: ""
+    fullnameOverride: ""
+
+    initContainers: []
+    serviceAccount:
+      # Specifies whether a service account should be created
+      create: true
+      # Annotations to add to the service account
+      annotations: {}
+      # The name of the service account to use.
+      # If not set and create is true, a name is generated using the fullname template
+      name: cert-updater
+
+    podAnnotations:
+      reloader.stakater.com/auto: "true"
+
+    podSecurityContext:
+      fsGroup: 5111
+      runAsUser: 5111
+    securityContext: {}
+
+    service:
+      enabled: false
+
+    ingress:
+
+    resources: {}
+
+    rbac:
+      create: false
+
+    autoscaling:
+      enabled: false
+
+    nodeSelector: {}
+
+    tolerations: []
+
+    affinity: {}
+    level:
+      log:
+      trace:
+
+    environment:
+      - name: INSTALLER_CMD
+        value: update-trust
+      - name: TRUST_CERT_PATH
+        value: /etc/nginx/tls/ca.crt
+    volumes:
+      enabled: true
+      volumeMounts:
+        - mountPath: /opt/privx/keyvault
+          name: privx-config
+          subPath: keyvault
+        - mountPath: /opt/privx/etc
+          name: privx-config
+          subPath: privxetc
+        - mountPath: /etc/nginx/tls
+          name: privx-tls-vol
+      claims:
+        - name: privx-config
+          claimName: privx-claim
+      secrets:
+        - name: privx-tls-vol
+          secretName: privx-tls

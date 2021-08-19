@@ -1,0 +1,21 @@
+servicename = "licensemanager"
+
+# Default config for license manager
+listen_port = 8101
+
+[license_manager]
+
+# Keyvault credentials.
+keyvault_id = "@LICENSE_MANAGER_ID@"
+keyvault_secret = "@LICENSE_MANAGER_SECRET@"
+
+[db]
+# DB data version number
+# Do not modify
+data_version = "2"
+
+[tls]
+# Microservice https server settings
+enable_https_server = true
+certificate = "/opt/privx/cert/license_manager.crt"
+private_key = "/opt/privx/cert/license_manager.key"

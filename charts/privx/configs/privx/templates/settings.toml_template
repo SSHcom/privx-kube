@@ -1,0 +1,36 @@
+servicename = "settings"
+
+# Default config for settings service
+listen_port = 8099
+
+# Keyvault credentials.
+keyvault_id = "@SETTINGS_ID@"
+keyvault_secret = "@SETTINGS_SECRET@"
+
+[db]
+# Maximum amount of time a connection may be reused (in seconds)
+# 0 = connections are reused forever
+# i.e. conn_max_lifetime = 900
+conn_max_lifetime = 900
+
+# SetConnMaxIdleTime sets the maximum amount of time a connection may be idle.
+# If d <= 0, connections are not closed due to a connection's idle time.
+conn_max_idletime = 900
+
+# Maximum number of open connections to the database.
+# If n <= 0, then there is no limit on the number of open connections.
+max_open_conns = 20
+
+# Maximum number of idle DB connections
+# If n <= 0, no idle connections are retained
+max_idle_conns = 2
+
+# DB data version number
+# Do not modify
+data_version = "2"
+
+[tls]
+# Microservice https server settings
+enable_https_server = true
+certificate = "/opt/privx/cert/settings.crt"
+private_key = "/opt/privx/cert/settings.key"
