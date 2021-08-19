@@ -1,0 +1,12 @@
+ingress:
+  common:
+    host: privx.yourdomain.com
+
+dbAddress: db-psql.db
+
+ms:
+  licensemanager:
+    licenseCode:
+      prod:
+        enabled: true
+        value: <placeholder>
