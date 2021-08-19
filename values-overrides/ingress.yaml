@@ -1,0 +1,23 @@
+## Values override for ingress controller for all the ingress rules
+## except for the client-cert endpoint
+
+tcp:
+  2222: "privx/ssh-mitm:2222"
+  3389: "privx/rdp-mitm:3389"
+  1080: "privx/ssh-mitm:1080"
+  8443: "privx/nginx:8443"
+
+addHeaders:
+  Cache-Control: "private, no-cache, must-revalidate"
+  Expires: "0"
+  Pragma: "no-cache"
+  X-Frame-Options: "SAMEORIGIN"
+  X-Content-Type-Options: "nosniff"
+  X-XSS-Protection: "1; mode=block"
+  Content-Security-Policy: "connect-src 'self' wss://*:*; img-src 'self' data:; default-src 'self'"
+  Strict-Transport-Security: "max-age=31536000; includeSubdomains;"
+
+config:
+  use-gzip: "true"
+  gzip-types: "text/plain text/xml text/css text/comma-separated-values text/javascript application/x-javascript application/atom+xml"
+  gzip-min-length: "500"
