@@ -2416,7 +2416,7 @@ ms:
       - name: INSTALLER_CMD
         value: update-trust
       - name: TRUST_CERT_PATH
-        value: /etc/nginx/tls/ca.crt
+        value: /etc/nginx/ca/ca.crt
     volumes:
       enabled: true
       volumeMounts:
@@ -2426,11 +2426,11 @@ ms:
         - mountPath: /opt/privx/etc
           name: privx-config
           subPath: privxetc
-        - mountPath: /etc/nginx/tls
-          name: privx-tls-vol
+        - mountPath: /etc/nginx/ca
+          name: privx-ca-vol
       claims:
         - name: privx-config
           claimName: privx-claim
       secrets:
-        - name: privx-tls-vol
-          secretName: privx-tls
+        - name: privx-ca-vol
+          secretName: privx-ca-secret
