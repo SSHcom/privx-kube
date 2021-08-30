@@ -66,7 +66,7 @@ PrivX assumes that at least two kubernetes secrets with specific certificates
 are present in the `privx` namespace.
 
 1. `privx-tls` (Used for storing server certificate for HTTPS Ingress)
-2. `privx-ca-secret` (Use for storing CA certificate that issued the server
+2. `privx-ca-secret` (Used for storing CA certificate that issued the server
    certificate)
 
 The first certificate can be valid for a short duration and is used for securing
@@ -104,7 +104,8 @@ PrivX assumes that a volume claim named `privx-claim` be present with
 
 ### PrivX license
 
-The value for `ms.licensemanager.licenseCode.prod.value` should be changed to a
+The value for `ms.licensemanager.licenseCode.prod.value` in the file
+[privx.yaml](values-overrides/privx.yaml) should be changed to a
 valid license value. **NOTE:** If offline licenses are used, then please wait
 for more instructions as support for that is still under work.
 
