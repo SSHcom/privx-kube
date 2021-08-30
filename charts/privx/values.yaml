@@ -52,10 +52,10 @@ jobs:
     weight: "-1"
     hookDeletePolicy: before-hook-creation
     image:
-      repository: <placeholder>/installer
+      repository: gallery.ecr.aws/r3m4z6n1/installer
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: ""
+      tag: 20.0
     imagePullSecrets:
       - name: docker-pull-secret
     podSecurityContext:
@@ -162,10 +162,10 @@ jobs:
     weight: "-1"
     hookDeletePolicy: before-hook-creation
     image:
-      repository: <placeholder>/installer
+      repository: gallery.ecr.aws/r3m4z6n1/installer
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: ""
+      tag: 20.0
     imagePullSecrets:
       - name: docker-pull-secret
     podSecurityContext:
@@ -206,10 +206,10 @@ jobs:
     weight: "-1"
     hookDeletePolicy: before-hook-creation,hook-succeeded
     image:
-      repository: <placeholder>/secrets-generator
-      pullPolicy: Always
+      repository: gallery.ecr.aws/r3m4z6n1/secrets-generator
+      pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: ""
+      tag: 20.0
     imagePullSecrets:
       - name: docker-pull-secret
     podSecurityContext:
@@ -281,10 +281,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: <placeholder>/rdp-proxy
+      repository: gallery.ecr.aws/r3m4z6n1/rdp-proxy
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: ""
+      tag: 20.0
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -408,10 +408,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: <placeholder>/ssh-proxy
+      repository: gallery.ecr.aws/r3m4z6n1/ssh-proxy
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: ""
+      tag: 20.0
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -527,10 +527,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: <placeholder>/auth
+      repository: gallery.ecr.aws/r3m4z6n1/auth
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: ""
+      tag: 20.0
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -633,10 +633,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: <placeholder>/keyvault
+      repository: gallery.ecr.aws/r3m4z6n1/keyvault
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: ""
+      tag: 20.0
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -738,10 +738,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: <placeholder>/authorizer
+      repository: gallery.ecr.aws/r3m4z6n1/authorizer
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: ""
+      tag: 20.0
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -868,10 +868,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: <placeholder>/connection-manager
+      repository: gallery.ecr.aws/r3m4z6n1/connection-manager
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: ""
+      tag: 20.0
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -976,10 +976,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: <placeholder>/host-store
+      repository: gallery.ecr.aws/r3m4z6n1/host-store
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: ""
+      tag: 20.0
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1081,10 +1081,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: <placeholder>/license-manager
+      repository: gallery.ecr.aws/r3m4z6n1/license-manager
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: ""
+      tag: 20.0
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1193,10 +1193,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: <placeholder>/monitor-service
+      repository: gallery.ecr.aws/r3m4z6n1/monitor-service
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: ""
+      tag: 20.0
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1298,10 +1298,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: <placeholder>/rdp-mitm
+      repository: gallery.ecr.aws/r3m4z6n1/rdp-mitm
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: ""
+      tag: 20.0
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1310,8 +1310,8 @@ ms:
 
     initContainers:
       - name: conf-copier
-        image: <placeholder>/rdp-mitm-conf:latest
-        imagePullPolicy: Always
+        image: gallery.ecr.aws/r3m4z6n1/rdp-mitm-conf:20.0
+        imagePullPolicy:  IfNotPresent
         command: [ "/bin/sh", "-c" ]
         securityContext:
           readOnlyRootFilesystem: true
@@ -1446,10 +1446,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: <placeholder>/ssh-mitm
+      repository: gallery.ecr.aws/r3m4z6n1/ssh-mitm
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: ""
+      tag: 20.0
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1560,10 +1560,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: <placeholder>/trail-index
+      repository: gallery.ecr.aws/r3m4z6n1/trail-index
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: ""
+      tag: 20.0
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1668,10 +1668,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: <placeholder>/role-store
+      repository: gallery.ecr.aws/r3m4z6n1/role-store
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: ""
+      tag: 20.0
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1775,10 +1775,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: <placeholder>/settings
+      repository: gallery.ecr.aws/r3m4z6n1/settings
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: ""
+      tag: 20.0
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1880,10 +1880,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: <placeholder>/userstore
+      repository: gallery.ecr.aws/r3m4z6n1/userstore
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: ""
+      tag: 20.0
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1985,10 +1985,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: <placeholder>/vault
+      repository: gallery.ecr.aws/r3m4z6n1/vault
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: ""
+      tag: 20.0
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2091,10 +2091,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: <placeholder>/workflow-engine
+      repository: gallery.ecr.aws/r3m4z6n1/workflow-engine
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: ""
+      tag: 20.0
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2103,8 +2103,8 @@ ms:
 
     initContainers:
       - name: conf-copier
-        image: <placeholder>/workflow-engine-conf:latest
-        imagePullPolicy: Always
+        image: gallery.ecr.aws/r3m4z6n1/workflow-engine-conf:20.0
+        imagePullPolicy:  IfNotPresent
         command: [ "/bin/sh", "-c" ]
         args:
           - echo copying templates;
@@ -2220,10 +2220,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: <placeholder>/nginx
+      repository: gallery.ecr.aws/r3m4z6n1/nginx
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: ""
+      tag: 20.0
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2362,10 +2362,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: <placeholder>/installer
+      repository: gallery.ecr.aws/r3m4z6n1/installer
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: ""
+      tag: 20.0
 
     imagePullSecrets:
       - name: docker-pull-secret
