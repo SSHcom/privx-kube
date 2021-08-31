@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  privx:
+  - apiVersion: v2
+    appVersion: 20.0.0
+    created: "2021-08-31T16:43:01.287169+03:00"
+    description: A Helm chart for deploying PrivX on Kubernetes
+    digest: d9d2335f4b43ea3ce6fc6f9e9b2750028f1fc0d0ddaaa308d4917922c43ad886
+    name: privx
+    type: application
+    urls:
+    - privx-0.0.3.tgz
+    version: 0.0.3
+generated: "2021-08-31T16:43:01.272169+03:00"
