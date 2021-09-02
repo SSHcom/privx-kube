@@ -52,7 +52,7 @@ jobs:
     weight: "-1"
     hookDeletePolicy: before-hook-creation
     image:
-      repository: public.ecr.aws/r3m4z6n1/installer
+      repository: public.ecr.aws/sshprivx/installer
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: "20.0"
@@ -162,7 +162,7 @@ jobs:
     weight: "-1"
     hookDeletePolicy: before-hook-creation
     image:
-      repository: public.ecr.aws/r3m4z6n1/installer
+      repository: public.ecr.aws/sshprivx/installer
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: "20.0"
@@ -206,7 +206,7 @@ jobs:
     weight: "-1"
     hookDeletePolicy: before-hook-creation,hook-succeeded
     image:
-      repository: public.ecr.aws/r3m4z6n1/secrets-generator
+      repository: public.ecr.aws/sshprivx/secrets-generator
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: "20.0"
@@ -281,7 +281,7 @@ ms:
     replicaCount: 1
 
     image:
-      repository: public.ecr.aws/r3m4z6n1/rdp-proxy
+      repository: public.ecr.aws/sshprivx/rdp-proxy
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: "20.0"
@@ -408,7 +408,7 @@ ms:
     replicaCount: 1
 
     image:
-      repository: public.ecr.aws/r3m4z6n1/ssh-proxy
+      repository: public.ecr.aws/sshprivx/ssh-proxy
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: "20.0"
@@ -527,7 +527,7 @@ ms:
     replicaCount: 1
 
     image:
-      repository: public.ecr.aws/r3m4z6n1/auth
+      repository: public.ecr.aws/sshprivx/auth
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: "20.0"
@@ -633,7 +633,7 @@ ms:
     replicaCount: 1
 
     image:
-      repository: public.ecr.aws/r3m4z6n1/keyvault
+      repository: public.ecr.aws/sshprivx/keyvault
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: "20.0"
@@ -738,7 +738,7 @@ ms:
     replicaCount: 1
 
     image:
-      repository: public.ecr.aws/r3m4z6n1/authorizer
+      repository: public.ecr.aws/sshprivx/authorizer
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: "20.0"
@@ -868,7 +868,7 @@ ms:
     replicaCount: 1
 
     image:
-      repository: public.ecr.aws/r3m4z6n1/connection-manager
+      repository: public.ecr.aws/sshprivx/connection-manager
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: "20.0"
@@ -976,7 +976,7 @@ ms:
     replicaCount: 1
 
     image:
-      repository: public.ecr.aws/r3m4z6n1/host-store
+      repository: public.ecr.aws/sshprivx/host-store
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: "20.0"
@@ -1081,7 +1081,7 @@ ms:
     replicaCount: 1
 
     image:
-      repository: public.ecr.aws/r3m4z6n1/license-manager
+      repository: public.ecr.aws/sshprivx/license-manager
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: "20.0"
@@ -1193,7 +1193,7 @@ ms:
     replicaCount: 1
 
     image:
-      repository: public.ecr.aws/r3m4z6n1/monitor-service
+      repository: public.ecr.aws/sshprivx/monitor-service
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: "20.0"
@@ -1298,7 +1298,7 @@ ms:
     replicaCount: 1
 
     image:
-      repository: public.ecr.aws/r3m4z6n1/rdp-mitm
+      repository: public.ecr.aws/sshprivx/rdp-mitm
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: "20.0"
@@ -1310,7 +1310,7 @@ ms:
 
     initContainers:
       - name: conf-copier
-        image: public.ecr.aws/r3m4z6n1/rdp-mitm-conf:20.0
+        image: public.ecr.aws/sshprivx/rdp-mitm-conf:20.0
         imagePullPolicy:  IfNotPresent
         command: [ "/bin/sh", "-c" ]
         securityContext:
@@ -1446,7 +1446,7 @@ ms:
     replicaCount: 1
 
     image:
-      repository: public.ecr.aws/r3m4z6n1/ssh-mitm
+      repository: public.ecr.aws/sshprivx/ssh-mitm
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: "20.0"
@@ -1560,7 +1560,7 @@ ms:
     replicaCount: 1
 
     image:
-      repository: public.ecr.aws/r3m4z6n1/trail-index
+      repository: public.ecr.aws/sshprivx/trail-index
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: "20.0"
@@ -1668,7 +1668,7 @@ ms:
     replicaCount: 1
 
     image:
-      repository: public.ecr.aws/r3m4z6n1/role-store
+      repository: public.ecr.aws/sshprivx/role-store
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: "20.0"
@@ -1775,7 +1775,7 @@ ms:
     replicaCount: 1
 
     image:
-      repository: public.ecr.aws/r3m4z6n1/settings
+      repository: public.ecr.aws/sshprivx/settings
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: "20.0"
@@ -1880,7 +1880,7 @@ ms:
     replicaCount: 1
 
     image:
-      repository: public.ecr.aws/r3m4z6n1/userstore
+      repository: public.ecr.aws/sshprivx/userstore
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: "20.0"
@@ -1985,7 +1985,7 @@ ms:
     replicaCount: 1
 
     image:
-      repository: public.ecr.aws/r3m4z6n1/vault
+      repository: public.ecr.aws/sshprivx/vault
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: "20.0"
@@ -2091,7 +2091,7 @@ ms:
     replicaCount: 1
 
     image:
-      repository: public.ecr.aws/r3m4z6n1/workflow-engine
+      repository: public.ecr.aws/sshprivx/workflow-engine
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: "20.0"
@@ -2103,7 +2103,7 @@ ms:
 
     initContainers:
       - name: conf-copier
-        image: public.ecr.aws/r3m4z6n1/workflow-engine-conf:20.0
+        image: public.ecr.aws/sshprivx/workflow-engine-conf:20.0
         imagePullPolicy:  IfNotPresent
         command: [ "/bin/sh", "-c" ]
         args:
@@ -2220,7 +2220,7 @@ ms:
     replicaCount: 1
 
     image:
-      repository: public.ecr.aws/r3m4z6n1/nginx
+      repository: public.ecr.aws/sshprivx/nginx
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: "20.0"
@@ -2362,7 +2362,7 @@ ms:
     replicaCount: 1
 
     image:
-      repository: public.ecr.aws/r3m4z6n1/installer
+      repository: public.ecr.aws/sshprivx/installer
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: "20.0"
