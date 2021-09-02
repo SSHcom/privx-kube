@@ -1,5 +1,4 @@
-# Variables for docker installer automation
-# Run docker_create_env.sh to recreate.
+# Variables for kubernetes installer automation
 
 #######################
 # appliance addresses #
@@ -13,22 +12,27 @@ export  PRIVX_IP_ADDRESSES=" "
 ##########################################
 # External database configuration
 export  PRIVX_USE_EXTERNAL_DATABASE="1"
-export  PRIVX_POSTGRES_ADDRESS="{{ .Values.dbAddress }}"
-export  PRIVX_POSTGRES_PORT="5432"
+export  PRIVX_POSTGRES_ADDRESS="{{ required "A valid db.address value is required" .Values.db.address }}"
+export  PRIVX_POSTGRES_PORT="{{ required "A valid db.port value is required" .Values.db.port }}"
 # PostgreSQL username/password
-export  PRIVX_POSTGRES_USER="postgres"
-export  PRIVX_POSTGRES_PASSWORD="test"
+export  PRIVX_POSTGRES_USER="{{ required "A valid db.admin.name value is required" .Values.db.admin.name }}"
+export  PRIVX_POSTGRES_PASSWORD="{{ required "A valid db.admin.password value is required" .Values.db.admin.password }}"
 # Database name
-export  PRIVX_DATABASE_NAME="privx"
+export  PRIVX_DATABASE_NAME="{{ required "A valid db.name value is required" .Values.db.name }}"
 # Database-user name
-export  PRIVX_DATABASE_USERNAME="privx"
+export  PRIVX_DATABASE_USERNAME="{{ required "A valid db.user.name value is required" .Values.db.user.name }}"
 # Database-user password
-export  PRIVX_DATABASE_PASSWORD="privx"
+export  PRIVX_DATABASE_PASSWORD="{{ required "A valid db.user.password value is required" .Values.db.user.password }}"
 # Database-connection SSL mode
-export  PRIVX_DATABASE_SSLMODE="require"
+export  PRIVX_DATABASE_SSLMODE="{{ .Values.db.sslmode | default "require" }}"
 # Notification backend, "db" or "redis"
 export  PRIVX_NOTIFICATION_BACKEND="db"
 # Redis-server address
 export  PRIVX_REDIS_ADDRESS="redis"
 # Redis-service port number
 export  PRIVX_REDIS_PORT="6379"
+
+# PrivX superuser
+export PRIVX_SUPERUSER="{{ required "A valid privx.admin.username value is required" .Values.privx.admin.username }}"
+export PRIVX_SUPERUSER_PASSWORD="{{ required "A valid privx.admin.password value is required" .Values.privx.admin.password }}"
+export PRIVX_SUPERUSER_EMAIL="{{ required "A valid privx.admin.email value is required" .Values.privx.admin.email }}"

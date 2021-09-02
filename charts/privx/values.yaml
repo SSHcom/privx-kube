@@ -19,7 +19,32 @@ ingress:
       nginx.ingress.kubernetes.io/affinity-mode: "persistent"
       nginx.ingress.kubernetes.io/session-cookie-change-on-failure: "true"
 
-dbAddress: db-psql.db
+db:
+  # database address (required)
+  address:
+  # database port (required)
+  port:
+  # database admin user name and password (required)
+  admin:
+    name:
+    password:
+  # database user name and password (required)
+  user:
+    name:
+    password:
+  # database name (required)
+  name:
+  # database ssl mode (require by default. Complete list of options can be checked from the postgresql version used)
+  sslmode: require
+
+privx:
+  admin:
+    #admin username for PrivX UI login (required)
+    username:
+    #admin password for PrivX UI login (required)
+    password:
+    #admin email for PrivX UI login (required)
+    email:
 
 #==============Config values (TOMLS, RDPMITM and NGINX configs)
 configs:
