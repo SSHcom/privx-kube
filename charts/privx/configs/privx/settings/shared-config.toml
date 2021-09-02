@@ -177,7 +177,6 @@ azure_event_timeout = 20
 ###############################################################################
 # Notification cache
 
-# NOTE: Redis cache is required if running more than one instance of role-store, auth or workflow-engine service.
 [notificationCache]
 enable = true
 
@@ -210,12 +209,12 @@ dbnumber = 0
 # Host name of database
 # i.e. host = "pg.example.someserver.com"
 #host = "172.17.0.1"
-host = "{{ .Values.dbAddress }}"
+host = "{{ .Values.db.address }}"
 #host = "db-psql"
 
 # Port number of the database
 # i.e. port = 5432
-port = 5432
+port = "{{ .Values.db.port }}"
 
 # Driver name, i.e. postgres, mysql, ora
 # i.e. driver = "postgres"
@@ -223,7 +222,7 @@ driver = "postgres"
 
 # Postgres SSLmode: disable, require, verify-ca, verify-full
 # i.e. sslmode = "verify-full"
-sslmode = "require"
+sslmode = '{{ .Values.db.sslmode | default "require" }}'
 
 # Additional Postgres database connection parameters
 # i.e. additional_params = "sslrootcert=/opt/privx/etc/privx-db-trust-anchor.pem"

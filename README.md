@@ -46,10 +46,21 @@ PrivX uses Postgres database for relational transactions and internal
 notifications. Therefore, it is important that a database is available either
 internally in the cluster or outside of the cluster.
 
-Once the database is present, the value for `dbAddress` in the file
-[privx.yaml](values-overrides/privx.yaml) should be changed to point to the
-actual address of the database. The default value that PrivX assumes is `db-psql`
-in the namespace `db`.
+Once the database is present, the following values in the file
+[privx.yaml](values-overrides/privx.yaml) should be changed for privx to be able
+to reach and interact with the database.
+
+    - db.address (database address)
+    - db.port (database port)
+    - db.name (database name)
+    - db.sslmode (database sslmode (optional: default value=`require`))
+    - db.admin.name (database admin username)
+    - db.admin.password (database admin password)
+    - db.user.name (database privx user)
+    - db.user.password (database privx user password)
+
+**NOTE: Apart from the db.sslmode, all the other settings are mandatory and
+PrivX deployment will not work without setting these.**
 
 ### Namespace
 
@@ -108,6 +119,14 @@ The value for `ms.licensemanager.licenseCode.prod.value` in the file
 [privx.yaml](values-overrides/privx.yaml) should be changed to a
 valid license value. **NOTE:** If offline licenses are used, then please wait
 for more instructions as support for that is still under work.
+
+### Privx Admin user
+The values for the following are **mandatory** and need to be set before
+installing PrivX in the file [privx.yaml](values-overrides/privx.yaml).
+
+    - privx.admin.username (admin username for PrivX UI login)
+    - privx.admin.password (admin password for PrivX UI login)
+    - privx.admin.email (admin email for PrivX UI login)
 
 ## Install PrivX
 
