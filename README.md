@@ -5,7 +5,7 @@ a kubernetes cluster.
 
 ## Introduction
 This repo contains the PrivX chart and in addition uses [Bitnami Nginx Ingress
-Controller](https://github.com/kubernetes/ingress-nginx). The purpose of the
+Controller](https://github.com/bitnami/charts/tree/master/bitnami/nginx-ingress-controller). The purpose of the
 ingress controller is to setup ingress to the PrivX microservices in a dynamic
 way.
 
