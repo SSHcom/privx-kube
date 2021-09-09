@@ -4,7 +4,7 @@
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "privx.fullname" . }}-{{ $service.name }}
+  name: {{ include "privx.fullname" $globalContext }}-{{ $service.name }}
   labels:
     app.kubernetes.io/name: {{ include "privx.name" $globalContext }}-{{ $service.name }}
 spec:
