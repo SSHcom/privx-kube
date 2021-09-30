@@ -46,6 +46,13 @@ privx:
     #admin email for PrivX UI login (required)
     email:
 
+# When enabled migration will do the backup + upgrade (while using the correct override values)
+migration:
+  enabled: false
+
+# Enabling shutdown will bring all the deployment replicas to zero
+shutdown: false
+
 #==============Config values (TOMLS, RDPMITM and NGINX configs)
 configs:
   nginx:

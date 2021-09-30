@@ -1,5 +1,9 @@
 {{- $globalContext := . }}
-{{- range $config := .Values.configs}}
+{{- $configs := .Values.configs }}
+{{- if .Values.migration.enabled }}
+{{- $configs = .Values.migration.configs }}
+{{- end }}
+{{- range $config := $configs }}
 {{- $files := $config.files -}}
 apiVersion: v1
 kind: ConfigMap
@@ -11,6 +15,9 @@ metadata:
 data:
 {{ range $path, $d :=  $globalContext.Files.Glob  $files }}
   {{ base ($path | toString) }}: |+
+  {{- if and (not $globalContext.Values.migration.enabled) (contains "toml" (base ($path | toString))) (not (contains "version" (base ($path | toString)))) }}
+    {{ printf "version = %s" (regexFind "\\d+\\.\\d+" $globalContext.Chart.AppVersion | quote) }}
+  {{ end }}
   {{- tpl ($d | toString | nindent 4) $globalContext }}
 {{ end }}
 ---

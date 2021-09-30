@@ -7,8 +7,12 @@ metadata:
   labels:
     app.kubernetes.io/name: {{ include "privx.name" $globalContext }}-{{ $service.name }}
 spec:
-  {{- if not $service.autoscaling.enabled }}
+  {{- if or (not $service.autoscaling.enabled) $globalContext.Values.shutdown }}
+  {{- if $globalContext.Values.shutdown }}
+  replicas: 0
+  {{- else }}
   replicas: {{ $service.replicaCount }}
+  {{- end }}
   {{- end }}
   selector:
     matchLabels:

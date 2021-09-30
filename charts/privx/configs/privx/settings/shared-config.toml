@@ -214,7 +214,7 @@ host = "{{ .Values.db.address }}"
 
 # Port number of the database
 # i.e. port = 5432
-port = "{{ .Values.db.port }}"
+port = {{ .Values.db.port }}
 
 # Driver name, i.e. postgres, mysql, ora
 # i.e. driver = "postgres"
