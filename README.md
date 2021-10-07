@@ -39,6 +39,30 @@ helm install \
     -f values-overrides/ingress.yaml \
     ingress charts/nginx-ingress-controller/
 ```
+#### Restricted access Ingress Controller
+
+If the ingress controller is deployed in a more secure fashion, then the
+following command can be used:
+
+**NOTE: The pre-requisite for using the command is to have a volume claim named
+`ingress-claim`**
+
+```
+helm upgrade --install \
+    -n ingress --create-namespace \
+    -f values-overrides/ingress.yaml \
+    -f values-overrides/ingress-secure.yaml \
+    ingress charts/nginx-ingress-controller/
+```
+
+The command above uses an extra override file called
+[ingress-secure.yaml](values-overrides/ingress-secure.yaml).
+
+The file restricts privilege escalation, writing to container
+filesystem and drops all file capabilities including the `NET_BIND_SERVICE`
+that is needed by the ingress controller. The last setting is dropped with the
+help of a wrapper container around the Bitnami Ingress Controller Docker container
+by dropping the file capability `cap_net_bind_service`.
 
 ### Working Postgres Database
 
