@@ -213,3 +213,16 @@ data_version = "2"
 ################################# PrivX 20.0 #################################
 [20.0.authorizer.db]
 data_version = "3"
+
+################################# PrivX 21.0 #################################
+[21.0.vault.db]
+data_version = "2"
+
+[21.0.settings.db]
+data_version = "3"
+
+[21.0.license-manager.db]
+data_version = "3"
+
+[21.0.monitorservice.db]
+data_version = "10"

@@ -12,7 +12,7 @@ keyvault_secret = "@LICENSE_MANAGER_SECRET@"
 [db]
 # DB data version number
 # Do not modify
-data_version = "2"
+data_version = "3"
 
 [tls]
 # Microservice https server settings

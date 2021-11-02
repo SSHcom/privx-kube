@@ -41,6 +41,7 @@ signing_method = "Ed25519"
 #if signing_method symmetric, add the secret to conf file
 #signing_secret = "verysecret"
 use_cookies = true
+use_fingerprint = true
 #
 # PrivX microservices use this client definition
 #

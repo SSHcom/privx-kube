@@ -175,6 +175,7 @@ blacklisted_host_tag_prefixes = [
 [ROLE-STORE.housekeeping]
 # Unused SCIM role housekeeping interval in minutes
 scim_role_housekeeping_interval = 720
+users_active_interval = 15780000
 
 # Amazon Web Services settings
 [ROLE-STORE.aws]
@@ -453,6 +454,9 @@ web_proxy_enabled = true
 
 # When connecting directly, check that target is reachable.
 connectivity_test_timeout = 30
+
+# Disable windows smart card login failure workaround.
+smartcard_status_workaround_disabled = true
 
 [RDP-PROXY.certificates]
 # Replace the stored certificate if received target certificate is differ from stored certificate.
@@ -792,7 +796,32 @@ max_idle_conns = 2
 [VAULT]
 [VAULT.secrets]
 # vault secrets schema definitions
-schemas = '''[]'''
+# Credentials schema as default
+schemas = '''
+[
+{
+"name": "credentials",
+"title": "Credentials",
+"properties": [
+{
+"name": "user",
+"title": "Username"
+},
+{
+"name": "pass",
+"title": "Password",
+"masked": true
+},
+{
+"name": "comment",
+"title": "Comment",
+"wide": true,
+"multiline": true
+}
+]
+}
+]
+'''
 
 [VAULT.db]
 # Maximum amount of time a connection may be reused (in seconds)

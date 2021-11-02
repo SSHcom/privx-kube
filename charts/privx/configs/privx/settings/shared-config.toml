@@ -209,12 +209,12 @@ dbnumber = 0
 # Host name of database
 # i.e. host = "pg.example.someserver.com"
 #host = "172.17.0.1"
-host = "{{ .Values.db.address }}"
+host = {{ required "A valid db.address value is required" .Values.db.address | quote }}
 #host = "db-psql"
 
 # Port number of the database
 # i.e. port = 5432
-port = {{ .Values.db.port }}
+port = {{ required "A valid db.port value is required" .Values.db.port }}
 
 # Driver name, i.e. postgres, mysql, ora
 # i.e. driver = "postgres"
