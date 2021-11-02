@@ -1,0 +1,92 @@
+servicename = "authorizer"
+
+# Default config for authorizer
+listen_port = 8082
+
+[authorizer]
+
+# Keyvault credentials.
+keyvault_id = "@AUTHORIZER_ID@"
+keyvault_secret = "@AUTHORIZER_SECRET@"
+
+# Default key type. Possible values are: RSA, ECDSA
+key_type = "RSA"
+
+# Default key size.
+key_size = 4096
+
+# Default set of ssh certificate extensions as a comma separated list.
+ssh_default_extensions = "permit-pty, permit-user-rc"
+
+# Default set of ssh certificate extensions as a comma separated list
+# for certificates issued to ssh-mitm connections.
+ssh_mitm_default_extensions = "permit-X11-forwarding, permit-port-forwarding, permit-pty, permit-user-rc"
+
+# Default set of ssh certificate extensions as a comma separated list
+# for certificates issued to agents.
+ssh_agent_default_extensions = "permit-X11-forwarding, permit-port-forwarding, permit-pty, permit-user-rc"
+
+# X509 certificate and CA certificate subject names
+# Specify certificate subject names in following format:
+#   "CN=PrivX CA/C=FI/O=SSH/OU=PrivX\/Development"
+#
+# Supported subject name attributes:
+#   asn.1                       attribute
+#   -------------------------------------
+#   2.5.4.3                     CN
+#	2.5.4.4                     SN
+#	2.5.4.5                     serialNumber
+#	2.5.4.6                     C
+#	2.5.4.7                     L
+#	2.5.4.8                     ST
+#	2.5.4.9                     streetAddress
+#	2.5.4.10                    O
+#	2.5.4.11                    OU
+#	2.5.4.12                    title
+#	2.5.4.17                    postalCode
+#	2.5.4.42                    GN
+#	2.5.4.43                    initials
+#	2.5.4.44                    generationQualifier
+#	2.5.4.46                    dnQualifier
+#	2.5.4.65                    pseudonym
+#	0.9.2342.19200300.100.1.25  DC
+#	1.2.840.113549.1.9.1        emailAddress
+#	0.9.2342.19200300.100.1.1   userid
+
+# x509 CA certificate subject name
+x509_ca_subject = "OU=PrivX Authorizer CA/CN=PrivX CA"
+
+# X509 certificate subject name
+x509_certificate_subject = "CN=PrivX User"
+
+# How much earlier the certificate becomes valid compared to the
+# current authorizer time. This settings can be adjust to tolerate
+# cases when serer clocks are slightly out-of-sync. The value is in
+# milliseconds.
+certificate_valid_before = 120000
+
+# OpenSSH / SSH X.509 certificate validity duration in milliseconds.
+# Default value: 5 minutes
+certificate_validity = 300000
+
+# RDP X.509 certificate validity duration is milliseconds.
+# Default value: 8 hours
+rdp_certificate_validity = 28800000
+
+# Allow PrivX to manage target host roles on behalf of target host.
+# This enables PrivX authorizer to allow using "--delegated-principals" and "--delegated-personal-account-roles" configuration flags of deploy script.
+# If disabled, the target host SSHD config is locked down and adding new roles to target host requires re-running deploy script.
+# Enabling this is useful for environments where new roles are created often and administrator does not want to re-run deploy script on target hosts.
+# NOTE: if enabled, using both methods is allowed. Configuration is host specific, depending on deploy script parameters.
+allow_delegated_ssh_roles = true
+
+[db]
+# DB data version number
+# Do not modify
+data_version = "3"
+
+[tls]
+# Microservice https server settings
+enable_https_server = true
+certificate = "/opt/privx/cert/authorizer.crt"
+private_key = "/opt/privx/cert/authorizer.key"

@@ -1,0 +1,66 @@
+#
+#oauth client specific signing and token parameters
+#
+# Supported token signing methods:
+# - HS256, HS384, HS512, RS256, RS384, (RS512), ES256, ES384, ES512
+# For details: https://tools.ietf.org/html/rfc7518
+#
+# R512 fails tokens too long
+#
+
+client_ids = [
+    "privx-ui",
+    "privx-service",
+    "privx-external",
+]
+
+
+#
+# PrivX ui users use this client definition
+#
+[privx-ui]
+id = "privx-ui"
+
+#audience will be in standard claims and is required to fetch
+#client specific signature verification key
+audience = "privx-ui"
+
+# privx-ui client type is always public
+client_type = "public"
+
+authorize_token_valid = "5m"
+access_token_valid = "5m"
+refresh_token_valid = "8h"
+
+# session_valid defines maximum session validity time from logon.
+# if session_valid is defined, "refresh" request to /token returns also refesh
+# tokens until session_valid is reached.
+session_valid = "8h"
+
+signing_method = "Ed25519"
+#if signing_method symmetric, add the secret to conf file
+#signing_secret = "verysecret"
+use_cookies = true
+use_fingerprint = true
+#
+# PrivX microservices use this client definition
+#
+[privx-service]
+id = "privx-service"
+audience = "privx-service"
+
+access_token_valid = "72h"
+signing_method = "Ed25519"
+
+# Client side access token expiration margin
+access_token_expiration_margin = "60s"
+
+#
+# External scripts use this client definition
+#
+[privx-external]
+id = "privx-external"
+audience = "privx-external"
+access_token_valid = "30m"
+signing_method = "Ed25519"
+client_type = "public"
