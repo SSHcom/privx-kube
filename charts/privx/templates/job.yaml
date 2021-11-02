@@ -34,6 +34,10 @@ spec:
           env:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- with $job.command }}
+          command:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           {{- with $job.args }}
           args:
             {{- toYaml . | nindent 12 }}
