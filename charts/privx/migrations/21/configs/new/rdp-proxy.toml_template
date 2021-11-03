@@ -1,0 +1,14 @@
+servicename = "rdp-proxy"
+
+# Default port for rdp-proxy
+listen_port = 8087
+
+# Keyvault credentials.
+keyvault_id = "@RDPPROXY_ID@"
+keyvault_secret = "@RDPPROXY_SECRET@"
+
+[tls]
+# Microservice https server settings
+enable_https_server = true
+certificate = "/opt/privx/cert/rdp-proxy.crt"
+private_key = "/opt/privx/cert/rdp-proxy.key"
