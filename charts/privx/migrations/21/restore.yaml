@@ -17,7 +17,7 @@ jobs:
     image:
       repository: public.ecr.aws/sshprivx/upgrader
       pullPolicy: IfNotPresent
-      tag: "21.0"
+      tag: "21.1"
     imagePullSecrets:
       - name: docker-pull-secret
     environment:
