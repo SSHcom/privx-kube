@@ -40,8 +40,15 @@ session_valid = "8h"
 signing_method = "Ed25519"
 #if signing_method symmetric, add the secret to conf file
 #signing_secret = "verysecret"
+
+# If enabled, http only cookies are enabled to secure the access & refresh
+# tokens (Refresh token only as of Privx 21). Enabled by default
 use_cookies = true
-use_fingerprint = true
+
+# If enabled, extra fingerprint is added to secure the access and refresh
+# tokens. Disabled by default.
+use_fingerprint = false
+
 #
 # PrivX microservices use this client definition
 #
