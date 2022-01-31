@@ -87,7 +87,7 @@ jobs:
       repository: public.ecr.aws/sshprivx/installer
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "21.1"
+      tag: "22.0"
     imagePullSecrets:
       - name: docker-pull-secret
     podSecurityContext:
@@ -97,6 +97,10 @@ jobs:
     environment:
       - name: INSTALLER_CMD
         value: full-install
+      - name: PRIVX_USER
+        value: "5111"
+      - name: PRIVX_GROUP
+        value: "5111"
     volumes:
       enabled: true
       volumeMounts:
@@ -197,7 +201,7 @@ jobs:
       repository: public.ecr.aws/sshprivx/installer
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "21.1"
+      tag: "22.0"
     imagePullSecrets:
       - name: docker-pull-secret
     podSecurityContext:
@@ -241,7 +245,7 @@ jobs:
       repository: public.ecr.aws/sshprivx/secrets-generator
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "21.1"
+      tag: "22.0"
     imagePullSecrets:
       - name: docker-pull-secret
     podSecurityContext:
@@ -316,7 +320,7 @@ ms:
       repository: public.ecr.aws/sshprivx/rdp-proxy
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "21.1"
+      tag: "22.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -443,7 +447,7 @@ ms:
       repository: public.ecr.aws/sshprivx/ssh-proxy
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "21.1"
+      tag: "22.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -562,7 +566,7 @@ ms:
       repository: public.ecr.aws/sshprivx/auth
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "21.1"
+      tag: "22.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -668,7 +672,7 @@ ms:
       repository: public.ecr.aws/sshprivx/keyvault
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "21.1"
+      tag: "22.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -773,7 +777,7 @@ ms:
       repository: public.ecr.aws/sshprivx/authorizer
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "21.1"
+      tag: "22.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -903,7 +907,7 @@ ms:
       repository: public.ecr.aws/sshprivx/connection-manager
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "21.1"
+      tag: "22.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1011,7 +1015,7 @@ ms:
       repository: public.ecr.aws/sshprivx/host-store
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "21.1"
+      tag: "22.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1116,7 +1120,7 @@ ms:
       repository: public.ecr.aws/sshprivx/license-manager
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "21.1"
+      tag: "22.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1228,7 +1232,7 @@ ms:
       repository: public.ecr.aws/sshprivx/monitor-service
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "21.1"
+      tag: "22.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1333,7 +1337,7 @@ ms:
       repository: public.ecr.aws/sshprivx/rdp-mitm
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "21.1"
+      tag: "22.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1342,8 +1346,8 @@ ms:
 
     initContainers:
       - name: conf-copier
-        image: public.ecr.aws/sshprivx/rdp-mitm-conf:21.1
-        imagePullPolicy:  IfNotPresent
+        image: public.ecr.aws/sshprivx/rdp-mitm-conf:22.0
+        imagePullPolicy: IfNotPresent
         command: [ "/bin/sh", "-c" ]
         securityContext:
           readOnlyRootFilesystem: true
@@ -1481,7 +1485,7 @@ ms:
       repository: public.ecr.aws/sshprivx/ssh-mitm
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "21.1"
+      tag: "22.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1595,7 +1599,7 @@ ms:
       repository: public.ecr.aws/sshprivx/trail-index
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "21.1"
+      tag: "22.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1703,7 +1707,7 @@ ms:
       repository: public.ecr.aws/sshprivx/role-store
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "21.1"
+      tag: "22.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1810,7 +1814,7 @@ ms:
       repository: public.ecr.aws/sshprivx/settings
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "21.1"
+      tag: "22.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1915,7 +1919,7 @@ ms:
       repository: public.ecr.aws/sshprivx/userstore
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "21.1"
+      tag: "22.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2020,7 +2024,7 @@ ms:
       repository: public.ecr.aws/sshprivx/vault
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "21.1"
+      tag: "22.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2126,7 +2130,7 @@ ms:
       repository: public.ecr.aws/sshprivx/workflow-engine
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "21.1"
+      tag: "22.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2135,8 +2139,8 @@ ms:
 
     initContainers:
       - name: conf-copier
-        image: public.ecr.aws/sshprivx/workflow-engine-conf:21.1
-        imagePullPolicy:  IfNotPresent
+        image: public.ecr.aws/sshprivx/workflow-engine-conf:22.0
+        imagePullPolicy: IfNotPresent
         command: [ "/bin/sh", "-c" ]
         args:
           - echo copying templates;
@@ -2255,7 +2259,7 @@ ms:
       repository: public.ecr.aws/sshprivx/nginx
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "21.1"
+      tag: "22.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2397,7 +2401,7 @@ ms:
       repository: public.ecr.aws/sshprivx/installer
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "21.1"
+      tag: "22.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2466,3 +2470,109 @@ ms:
       secrets:
         - name: privx-ca-vol
           secretName: privx-ca-secret
+
+
+  #==========network-access-manager values===============
+  networkaccessmanager:
+    name: network-access-manager
+    replicaCount: 1
+
+    image:
+      repository: public.ecr.aws/sshprivx/network-access-manager
+      pullPolicy: IfNotPresent
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: "22.0"
+
+    imagePullSecrets:
+      - name: docker-pull-secret
+    nameOverride: ""
+    fullnameOverride: ""
+
+    initContainers: []
+    serviceAccount:
+      # Specifies whether a service account should be created
+      create: true
+      # Annotations to add to the service account
+      annotations: {}
+      # The name of the service account to use.
+      # If not set and create is true, a name is generated using the fullname template
+      name: network-access-manager
+
+    podAnnotations: {}
+    podSecurityContext:
+      fsGroup: 5111
+      runAsUser: 5111
+    securityContext: {}
+
+    service:
+      enabled: true
+      type: ClusterIP
+      port: 8899
+
+    ingress:
+      https:
+        name: https
+        useCommonHost: true
+        useCommonAnnotations: true
+        className: ""
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-ssl-name: "network-access-manager"
+        hosts:
+          - host: localhost
+            paths:
+              - path: /network-access-manager
+                pathType: Prefix
+        tls:
+          - secretName: privx-tls
+            hosts:
+              - localhost
+
+    resources: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious
+      # choice for the user. This also increases chances charts run on environments with little
+      # resources, such as Minikube. If you do want to specify resources, uncomment the following
+      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+
+    rbac:
+      create: false
+
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 100
+      targetCPUUtilizationPercentage: 80
+      # targetMemoryUtilizationPercentage: 80
+
+    nodeSelector: {}
+
+    tolerations: []
+
+    affinity: {}
+    level:
+      log: DEBUG
+      trace: 3
+
+    volumes:
+      enabled: true
+      volumeMounts:
+        - mountPath: /opt/privx/cert
+          name: privx-config
+          subPath: privxcert
+        - mountPath: /opt/privx/keyvault
+          name: privx-config
+          subPath: keyvault
+        - mountPath: /opt/privx/etc
+          name: privx-config
+          subPath: privxetc
+        - mountPath: /etc/nginx/ssl
+          name: privx-config
+          subPath: nginxssl
+      claims:
+        - name: privx-config
+          claimName: privx-claim
