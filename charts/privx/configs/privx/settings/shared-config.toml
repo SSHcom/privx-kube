@@ -89,6 +89,9 @@ authorizer_crl_http_port = 8088
 # Keyvault
 keyvault_address = "https://{{ .Values.ms.keyvault.name }}:{{ .Values.ms.keyvault.service.port }}/keyvault/api/v1"
 
+# Network Access Manager
+networkaccessmanager_address = "https://{{ .Values.ms.networkaccessmanager.name }}:{{ .Values.ms.networkaccessmanager.service.port }}/network-access-manager/api/v1"
+
 # Connection manager
 connectionmanager_address = "https://{{ .Values.ms.connectionmanager.name }}:{{ .Values.ms.connectionmanager.service.port }}/connection-manager/api/v1"
 connectionmanager_ws_address = "wss://{{ .Values.ms.connectionmanager.name }}:{{ .Values.ms.connectionmanager.service.port }}/connection-manager/api/v1/websocket"
@@ -265,7 +268,7 @@ client_cert_subject_name = "OU=PrivX Internal Web Server"
 # i.e. with the following example: X-Forwarded-For: faked-ip.com, webproxy.ip, 123.11.12.3, elb-ip
 # using value 1 would pick the second item from the end, which would be 123.11.12.3
 # If not using load balancers, use the value 0
-# Used for resolving client IP for role IP restrictions and login rate limiter.
+# Used for resolving client IP for role IP restrictions, login rate limiter and auth token fingerprint.
 # Does not affect to SSH-MITM and RDP-MITM IP restrictions.
 # If role IP restrictions or login rate limiter are not used, this setting is ignored.
 # Default value 0 = use the last IP address in the provided X-Forwarded-For header

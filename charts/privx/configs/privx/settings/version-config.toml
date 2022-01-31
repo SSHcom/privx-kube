@@ -226,3 +226,13 @@ data_version = "3"
 
 [21.0.monitorservice.db]
 data_version = "10"
+
+################################# PrivX 22.0 #################################
+[22.0.workflowengine.db]
+data_version = "7"
+
+[22.0.connectionmanager.db]
+data_version = "10"
+
+[22.0.hoststore.db]
+data_version = "17"

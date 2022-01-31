@@ -20,6 +20,7 @@ clients = [
   "settings:@SETTINGS_CLIENTID@",
   "vault:@VAULT_CLIENTID@",
   "license-manager:@LICENSE_MANAGER_CLIENTID@",
+  "networkaccessmanager:@NETWORK_ACCESS_MANAGER_CLIENTID@",
 ]
 
 # Keyvault backend.
