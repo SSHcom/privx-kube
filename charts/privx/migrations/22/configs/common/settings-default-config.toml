@@ -72,6 +72,50 @@ privx_app_switcher_links_ukm = ""
 # issuing certificates of the host certificates.
 host_certificate_trust_anchors = ""
 
+# If enabled, the allow_plaintext_vnc will not setup an ssh tunnel to secure the
+# vnc connection. By default, the option is disabled and vnc connections secured
+allow_plaintext_vnc = false
+
+[GLOBAL.icap]
+# Enable ICAP for RDP web UI file transfers
+icap_for_rdp_proxy = false
+
+# Enable ICAP for RDP native client file transfers
+icap_for_rdp_mitm = false
+
+# Enable ICAP for SSH web UI file transfers (not implemented yet)
+icap_for_ssh_proxy = false
+
+# Enable ICAP for SSH native client file transfers (not implemented yet)
+icap_for_ssh_mitm = false
+
+# ICAP server hostname
+# Example: 10.1.1.1
+icap_server_hostname = ""
+
+# ICAP server port
+# Example: 1344
+icap_server_port = 1344
+
+# Send a response modification with http request headers, using this url
+# Example: icap://10.1.1.1:1344/respmod
+icap_respmod_url = ""
+
+# Send a request modification instead of response modification, using this url
+# Example: icap://10.1.1.1:1344/reqmod
+icap_reqmod_url = ""
+
+# Set maximum preview data size. Set to 0 to disable preview
+icap_preview_length = 4096
+
+# Optional service name for ICAP server
+# Example: "squidclamav"
+icap_service_name = ""
+
+# ICAP client binary path
+icap_client_binary_path = "/opt/privx/bin/c-icap-client"
+
+
 ##########################################################################################
 
 [ROLE-STORE]
@@ -88,7 +132,7 @@ host_scanning_frequency = 300
 # AWS role scanning delay after starting the service
 first_role_scanning_delay = 10
 
-# LDAP settings    
+# LDAP settings
 [ROLE-STORE.ldap]
 # Default LDAP cache TTL (in seconds). Used if no TTL is given for LDAP data source on application UI.
 # After the cache expires, it will not be purged until the fresh content is retrieved from LDAP, so the cache expiration
@@ -120,7 +164,7 @@ global_ad_user_filter = "(!userAccountControl:1.2.840.113556.1.4.803:=2)"
 # i.e. paging_size = 1000
 paging_size = 1000
 
-# Enable nested groups for role mappings. Enables LDAP_MATCHING_RULE_IN_CHAIN (1.2.840.113556.1.4.1941) filter for role queries 
+# Enable nested groups for role mappings. Enables LDAP_MATCHING_RULE_IN_CHAIN (1.2.840.113556.1.4.1941) filter for role queries
 # against user directories.
 # i.e. (memberOf:1.2.840.113556.1.4.1941:=CN=masterGroup,CN=Users,DC=testad,DC=example,DC=com)
 # This option affects only to role mappings, AD directory settings are not affected by this setting.
@@ -315,7 +359,7 @@ service_health_check_max_requests_per_second = 1
 # Default 600 seconds
 service_health_check_wait = 600
 
-# Housekeeping settings 
+# Housekeeping settings
 [HOST-STORE.host-house-keeping]
 # Interval for housekeeping, in Hours. Specifies the frequency
 # in which the clean-up josb (housekeeping) runs. The job, deletes the
@@ -458,6 +502,10 @@ connectivity_test_timeout = 30
 # Disable windows smart card login failure workaround.
 smartcard_status_workaround_disabled = true
 
+# Timeout interval (seconds) for connection message reply.
+# Default: 5 seconds.
+connection_message_timeout_sec = 5
+
 [RDP-PROXY.certificates]
 # Replace the stored certificate if received target certificate is differ from stored certificate.
 update_automatically = true
@@ -529,6 +577,10 @@ allow_role_ip_restrictions = true
 # Reauthorization interval in seconds
 reauthorization_interval_sec = 300
 
+# Timeout interval (seconds) for connection message reply.
+# Default: 5 seconds.
+connection_message_timeout_sec = 5
+
 [RDP-MITM.certificates]
 # Replace the stored certificate if received target certificate is differ from stored certificate.
 update_automatically = true
@@ -588,6 +640,10 @@ allow_connect_to_local_addresses = false
 
 # Target blacklist: a comma separated list of IP addresses or subnets (CIDR) of prohibited SSH targets
 target_blacklist = ""
+
+# Timeout interval (seconds) for connection message reply.
+# Default: 5 seconds.
+connection_message_timeout_sec = 5
 
 [SSH-PROXY.db]
 # Maximum amount of time a connection may be reused (in seconds)
@@ -655,6 +711,13 @@ target_blacklist = ""
 # If that's the case, but you still want to use IP limitations for web based access, set this value to false.
 allow_role_ip_restrictions = true
 
+# Exec connection idle timeout in seconds
+exec_connection_idle_timeout_sec = 30
+
+# Timeout interval (seconds) for connection message reply.
+# Default: 5 seconds.
+connection_message_timeout_sec = 5
+
 [SSH-MITM.db]
 # Maximum amount of time a connection may be reused (in seconds)
 # 0 = connections are reused forever
@@ -715,7 +778,74 @@ max_open_conns = 20
 max_idle_conns = 2
 
 ##########################################################################################
+[NETWORK-ACCESS-MANAGER]
+[NETWORK-ACCESS-MANAGER.db]
+# Maximum amount of time a connection may be reused (in seconds)
+# 0 = connections are reused forever
+# i.e. conn_max_lifetime = 900
+conn_max_lifetime = 900
 
+# SetConnMaxIdleTime sets the maximum amount of time a connection may be idle.
+# If d <= 0, connections are not closed due to a connection's idle time.
+conn_max_idletime = 900
+
+# Maximum number of open connections to the database.
+# If n <= 0, then there is no limit on the number of open connections.
+max_open_conns = 20
+
+# Maximum number of idle DB connections
+# If n <= 0, no idle connections are retained
+max_idle_conns = 2
+
+[NETWORK-ACCESS-MANAGER.service]
+# Reauthorization interval in seconds
+reauthorization_interval_sec = 300
+
+# Housekeeping interval in seconds
+housekeeping_interval_sec = 60
+
+# Maximum number of retries for PrivX router session removal
+router_session_removal_max_retries = 5
+
+# Timeout interval (seconds) for connection message reply.
+# Default: 5 seconds.
+connection_message_timeout_sec = 5
+
+# Interval for metadata updates to connection manager, in seconds.
+metadata_update_interval_sec = 120
+
+# Timeout for network target sessions when no connection to connection manager (minutes).
+timeout_when_no_connmgr_min = 5
+
+[NETWORK-ACCESS-MANAGER.router]
+# Routers
+#
+# type: linux-iptables
+# {
+#   "type": "linux-iptables",
+#   "client_ip_pool": [ "10.0.0.0/24" ],
+#   "username": "root",
+#   "hostname": "router.privx.ssh.com",
+# }
+#
+# type: sshexec
+# {
+#   "type": "sshexec",
+#   "client_ip_pool": [ "11.0.0.0/24" ],
+#   "username": "root",
+#   "hostname": "router.privx.ssh.com",
+#   "parameters": "router specific parameter string"
+# }
+#
+# type: exec
+# {
+#   "type": "exec",
+#   "client_ip_pool": [ "12.0.0.0/24" ],
+#   "parameters": "router specific parameter string"
+# }
+routers = '[]'
+
+##########################################################################################
 [WORKFLOW-ENGINE]
 [WORKFLOW-ENGINE.housekeeping]
 # Interval for housekeeping, in hours.

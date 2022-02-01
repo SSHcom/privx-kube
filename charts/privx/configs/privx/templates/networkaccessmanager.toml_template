@@ -1,0 +1,19 @@
+servicename = "network_access_manager"
+
+# Default port for network access manager
+listen_port = 8899
+
+# Network-access-manager keyvault credentials.
+keyvault_id = "@NETWORK_ACCESS_MANAGER_ID@"
+keyvault_secret = "@NETWORK_ACCESS_MANAGER_SECRET@"
+
+[tls]
+# Microservice https server settings
+enable_https_server = true
+certificate = "/opt/privx/cert/network-access-manager.crt"
+private_key = "/opt/privx/cert/network-access-manager.key"
+
+[db]
+# DB data version number
+# Do not modify
+data_version = "1"

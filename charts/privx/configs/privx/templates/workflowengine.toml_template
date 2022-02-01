@@ -9,7 +9,7 @@ keyvault_secret = "@WORKFLOWENGINE_SECRET@"
 [db]
 # DB data version number
 # Do not modify
-data_version = "6"
+data_version = "7"
 
 [tls]
 # Microservice https server settings
