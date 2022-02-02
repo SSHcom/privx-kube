@@ -1,7 +1,7 @@
 image:
   registry: public.ecr.aws
   repository: sshprivx/nginx-ingress
-  tag: "21.1"
+  tag: "22.0"
 
 
 # Change the default ports 80 and 443 to be something > 1024
