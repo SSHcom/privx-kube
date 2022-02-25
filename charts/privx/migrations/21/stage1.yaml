@@ -16,14 +16,14 @@ jobs:
     image:
       repository: public.ecr.aws/sshprivx/upgrader
       pullPolicy: IfNotPresent
-      tag: "21.1"
+      tag: "21.3"
     imagePullSecrets:
       - name: docker-pull-secret
     environment:
       - name: UPGRADER_CMD
         value: backup
       - name: PRIVX_VERSION
-        value: 20.1.0
+        value: 20.3.0
     podSecurityContext:
       fsGroup: 5111
       runAsUser: 5111
