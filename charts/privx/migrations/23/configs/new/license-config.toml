@@ -1,0 +1,6 @@
+# File-based license management config.
+
+[license]
+
+# The license file path.
+file_path = "/opt/privx/license/privx.lic"

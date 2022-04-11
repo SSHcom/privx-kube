@@ -1,0 +1,245 @@
+# migration-tool version config
+# If configuration attribute is found in this list, override user old config with the new value.
+# Otherwise, preserve old settings if possible.
+
+################################# PrivX 2.2 #################################
+[2.2.rdp-proxy.rdp-proxy]
+# Turn on RDP smart card authentication
+smartcard_authentication_enabled = true
+
+[2.2.user-store.db]
+data_version = "2"
+
+[2.2.workflowengine.db]
+data_version = "2"
+
+################################# PrivX 2.3 #################################
+
+[2.3.user-store.db]
+data_version = "3"
+
+[2.3.shared-config.shared]
+auth_address = "https://localhost/auth/api"
+
+################################# PrivX 2.4 #################################
+
+# Add global AD user filter to filter out disabled AD users by default
+[2.4.rolestore.ldap]
+global_ad_user_filter = "(!userAccountControl:1.2.840.113556.1.4.803:=2)"
+
+################################# PrivX 3.0 #################################
+
+[3.0.shared-config.shared]
+auth_address = "https://localhost/auth/api/v1"
+
+################################# PrivX 4.0 #################################
+
+[4.0.connectionmanager.db]
+data_version = "3"
+
+[4.0.monitorservice.db]
+data_version = "2"
+
+################################# PrivX 5.0 #################################
+
+[5.0.connectionmanager.db]
+data_version = "4"
+
+[5.0.monitorservice.db]
+data_version = "3"
+
+[5.0.hoststore.db]
+data_version = "5"
+
+[5.0.rolestore.db]
+data_version = "2"
+
+################################# PrivX 6.0 #################################
+
+[6.0.workflowengine.db]
+data_version = "3"
+
+[6.0.monitorservice.db]
+data_version = "4"
+
+[6.0.keyvault.db]
+data_version = "2"
+
+################################# PrivX 7.0 #################################
+
+[7.0.rolestore.db]
+data_version = "3"
+
+[7.0.connectionmanager.db]
+data_version = "5"
+
+################################# PrivX 8.0 #################################
+
+[8.0.user-store.db]
+data_version = "6"
+
+[8.0.keyvault.db]
+data_version = "3"
+
+[8.0.monitorservice]
+status_check_interval = 1
+
+[8.0.rolestore.db]
+data_version = "4"
+
+[8.0.hoststore.db]
+data_version = "6"
+
+[8.0.oauth-shared-config]
+client_ids = [
+    "privx-ui",
+    "privx-service",
+    "privx-external",
+]
+
+################################# PrivX 9.0 #################################
+
+[9.0.connectionmanager.db]
+data_version = "7"
+
+[9.0.monitorservice.monitorservice]
+status_check_interval = 10
+housekeeping_interval = 8
+
+[9.0.rolestore.db]
+data_version = "5"
+
+[9.0.hoststore]
+listen_port = 8882
+
+[9.0.monitorservice.db]
+data_version = "6"
+
+################################# PrivX 10.0 #################################
+
+[10.0.hoststore.db]
+data_version = "7"
+
+
+################################# PrivX 11.0 #################################
+
+[11.0.hoststore.db]
+data_version = "8"
+
+################################# PrivX 12.0 #################################
+
+[12.0.user-store.db]
+data_version = "7"
+
+[12.0.hoststore.db]
+data_version = "9"
+
+################################# PrivX 13.0 #################################
+
+[13.0.rolestore.db]
+data_version = "6"
+
+[13.0.hoststore.db]
+data_version = "10"
+
+[13.0.monitorservice.db]
+data_version = "7"
+
+[13.0.workflowengine.db]
+data_version = "4"
+
+################################# PrivX 14.0 #################################
+
+[14.0.user-store.db]
+data_version = "8"
+
+[14.0.authorizer.db]
+data_version = "2"
+
+[14.0.rolestore.db]
+data_version = "7"
+
+[14.0.hoststore.db]
+data_version = "11"
+
+[14.0.connectionmanager.db]
+data_version = "8"
+
+[14.0.monitorservice.db]
+data_version = "8"
+
+################################# PrivX 15.0 #################################
+
+[15.0.workflowengine.db]
+data_version = "5"
+
+[15.0.license-manager.db]
+data_version = "2"
+
+[15.0.rolestore.db]
+data_version = "8"
+
+[15.0.user-store.db]
+data_version = "9"
+
+[15.0.monitorservice.db]
+data_version = "9"
+
+################################# PrivX 16.0 #################################
+
+[16.0.hoststore.db]
+data_version = "12"
+
+[16.0.connectionmanager.db]
+data_version = "9"
+
+[16.0.rolestore.db]
+data_version = "9"
+
+################################# PrivX 17.0 #################################
+[17.0.hoststore.db]
+data_version = "14"
+
+################################# PrivX 18.0 #################################
+[18.0.workflowengine.db]
+data_version = "6"
+
+[18.0.hoststore.db]
+data_version = "16"
+
+[18.0.settings.db]
+data_version = "2"
+
+################################# PrivX 20.0 #################################
+[20.0.authorizer.db]
+data_version = "3"
+
+################################# PrivX 21.0 #################################
+[21.0.vault.db]
+data_version = "2"
+
+[21.0.settings.db]
+data_version = "3"
+
+[21.0.license-manager.db]
+data_version = "3"
+
+[21.0.monitorservice.db]
+data_version = "10"
+
+################################# PrivX 22.0 #################################
+[22.0.workflowengine.db]
+data_version = "7"
+
+[22.0.connectionmanager.db]
+data_version = "10"
+
+[22.0.hoststore.db]
+data_version = "17"
+
+################################# PrivX 23.0 #################################
+[23.0.hoststore.db]
+data_version = "18"
+
+[23.0.networkaccessmanager.db]
+data_version = "2"
