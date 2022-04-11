@@ -53,6 +53,17 @@ migration:
 # Enabling shutdown will bring all the deployment replicas to zero
 shutdown: false
 
+# This pod security context is used by pods that have useGlobalPodSecurityContext set to true
+podSecurityContext:
+  fsGroup: 5111
+  runAsUser: 5111
+  runAsNonRoot: true
+
+securityContext:
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 5111
+  allowPrivilegeEscalation: false
 #==============Config values (TOMLS, RDPMITM and NGINX configs)
 configs:
   nginx:
@@ -87,13 +98,18 @@ jobs:
       repository: public.ecr.aws/sshprivx/installer
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "22.1"
+      tag: "23.0"
     imagePullSecrets:
       - name: docker-pull-secret
-    podSecurityContext:
-      fsGroup: 5111
-      runAsUser: 5111
+    useGlobalPodSecurityContext: true
     securityContext: {}
+    resources: {}
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
     environment:
       - name: INSTALLER_CMD
         value: full-install
@@ -157,11 +173,6 @@ jobs:
             cp -f /rdpmitm-mount/* /opt/privx/etc/rdpmitm/;
             rm -rf /opt/privx/keyvault/*;
             rm -rf /opt/privx/temp/*;
-        securityContext:
-          readOnlyRootFilesystem: true
-          runAsNonRoot: true
-          runAsUser: 5111
-          allowPrivilegeEscalation: false
         volumeMounts:
           - name: privx-templates-config
             mountPath: /templates-mount
@@ -183,7 +194,13 @@ jobs:
           - mountPath: /opt/privx/temp
             name: privx-config
             subPath: privxtmp
-
+        resources: {}
+          # limits:
+          #   cpu: 100m
+          #   memory: 128Mi
+          # requests:
+          #   cpu: 100m
+          #   memory: 128Mi
     serviceAccount:
       create: false
       annotations: {}
@@ -201,13 +218,18 @@ jobs:
       repository: public.ecr.aws/sshprivx/installer
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "22.1"
+      tag: "23.0"
     imagePullSecrets:
       - name: docker-pull-secret
-    podSecurityContext:
-      fsGroup: 5111
-      runAsUser: 5111
+    useGlobalPodSecurityContext: true
     securityContext: {}
+    resources: {}
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
     environment:
       - name: INSTALLER_CMD
         value: update-internal-cert
@@ -245,13 +267,18 @@ jobs:
       repository: public.ecr.aws/sshprivx/secrets-generator
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "22.1"
+      tag: "23.0"
     imagePullSecrets:
       - name: docker-pull-secret
-    podSecurityContext:
-      fsGroup: 5111
-      runAsUser: 5111
+    useGlobalPodSecurityContext: true
     securityContext: {}
+    resources: {}
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
     args:
       - --keys=ca.crt
       - --files=/etc/nginx/ssl/privx-ca.crt
@@ -320,7 +347,7 @@ ms:
       repository: public.ecr.aws/sshprivx/rdp-proxy
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "22.1"
+      tag: "23.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -337,10 +364,12 @@ ms:
       # If not set and create is true, a name is generated using the fullname template
       name: rdp-proxy
 
+    environment:
+      - name: HOME
+        value: /home/privx
+
     podAnnotations: {}
-    podSecurityContext:
-      fsGroup: 5111
-      runAsUser: 5111
+    useGlobalPodSecurityContext: true
     securityContext: {}
 
     service:
@@ -447,7 +476,7 @@ ms:
       repository: public.ecr.aws/sshprivx/ssh-proxy
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "22.1"
+      tag: "23.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -465,9 +494,7 @@ ms:
       name: ssh-proxy
 
     podAnnotations: {}
-    podSecurityContext:
-      fsGroup: 5111
-      runAsUser: 5111
+    useGlobalPodSecurityContext: true
     securityContext: {}
 
     service:
@@ -566,7 +593,7 @@ ms:
       repository: public.ecr.aws/sshprivx/auth
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "22.1"
+      tag: "23.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -584,9 +611,7 @@ ms:
       name: auth
 
     podAnnotations: {}
-    podSecurityContext:
-      fsGroup: 5111
-      runAsUser: 5111
+    useGlobalPodSecurityContext: true
     securityContext: {}
 
     service:
@@ -672,7 +697,7 @@ ms:
       repository: public.ecr.aws/sshprivx/keyvault
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "22.1"
+      tag: "23.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -690,9 +715,7 @@ ms:
       name: keyvault
 
     podAnnotations: {}
-    podSecurityContext:
-      fsGroup: 5111
-      runAsUser: 5111
+    useGlobalPodSecurityContext: true
     securityContext: {}
 
     service:
@@ -777,7 +800,7 @@ ms:
       repository: public.ecr.aws/sshprivx/authorizer
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "22.1"
+      tag: "23.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -795,9 +818,7 @@ ms:
       name: authorizer
 
     podAnnotations: {}
-    podSecurityContext:
-      fsGroup: 5111
-      runAsUser: 5111
+    useGlobalPodSecurityContext: true
     securityContext: {}
 
     service:
@@ -907,7 +928,7 @@ ms:
       repository: public.ecr.aws/sshprivx/connection-manager
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "22.1"
+      tag: "23.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -925,9 +946,7 @@ ms:
       name: connection-manager
 
     podAnnotations: {}
-    podSecurityContext:
-      fsGroup: 5111
-      runAsUser: 5111
+    useGlobalPodSecurityContext: true
     securityContext: {}
 
     service:
@@ -1015,7 +1034,7 @@ ms:
       repository: public.ecr.aws/sshprivx/host-store
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "22.1"
+      tag: "23.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1033,9 +1052,7 @@ ms:
       name: host-store
 
     podAnnotations: {}
-    podSecurityContext:
-      fsGroup: 5111
-      runAsUser: 5111
+    useGlobalPodSecurityContext: true
     securityContext: {}
 
     service:
@@ -1120,7 +1137,7 @@ ms:
       repository: public.ecr.aws/sshprivx/license-manager
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "22.1"
+      tag: "23.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1145,9 +1162,7 @@ ms:
       name: license-manager
 
     podAnnotations: {}
-    podSecurityContext:
-      fsGroup: 5111
-      runAsUser: 5111
+    useGlobalPodSecurityContext: true
     securityContext: {}
 
     service:
@@ -1232,7 +1247,7 @@ ms:
       repository: public.ecr.aws/sshprivx/monitor-service
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "22.1"
+      tag: "23.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1250,9 +1265,7 @@ ms:
       name: monitor-service
 
     podAnnotations: {}
-    podSecurityContext:
-      fsGroup: 5111
-      runAsUser: 5111
+    useGlobalPodSecurityContext: true
     securityContext: {}
 
     service:
@@ -1337,7 +1350,7 @@ ms:
       repository: public.ecr.aws/sshprivx/rdp-mitm
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "22.1"
+      tag: "23.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1346,15 +1359,9 @@ ms:
 
     initContainers:
       - name: conf-copier
-        image: public.ecr.aws/sshprivx/rdp-mitm-conf:22.1
+        image: public.ecr.aws/sshprivx/rdp-mitm-conf:23.0
         imagePullPolicy: IfNotPresent
         command: [ "/bin/sh", "-c" ]
-        securityContext:
-          readOnlyRootFilesystem: true
-          runAsNonRoot: true
-          runAsUser: 5111
-          allowPrivilegeEscalation: false
-
         env:
         - name: KEY_PASS
           value: inquisition
@@ -1369,6 +1376,13 @@ ms:
           subPath: privxetc
         - mountPath: /etc/nginx/tls
           name: privx-tls-vol
+        resources: {}
+          # limits:
+          #   cpu: 100m
+          #   memory: 128Mi
+          # requests:
+          #   cpu: 100m
+          #   memory: 128Mi
 
     serviceAccount:
       # Specifies whether a service account should be created
@@ -1380,9 +1394,7 @@ ms:
       name: rdp-mitm
 
     podAnnotations: {}
-    podSecurityContext:
-      fsGroup: 5111
-      runAsUser: 5111
+    useGlobalPodSecurityContext: true
     securityContext: {}
 
     service:
@@ -1485,7 +1497,7 @@ ms:
       repository: public.ecr.aws/sshprivx/ssh-mitm
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "22.1"
+      tag: "23.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1503,9 +1515,7 @@ ms:
       name: ssh-mitm
 
     podAnnotations: {}
-    podSecurityContext:
-      fsGroup: 5111
-      runAsUser: 5111
+    useGlobalPodSecurityContext: true
     securityContext: {}
 
     service:
@@ -1599,7 +1609,7 @@ ms:
       repository: public.ecr.aws/sshprivx/trail-index
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "22.1"
+      tag: "23.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1617,9 +1627,7 @@ ms:
       name: trail-index
 
     podAnnotations: {}
-    podSecurityContext:
-      fsGroup: 5111
-      runAsUser: 5111
+    useGlobalPodSecurityContext: true
     securityContext: {}
 
     service:
@@ -1707,7 +1715,7 @@ ms:
       repository: public.ecr.aws/sshprivx/role-store
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "22.1"
+      tag: "23.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1725,9 +1733,7 @@ ms:
       name: role-store
 
     podAnnotations: {}
-    podSecurityContext:
-      fsGroup: 5111
-      runAsUser: 5111
+    useGlobalPodSecurityContext: true
     securityContext: {}
 
     service:
@@ -1814,7 +1820,7 @@ ms:
       repository: public.ecr.aws/sshprivx/settings
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "22.1"
+      tag: "23.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1832,9 +1838,7 @@ ms:
       name: settings
 
     podAnnotations: {}
-    podSecurityContext:
-      fsGroup: 5111
-      runAsUser: 5111
+    useGlobalPodSecurityContext: true
     securityContext: {}
 
     service:
@@ -1919,7 +1923,7 @@ ms:
       repository: public.ecr.aws/sshprivx/userstore
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "22.1"
+      tag: "23.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1937,9 +1941,7 @@ ms:
       name: userstore
 
     podAnnotations: {}
-    podSecurityContext:
-      fsGroup: 5111
-      runAsUser: 5111
+    useGlobalPodSecurityContext: true
     securityContext: {}
 
     service:
@@ -2024,7 +2026,7 @@ ms:
       repository: public.ecr.aws/sshprivx/vault
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "22.1"
+      tag: "23.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2041,9 +2043,7 @@ ms:
       # If not set and create is true, a name is generated using the fullname template
       name: vault
 
-    podSecurityContext:
-      fsGroup: 5111
-      runAsUser: 5111
+    useGlobalPodSecurityContext: true
     securityContext: {}
 
     podAnnotations: {}
@@ -2130,7 +2130,7 @@ ms:
       repository: public.ecr.aws/sshprivx/workflow-engine
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "22.1"
+      tag: "23.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2139,7 +2139,7 @@ ms:
 
     initContainers:
       - name: conf-copier
-        image: public.ecr.aws/sshprivx/workflow-engine-conf:22.1
+        image: public.ecr.aws/sshprivx/workflow-engine-conf:23.0
         imagePullPolicy: IfNotPresent
         command: [ "/bin/sh", "-c" ]
         args:
@@ -2147,16 +2147,17 @@ ms:
             cp -rf templates/* /opt/privx/etc/templates/;
             echo copying locales;
             cp -rf locales/* /opt/privx/etc/locales/workflowengine;
-        securityContext:
-          readOnlyRootFilesystem: true
-          runAsNonRoot: true
-          runAsUser: 5111
-          allowPrivilegeEscalation: false
         volumeMounts:
         - mountPath: /opt/privx/etc
           name: privx-config
           subPath: privxetc
-
+        resources: {}
+          # limits:
+          #   cpu: 100m
+          #   memory: 128Mi
+          # requests:
+          #   cpu: 100m
+          #   memory: 128Mi
     serviceAccount:
       # Specifies whether a service account should be created
       create: true
@@ -2166,11 +2167,7 @@ ms:
       # If not set and create is true, a name is generated using the fullname template
       name: workflow-engine
 
-    podSecurityContext:
-      fsGroup: 5111
-      runAsNonRoot: true
-      runAsUser: 5111
-      runAsGroup: 5111
+    useGlobalPodSecurityContext: true
     securityContext:
       readOnlyRootFilesystem: true
       allowPrivilegeEscalation: false
@@ -2259,7 +2256,7 @@ ms:
       repository: public.ecr.aws/sshprivx/nginx
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "22.1"
+      tag: "23.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2277,9 +2274,7 @@ ms:
       name: nginx
 
     podAnnotations: {}
-    podSecurityContext:
-      fsGroup: 5111
-      runAsUser: 5111
+    useGlobalPodSecurityContext: true
     securityContext: {}
 
     service:
@@ -2401,7 +2396,7 @@ ms:
       repository: public.ecr.aws/sshprivx/installer
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "22.1"
+      tag: "23.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2421,9 +2416,7 @@ ms:
     podAnnotations:
       reloader.stakater.com/auto: "true"
 
-    podSecurityContext:
-      fsGroup: 5111
-      runAsUser: 5111
+    useGlobalPodSecurityContext: true
     securityContext: {}
 
     service:
@@ -2481,7 +2474,7 @@ ms:
       repository: public.ecr.aws/sshprivx/network-access-manager
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "22.1"
+      tag: "23.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2499,9 +2492,7 @@ ms:
       name: network-access-manager
 
     podAnnotations: {}
-    podSecurityContext:
-      fsGroup: 5111
-      runAsUser: 5111
+    useGlobalPodSecurityContext: true
     securityContext: {}
 
     service:
@@ -2521,6 +2512,212 @@ ms:
           - host: localhost
             paths:
               - path: /network-access-manager
+                pathType: Prefix
+        tls:
+          - secretName: privx-tls
+            hosts:
+              - localhost
+
+    resources: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious
+      # choice for the user. This also increases chances charts run on environments with little
+      # resources, such as Minikube. If you do want to specify resources, uncomment the following
+      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+
+    rbac:
+      create: false
+
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 100
+      targetCPUUtilizationPercentage: 80
+      # targetMemoryUtilizationPercentage: 80
+
+    nodeSelector: {}
+
+    tolerations: []
+
+    affinity: {}
+    level:
+      log: DEBUG
+      trace: 3
+
+    volumes:
+      enabled: true
+      volumeMounts:
+        - mountPath: /opt/privx/cert
+          name: privx-config
+          subPath: privxcert
+        - mountPath: /opt/privx/keyvault
+          name: privx-config
+          subPath: keyvault
+        - mountPath: /opt/privx/etc
+          name: privx-config
+          subPath: privxetc
+        - mountPath: /etc/nginx/ssl
+          name: privx-config
+          subPath: nginxssl
+      claims:
+        - name: privx-config
+          claimName: privx-claim
+
+  #==========secrets-manager values===============
+  secretsmanager:
+    name: secrets-manager
+    replicaCount: 1
+
+    image:
+      repository: public.ecr.aws/sshprivx/secrets-manager
+      pullPolicy: IfNotPresent
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: "23.0"
+
+    imagePullSecrets:
+      - name: docker-pull-secret
+    nameOverride: ""
+    fullnameOverride: ""
+
+    initContainers: []
+    serviceAccount:
+      # Specifies whether a service account should be created
+      create: true
+      # Annotations to add to the service account
+      annotations: {}
+      # The name of the service account to use.
+      # If not set and create is true, a name is generated using the fullname template
+      name: secrets-manager
+
+    podAnnotations: {}
+    useGlobalPodSecurityContext: true
+    securityContext: {}
+
+    service:
+      enabled: true
+      type: ClusterIP
+      port: 8100
+
+    ingress:
+      https:
+        name: https
+        useCommonHost: true
+        useCommonAnnotations: true
+        className: ""
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-ssl-name: "secrets-manager"
+        hosts:
+          - host: localhost
+            paths:
+              - path: /secrets-manager
+                pathType: Prefix
+        tls:
+          - secretName: privx-tls
+            hosts:
+              - localhost
+
+    resources: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious
+      # choice for the user. This also increases chances charts run on environments with little
+      # resources, such as Minikube. If you do want to specify resources, uncomment the following
+      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+
+    rbac:
+      create: false
+
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 100
+      targetCPUUtilizationPercentage: 80
+      # targetMemoryUtilizationPercentage: 80
+
+    nodeSelector: {}
+
+    tolerations: []
+
+    affinity: {}
+    level:
+      log: DEBUG
+      trace: 3
+
+    volumes:
+      enabled: true
+      volumeMounts:
+        - mountPath: /opt/privx/cert
+          name: privx-config
+          subPath: privxcert
+        - mountPath: /opt/privx/keyvault
+          name: privx-config
+          subPath: keyvault
+        - mountPath: /opt/privx/etc
+          name: privx-config
+          subPath: privxetc
+        - mountPath: /etc/nginx/ssl
+          name: privx-config
+          subPath: nginxssl
+      claims:
+        - name: privx-config
+          claimName: privx-claim
+
+  #==========extender-service values===============
+  extenderservice:
+    name: extender-service
+    replicaCount: 1
+
+    image:
+      repository: public.ecr.aws/sshprivx/extender-service
+      pullPolicy: IfNotPresent
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: "23.0"
+
+    imagePullSecrets:
+      - name: docker-pull-secret
+    nameOverride: ""
+    fullnameOverride: ""
+
+    initContainers: []
+    serviceAccount:
+      # Specifies whether a service account should be created
+      create: true
+      # Annotations to add to the service account
+      annotations: {}
+      # The name of the service account to use.
+      # If not set and create is true, a name is generated using the fullname template
+      name: extender-service
+
+    podAnnotations: {}
+    useGlobalPodSecurityContext: true
+    securityContext: {}
+
+    service:
+      enabled: true
+      type: ClusterIP
+      port: 8981
+
+    ingress:
+      https:
+        name: https
+        useCommonHost: true
+        useCommonAnnotations: true
+        className: ""
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-ssl-name: "extender-service"
+        hosts:
+          - host: localhost
+            paths:
+              - path: /extender-service
                 pathType: Prefix
         tls:
           - secretName: privx-tls

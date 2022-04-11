@@ -23,7 +23,7 @@ jobs:
       - name: UPGRADER_CMD
         value: backup
       - name: PRIVX_VERSION
-        value: 22.1.0
+        value: 22.2.0
     useGlobalPodSecurityContext: true
     securityContext: {}
     resources: {}
