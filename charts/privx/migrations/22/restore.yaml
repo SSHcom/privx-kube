@@ -17,14 +17,14 @@ jobs:
     image:
       repository: public.ecr.aws/sshprivx/upgrader
       pullPolicy: IfNotPresent
-      tag: "22.0"
+      tag: "22.1"
     imagePullSecrets:
       - name: docker-pull-secret
     environment:
       - name: UPGRADER_CMD
         value: restore
       - name: PREVIOUS_VERSION
-        value: 21.1.0
+        value: 21.3.0
       - name: BACKUP_DIR
         value: <generated-backup-folder-placeholder>
     podSecurityContext:
