@@ -415,6 +415,10 @@ system_health_check_interval = 1
 # Interval for removing expired keys from the db cache table, in Seconds
 cache_db_expiry_interval = 300
 
+# Warning threshold for running low on disk space for external components,
+# in GB
+external_component_low_storage_warning_threshold = 5
+
 [MONITOR-SERVICE.db]
 # Maximum amount of time a connection may be reused (in seconds)
 # 0 = connections are reused forever
@@ -505,6 +509,12 @@ smartcard_status_workaround_disabled = true
 # Timeout interval (seconds) for connection message reply.
 # Default: 5 seconds.
 connection_message_timeout_sec = 5
+
+# Enable wallpaper on target hosts. Disabled by default for performance reasons.
+enable_wallpaper = false
+
+# Enable font smoothing on target hosts.
+enable_font_smoothing = true
 
 [RDP-PROXY.certificates]
 # Replace the stored certificate if received target certificate is differ from stored certificate.
@@ -817,6 +827,9 @@ metadata_update_interval_sec = 120
 # Timeout for network target sessions when no connection to connection manager (minutes).
 timeout_when_no_connmgr_min = 5
 
+# Extender connect timeout, in seconds.
+extender_connect_timeout_sec = 10
+
 [NETWORK-ACCESS-MANAGER.router]
 # Routers
 #
@@ -844,6 +857,48 @@ timeout_when_no_connmgr_min = 5
 #   "parameters": "router specific parameter string"
 # }
 routers = '[]'
+
+##########################################################################################
+[EXTENDER-SERVICE]
+
+[EXTENDER-SERVICE.db]
+# Maximum amount of time a connection may be reused (in seconds)
+# 0 = connections are reused forever
+# i.e. conn_max_lifetime = 900
+conn_max_lifetime = 900
+
+# SetConnMaxIdleTime sets the maximum amount of time a connection may be idle.
+# If d <= 0, connections are not closed due to a connection's idle time.
+conn_max_idletime = 900
+
+# Maximum number of open connections to the database.
+# If n <= 0, then there is no limit on the number of open connections.
+max_open_conns = 20
+
+# Maximum number of idle DB connections
+# If n <= 0, no idle connections are retained
+max_idle_conns = 2
+
+[EXTENDER-SERVICE.service]
+
+# Extender listener address resolution mode:
+#   dynamic: select interface address using optional listener_addresses filter
+#   static:  use static IP address from listener_addresses (first address that
+#            matches the extender listener destination IP version)
+listener_address_mode = "dynamic"
+
+# Listener addresses for extender listener address resolution: An array of IP
+# addresses or IP subnet CIDRs. Optional if listener_address_mode is dynamic,
+# mandatory if listener_address_mode is static.
+listener_addresses = [
+]
+
+# Port range for extender listener ports
+listener_port_min = 11000
+listener_port_max = 11999
+
+# Web socket keepalive interval in seconds
+ws_keepalive_interval_sec = 30
 
 ##########################################################################################
 [WORKFLOW-ENGINE]
@@ -1063,6 +1118,27 @@ ssh_cert_templates='''
 
 [LICENSE-MANAGER]
 [LICENSE-MANAGER.db]
+# Maximum amount of time a connection may be reused (in seconds)
+# 0 = connections are reused forever
+# i.e. conn_max_lifetime = 900
+conn_max_lifetime = 900
+
+# SetConnMaxIdleTime sets the maximum amount of time a connection may be idle.
+# If d <= 0, connections are not closed due to a connection's idle time.
+conn_max_idletime = 900
+
+# Maximum number of open connections to the database.
+# If n <= 0, then there is no limit on the number of open connections.
+max_open_conns = 10
+
+# Maximum number of idle DB connections
+# If n <= 0, no idle connections are retained
+max_idle_conns = 2
+
+##########################################################################################
+
+[SECRETS-MANAGER]
+[SECRETS-MANAGER.db]
 # Maximum amount of time a connection may be reused (in seconds)
 # 0 = connections are reused forever
 # i.e. conn_max_lifetime = 900

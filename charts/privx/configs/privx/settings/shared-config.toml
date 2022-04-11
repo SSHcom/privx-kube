@@ -4,6 +4,8 @@
 # Service versions address
 ssh_product_versions_address = "https://versions.ssh.com"
 
+# Tutorial base url
+guide_base_url = "https://privx-tutorial.ssh.engineering/"
 # Service version update check interval in minutes, 0 disables the check
 ssh_product_versions_check_interval = 1440
 
@@ -125,6 +127,13 @@ vault_address = "https://{{ .Values.ms.vault.name }}:{{ .Values.ms.vault.service
 
 # License Manager
 license_manager_address = "https://{{ .Values.ms.licensemanager.name }}:{{ .Values.ms.licensemanager.service.port }}/license-manager/api/v1"
+
+# Secrets Manager
+secrets_manager_address = "https://{{ .Values.ms.secretsmanager.name }}:{{ .Values.ms.secretsmanager.service.port }}/secrets-manager/api/v1"
+
+# Extender Service
+extenderservice_address = "https://{{ .Values.ms.extenderservice.name }}:{{ .Values.ms.extenderservice.service.port }}/extender-service/api/v1"
+extenderservice_connect_api_address = "{{ .Values.ms.extenderservice.name }}:{{ .Values.ms.extenderservice.service.port }}"
 
 ###############################################################################
 

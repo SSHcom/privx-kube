@@ -19,8 +19,10 @@ clients = [
   "sshmitm:@SSHMITM_CLIENTID@",
   "settings:@SETTINGS_CLIENTID@",
   "vault:@VAULT_CLIENTID@",
+  "secretsmanager:@SECRETSMANAGER_CLIENTID@",
   "license-manager:@LICENSE_MANAGER_CLIENTID@",
   "networkaccessmanager:@NETWORK_ACCESS_MANAGER_CLIENTID@",
+  "extenderservice:@EXTENDER_SERVICE_CLIENTID@",
 ]
 
 # Keyvault backend.
