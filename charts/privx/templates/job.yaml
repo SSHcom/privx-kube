@@ -13,13 +13,27 @@ spec:
     spec:
       {{- with $job.initContainers }}
       initContainers:
-        {{- toYaml . | nindent 8 }}
+        {{- range $initContainer := $job.initContainers }}
+          {{- if $job.useGlobalPodSecurityContext }}
+        - securityContext:
+            {{- toYaml $globalContext.Values.securityContext | nindent 12 }}
+          {{- else }}
+        - securityContext: {}
+          {{- end }}
+          {{- with $initContainer }}
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
+        {{- end }}
       {{- end }}
       {{- if $job.serviceAccount.create }}
       serviceAccountName: {{ $job.serviceAccount.name }}
       {{- end }}
       securityContext:
-        {{- toYaml $job.podSecurityContext | nindent 8 }}
+        {{- if $job.useGlobalPodSecurityContext }}
+          {{- toYaml $globalContext.Values.podSecurityContext | nindent 8 }}
+        {{- else }}
+          {{- toYaml $job.podSecurityContext | nindent 8 }}
+        {{- end }}
       {{- with $job.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -27,12 +41,24 @@ spec:
       containers:
         - name: {{ $globalContext.Chart.Name }}-{{ $job.name }}
           securityContext:
-            {{- toYaml $job.securityContext | nindent 12 }}
+            {{- if $job.useGlobalPodSecurityContext }}
+              {{- toYaml $globalContext.Values.securityContext | nindent 12 }}
+            {{- else }}
+              {{- toYaml $job.securityContext | nindent 12 }}
+            {{- end }}
           image: "{{ $job.image.repository }}:{{ $job.image.tag | default "latest" }}"
           imagePullPolicy: {{ $job.image.pullPolicy }}
           {{- with $job.environment }}
           env:
             {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if $job.useGlobalPodSecurityContext }}
+            {{- range $env := $job.environment }}
+              {{- if or (eq $env.name "PRIVX_USER") (eq $env.name "PRIVX_GROUP") }}
+            - name: "{{ $env.name }}"
+              value: "{{ $globalContext.Values.podSecurityContext.runAsUser | toString }}"
+              {{- end }}
+            {{- end }}
           {{- end }}
           {{- with $job.command }}
           command:
@@ -50,6 +76,8 @@ spec:
               subPath: {{ .subPath }}
             {{- end }}
           {{- end }}
+          resources:
+            {{- toYaml $job.resources | nindent 12 }}
       restartPolicy: Never
       {{- if $job.volumes.enabled }}
       volumes:

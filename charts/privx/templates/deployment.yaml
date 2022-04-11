@@ -28,7 +28,17 @@ spec:
     spec:
       {{- with $service.initContainers }}
       initContainers:
-        {{- toYaml . | nindent 8 }}
+        {{- range $initContainer := $service.initContainers }}
+          {{- if $service.useGlobalPodSecurityContext }}
+        - securityContext:
+            {{- toYaml $globalContext.Values.securityContext | nindent 12 }}
+          {{- else }}
+        - securityContext: {}
+          {{- end }}
+          {{- with $initContainer }}
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
+        {{- end }}
       {{- end }}
       {{- with $service.imagePullSecrets }}
       imagePullSecrets:
@@ -36,11 +46,19 @@ spec:
       {{- end }}
       serviceAccountName: {{ $service.serviceAccount.name }}
       securityContext:
-        {{- toYaml $service.podSecurityContext | nindent 8 }}
+        {{- if $service.useGlobalPodSecurityContext }}
+          {{- toYaml $globalContext.Values.podSecurityContext | nindent 8 }}
+        {{- else }}
+          {{- toYaml $service.podSecurityContext | nindent 8 }}
+        {{- end }}
       containers:
         - name: {{ $globalContext.Chart.Name }}-{{ $service.name }}
           securityContext:
-            {{- toYaml $service.securityContext | nindent 12 }}
+            {{- if $service.useGlobalPodSecurityContext }}
+              {{- toYaml $globalContext.Values.securityContext | nindent 12 }}
+            {{- else }}
+              {{- toYaml $service.securityContext | nindent 12 }}
+            {{- end }}
           image: "{{ $service.image.repository }}:{{ $service.image.tag | default "latest" }}"
           imagePullPolicy: {{ $service.image.pullPolicy }}
           env:
