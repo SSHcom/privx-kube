@@ -44,7 +44,7 @@ extraVolumeMounts:
 # back so that there is no writing to the container filesystem
 initContainers:
   - name: conf-copier-1
-    image: public.ecr.aws/sshprivx/nginx-ingress:22.1
+    image: public.ecr.aws/sshprivx/nginx-ingress:23.0
     imagePullPolicy: IfNotPresent
     command: [ "/bin/sh", "-c" ]
     securityContext:

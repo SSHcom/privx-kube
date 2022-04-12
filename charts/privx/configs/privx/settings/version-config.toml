@@ -236,3 +236,10 @@ data_version = "10"
 
 [22.0.hoststore.db]
 data_version = "17"
+
+################################# PrivX 23.0 #################################
+[23.0.hoststore.db]
+data_version = "18"
+
+[23.0.networkaccessmanager.db]
+data_version = "2"

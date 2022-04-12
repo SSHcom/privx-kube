@@ -1,19 +1,19 @@
 migration:
   enabled: true
   from: 21
-  to: 22
+  to: 23
 
   configs:
     new:
       name: new
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/22/configs/new/*"
+      files: "migrations/23/configs/new/*"
     common:
       name: common
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/22/configs/common/*"
+      files: "migrations/23/configs/common/*"
 # ==========Upgrader===============
 jobs:
   upgrader:
@@ -24,16 +24,21 @@ jobs:
     image:
       repository: public.ecr.aws/sshprivx/upgrader
       pullPolicy: IfNotPresent
-      tag: "22.1"
+      tag: "23.0"
     imagePullSecrets:
       - name: docker-pull-secret
     environment:
       - name: UPGRADER_CMD
         value: upgrade
-    podSecurityContext:
-      fsGroup: 5111
-      runAsUser: 5111
+    useGlobalPodSecurityContext: true
     securityContext: {}
+    resources: {}
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
     volumes:
       enabled: true
       volumeMounts:
@@ -66,11 +71,6 @@ jobs:
             cp -f /new-templates-mount/* /opt/privx/etc/new/;
             echo copying common configs;
             cp -f /common-config-mount/* /opt/privx/etc/;
-        securityContext:
-          readOnlyRootFilesystem: true
-          runAsNonRoot: true
-          runAsUser: 5111
-          allowPrivilegeEscalation: false
         volumeMounts:
           - name: privx-new-config
             mountPath: /new-templates-mount
@@ -79,6 +79,13 @@ jobs:
           - name: privx-config
             mountPath: /opt/privx/etc
             subPath: privxetc
+        resources: {}
+          # limits:
+          #   cpu: 100m
+          #   memory: 128Mi
+          # requests:
+          #   cpu: 100m
+          #   memory: 128Mi
     serviceAccount:
       create: false
       annotations: {}
