@@ -14,6 +14,24 @@ way.
 - Kubernetes >= 1.19
 - Kubectl >= 1.19
 - Helm >= 3.6.3
+- Volume/Storage requirements as described below
+
+### Volume Requirements
+PrivX depends on its different components to be able to share storage for it to work
+correctly. For this reason, it is important that a choice for storage is made in
+such a way so that the following requirement is fulfilled:
+
+#### Support for ReadWriteMany AccessMode:
+    This is required because it allows the PrivX pods to be able to share storage
+    and at the same time, the pods can be on different nodes in the cluster, which
+    allows for PrivX to be scalable in Highly Available (HA) fashion.
+
+#### Support for ReadWriteOnce AccessMode:
+    If for any reason, ReadWriteMany access mode is not available, the next best
+    option is to have the ReadWriteOnce access mode for the storage. The only
+    downside to this is that all the pods in a PrivX deployment would have to be
+    co-located in a single node. This makes it prone to failure if the node goes
+    down and manual intervention will be needed and possible loss of data.
 
 ## Pre-Install requirements
 
