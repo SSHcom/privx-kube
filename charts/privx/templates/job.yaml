@@ -54,9 +54,13 @@ spec:
           {{- end }}
           {{- if $job.useGlobalPodSecurityContext }}
             {{- range $env := $job.environment }}
-              {{- if or (eq $env.name "PRIVX_USER") (eq $env.name "PRIVX_GROUP") }}
+              {{- if eq $env.name "PRIVX_USER" }}
             - name: "{{ $env.name }}"
               value: "{{ $globalContext.Values.podSecurityContext.runAsUser | toString }}"
+              {{- end }}
+              {{- if eq $env.name "PRIVX_GROUP" }}
+            - name: "{{ $env.name }}"
+              value: "{{ $globalContext.Values.podSecurityContext.fsGroup | toString }}"
               {{- end }}
             {{- end }}
           {{- end }}
