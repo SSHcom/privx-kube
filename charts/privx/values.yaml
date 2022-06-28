@@ -565,6 +565,9 @@ ms:
     volumes:
       enabled: true
       volumeMounts:
+        - mountPath: /tmp
+          name: privx-config
+          subPath: privxsshproxyshareddrive
         - mountPath: /opt/privx/cert
           name: privx-config
           subPath: privxcert
@@ -1581,6 +1584,9 @@ ms:
     volumes:
       enabled: true
       volumeMounts:
+        - mountPath: /tmp
+          name: privx-config
+          subPath: privxsshmitmshareddrive
         - mountPath: /opt/privx/cert
           name: privx-config
           subPath: privxcert
