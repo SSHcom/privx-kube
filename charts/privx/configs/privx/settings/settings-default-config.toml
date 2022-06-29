@@ -76,6 +76,27 @@ host_certificate_trust_anchors = ""
 # vnc connection. By default, the option is disabled and vnc connections secured
 allow_plaintext_vnc = false
 
+[GLOBAL.ssh_common]
+
+# when set to true, the audit_enabled is used to audit SSH events that are
+# listed in the section events_to_audit below.
+audit_enabled = false
+
+# events_to_audit is used to list the type of SSH events that should be audited.
+# The list of event types is provided as an array and the following are
+# valid event types:
+# - stdin
+# - stdout
+# - stderr
+# - channel_request
+# - global_request
+events_to_audit = [
+"stdout",
+"stderr",
+"channel_request",
+"global_request"
+]
+
 [GLOBAL.icap]
 # Enable ICAP for RDP web UI file transfers
 icap_for_rdp_proxy = false

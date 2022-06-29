@@ -138,24 +138,24 @@ extenderservice_connect_api_address = "{{ .Values.ms.extenderservice.name }}:{{ 
 ###############################################################################
 
 # Should we send PrivX system events to stdout
-# send_regular_events_to_stdout = false
 send_regular_events_to_stdout = true
 
 # Should we send PrivX audit events to syslog
-# send_regular_events_to_syslog = true
-send_audit_events_to_syslog = false
+send_audit_events_to_syslog = {{ if .Values.privx.syslog.enabled -}} true {{- else -}} false {{- end }}
+
+# Should we send PrivX audit events to stdout
+send_audit_events_to_stdout = {{ if .Values.privx.syslog.enabled -}} false {{- else -}} true {{- end }}
 
 # Should we send PrivX system events to syslog
-# send_regular_events_to_syslog = true
 send_regular_events_to_syslog = false
 
 # rsyslog address. Used for event and audit log messages, if enabled.
 syslog_protocol = "tcp"
-syslog_address = "syslog-service:514"
+syslog_address = "{{ .Values.ms.syslogservice.name }}:{{ .Values.ms.syslogservice.service.port }}"
 
 # The used logging format for audit events, valid values: "syslog" and "cef".
 # audit_event_format = "syslog"
-audit_event_format = "syslog"
+audit_event_format = {{ if eq .Values.privx.syslog.audit.format "cef" -}} "cef" {{- else -}} "syslog" {{- end }}
 
 # Should we send audit events to AWS CloudWatchEvents
 # Use the following event pattern for CloudWatch event rules in AWS Console:

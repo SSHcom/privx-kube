@@ -10,7 +10,7 @@ keyvault_secret = "@ROLESTORE_SECRET@"
 [db]
 # DB data version number
 # Do not modify
-data_version = "9"
+data_version = "10"
 
 [tls]
 # Microservice https server settings
