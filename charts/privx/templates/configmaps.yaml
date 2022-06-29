@@ -4,6 +4,8 @@
 {{- $configs = .Values.migration.configs }}
 {{- end }}
 {{- range $config := $configs }}
+{{- if and (eq $config.name "syslog") (not ($globalContext.Values.privx.syslog.enabled)) }}
+{{- else }}
 {{- $files := $config.files -}}
 apiVersion: v1
 kind: ConfigMap
@@ -21,4 +23,5 @@ data:
   {{- tpl ($d | toString | nindent 4) $globalContext }}
 {{ end }}
 ---
+{{- end }}
 {{- end }}

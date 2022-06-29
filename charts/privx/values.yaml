@@ -45,6 +45,45 @@ privx:
     password:
     #admin email for PrivX UI login (required)
     email:
+  # audit.priority is used to set the priority level for audit events in PrivX
+  # Here are the priority levels used in PrivX and their corresponding numeric
+  # values:
+  # - EMERGENCY = 0
+  # - ALERT = 1
+  # - CRITICAL = 2
+  # - ERROR = 3
+  # - WARNING = 4
+  # - NOTICE = 5
+  # - INFO = 6
+  # - DEBUG = 7
+  #
+  # NOTE: The audit feature is enabled separately in the PrivX settings
+  audit:
+    priority: "6"
+
+  # If enabled, syslog-service will be deployed as a deployment and PrivX audit
+  # events will be sent to the syslog-service. When disabled, the audit events
+  # are sent to stdout. NOTE: Sensitive audit events are not logged to stdout.
+  syslog:
+    # value can be either true or false (without quotations)
+    enabled: false
+    audit:
+      # format can either be cef or syslog (default syslog)
+      format: syslog
+      # Audit events are logged to /var/log/audit.log that is mounted to the syslog
+      # pod. If this value is changed, make sure that the syslog has enough
+      # permissions to write to the file or send to a remote server.
+      to: "/var/log/audit.log"
+      # Pick where senstive audit events should be sent. By default those are
+      # not logged and sent to /dev/null. Please pick a secure SIEM system to
+      # forward those logs to. For security reasons, it is recommended that the
+      # logs not be stored on disk.
+      # example values:
+      # @10.10.10.10:8888 (for sending on UDP port)
+      # @@10.10.10.10:8888 (for sending TCP port)
+      # for more values, please check the rsyslog configuration rules
+      sensitive:
+        to:
 
 # When enabled migration will do the backup + upgrade (while using the correct override values)
 migration:
@@ -86,6 +125,11 @@ configs:
     hook: pre-install
     weight: "-2"
     files: "configs/privx/templates/*"
+  syslog:
+    name: syslog
+    hook: pre-install
+    weight: "-2"
+    files: "configs/privx/syslog/*"
 
 jobs:
 # ==========Full Installer Job===============
@@ -98,7 +142,7 @@ jobs:
       repository: public.ecr.aws/sshprivx/installer
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "23.1"
+      tag: "24.0"
     imagePullSecrets:
       - name: docker-pull-secret
     useGlobalPodSecurityContext: true
@@ -218,7 +262,7 @@ jobs:
       repository: public.ecr.aws/sshprivx/installer
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "23.1"
+      tag: "24.0"
     imagePullSecrets:
       - name: docker-pull-secret
     useGlobalPodSecurityContext: true
@@ -267,7 +311,7 @@ jobs:
       repository: public.ecr.aws/sshprivx/secrets-generator
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "23.1"
+      tag: "24.0"
     imagePullSecrets:
       - name: docker-pull-secret
     useGlobalPodSecurityContext: true
@@ -347,7 +391,7 @@ ms:
       repository: public.ecr.aws/sshprivx/rdp-proxy
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "23.1"
+      tag: "24.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -476,7 +520,7 @@ ms:
       repository: public.ecr.aws/sshprivx/ssh-proxy
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "23.1"
+      tag: "24.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -596,7 +640,7 @@ ms:
       repository: public.ecr.aws/sshprivx/auth
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "23.1"
+      tag: "24.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -700,7 +744,7 @@ ms:
       repository: public.ecr.aws/sshprivx/keyvault
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "23.1"
+      tag: "24.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -803,7 +847,7 @@ ms:
       repository: public.ecr.aws/sshprivx/authorizer
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "23.1"
+      tag: "24.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -931,7 +975,7 @@ ms:
       repository: public.ecr.aws/sshprivx/connection-manager
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "23.1"
+      tag: "24.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1037,7 +1081,7 @@ ms:
       repository: public.ecr.aws/sshprivx/host-store
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "23.1"
+      tag: "24.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1140,7 +1184,7 @@ ms:
       repository: public.ecr.aws/sshprivx/license-manager
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "23.1"
+      tag: "24.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1250,7 +1294,7 @@ ms:
       repository: public.ecr.aws/sshprivx/monitor-service
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "23.1"
+      tag: "24.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1353,7 +1397,7 @@ ms:
       repository: public.ecr.aws/sshprivx/rdp-mitm
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "23.1"
+      tag: "24.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1362,7 +1406,7 @@ ms:
 
     initContainers:
       - name: conf-copier
-        image: public.ecr.aws/sshprivx/rdp-mitm-conf:23.1
+        image: public.ecr.aws/sshprivx/rdp-mitm-conf:24.0
         imagePullPolicy: IfNotPresent
         command: [ "/bin/sh", "-c" ]
         env:
@@ -1500,7 +1544,7 @@ ms:
       repository: public.ecr.aws/sshprivx/ssh-mitm
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "23.1"
+      tag: "24.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1615,7 +1659,7 @@ ms:
       repository: public.ecr.aws/sshprivx/trail-index
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "23.1"
+      tag: "24.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1721,7 +1765,7 @@ ms:
       repository: public.ecr.aws/sshprivx/role-store
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "23.1"
+      tag: "24.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1826,7 +1870,7 @@ ms:
       repository: public.ecr.aws/sshprivx/settings
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "23.1"
+      tag: "24.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1929,7 +1973,7 @@ ms:
       repository: public.ecr.aws/sshprivx/userstore
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "23.1"
+      tag: "24.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2032,7 +2076,7 @@ ms:
       repository: public.ecr.aws/sshprivx/vault
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "23.1"
+      tag: "24.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2136,7 +2180,7 @@ ms:
       repository: public.ecr.aws/sshprivx/workflow-engine
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "23.1"
+      tag: "24.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2145,7 +2189,7 @@ ms:
 
     initContainers:
       - name: conf-copier
-        image: public.ecr.aws/sshprivx/workflow-engine-conf:23.1
+        image: public.ecr.aws/sshprivx/workflow-engine-conf:24.0
         imagePullPolicy: IfNotPresent
         command: [ "/bin/sh", "-c" ]
         args:
@@ -2262,7 +2306,7 @@ ms:
       repository: public.ecr.aws/sshprivx/nginx
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "23.1"
+      tag: "24.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2402,7 +2446,7 @@ ms:
       repository: public.ecr.aws/sshprivx/installer
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "23.1"
+      tag: "24.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2480,7 +2524,7 @@ ms:
       repository: public.ecr.aws/sshprivx/network-access-manager
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "23.1"
+      tag: "24.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2583,7 +2627,7 @@ ms:
       repository: public.ecr.aws/sshprivx/secrets-manager
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "23.1"
+      tag: "24.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2686,7 +2730,7 @@ ms:
       repository: public.ecr.aws/sshprivx/extender-service
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "23.1"
+      tag: "24.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2779,3 +2823,90 @@ ms:
       claims:
         - name: privx-config
           claimName: privx-claim
+
+  #==========syslog (optional for auditing)===============
+  syslogservice:
+    name: syslog-service
+    replicaCount: 1
+
+    image:
+      repository: public.ecr.aws/sshprivx/syslog-service
+      pullPolicy: IfNotPresent
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: "24.0"
+
+    imagePullSecrets:
+      - name: docker-pull-secret
+    nameOverride: ""
+    fullnameOverride: ""
+
+    initContainers: []
+    serviceAccount:
+      # Specifies whether a service account should be created
+      create: true
+      # Annotations to add to the service account
+      annotations: {}
+      # The name of the service account to use.
+      # If not set and create is true, a name is generated using the fullname template
+      name: syslog-service
+
+    podAnnotations: {}
+    useGlobalPodSecurityContext: true
+    securityContext: {}
+
+    service:
+      enabled: true
+      type: ClusterIP
+      port: 5514
+
+    # syslog is not supposed to be accessed from outside the cluster, hence the
+    # ingress is left empty.
+    ingress: {}
+
+    resources: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious
+      # choice for the user. This also increases chances charts run on environments with little
+      # resources, such as Minikube. If you do want to specify resources, uncomment the following
+      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+
+    rbac:
+      create: false
+
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 100
+      targetCPUUtilizationPercentage: 80
+      # targetMemoryUtilizationPercentage: 80
+
+    nodeSelector: {}
+
+    tolerations: []
+
+    affinity: {}
+    level:
+      log: DEBUG
+      trace: 3
+
+    volumes:
+      enabled: true
+      volumeMounts:
+        - mountPath: /var/log/
+          name: privx-config
+          subPath: syslogaudit
+        - mountPath: /etc/rsyslog.d/privx-syslog.conf
+          subPath: privx-syslog.conf
+          name: privx-syslog-config
+      claims:
+        - name: privx-config
+          claimName: privx-claim
+      configMaps:
+        - name: privx-syslog-config
+          configMap:
+            name: syslog-config
