@@ -1,7 +1,7 @@
 image:
   registry: public.ecr.aws
   repository: sshprivx/nginx-ingress
-  tag: "23.1"
+  tag: "24.0"
 
 
 # Change the default ports 80 and 443 to be something > 1024
@@ -44,7 +44,7 @@ extraVolumeMounts:
 # back so that there is no writing to the container filesystem
 initContainers:
   - name: conf-copier-1
-    image: public.ecr.aws/sshprivx/nginx-ingress:23.1
+    image: public.ecr.aws/sshprivx/nginx-ingress:24.0
     imagePullPolicy: IfNotPresent
     command: [ "/bin/sh", "-c" ]
     securityContext:

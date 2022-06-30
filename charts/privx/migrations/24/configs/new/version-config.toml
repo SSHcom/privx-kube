@@ -253,3 +253,4 @@ send_audit_events_to_syslog = {{ if .Values.privx.syslog.enabled -}} true {{- el
 send_audit_events_to_stdout = {{ if .Values.privx.syslog.enabled -}} false {{- else -}} true {{- end }}
 syslog_address = "{{ .Values.ms.syslogservice.name }}:{{ .Values.ms.syslogservice.service.port }}"
 audit_event_format = {{ if eq .Values.privx.syslog.audit.format "cef" -}} "cef" {{- else -}} "syslog" {{- end }}
+

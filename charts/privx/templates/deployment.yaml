@@ -1,5 +1,7 @@
 {{- $globalContext := . }}
 {{- range $service := .Values.ms}}
+{{- if and (eq $service.name "syslog-service") (not ($globalContext.Values.privx.syslog.enabled)) }}
+{{- else }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -70,6 +72,8 @@ spec:
               value: "{{ $service.level.log | default "INFO" }}"
             - name: SSH_TRACE
               value: "{{ $service.level.trace | default "1" }}"
+            - name: SSH_AUDIT_PRIORITY
+              value: "{{ $globalContext.Values.privx.audit.priority | default "6" }}"
             {{- if $service.licenseCode }}
             {{- if $service.licenseCode.dev.enabled }}
             - name: LICBE_PROFILE
@@ -142,4 +146,5 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
 ---
+{{- end}}
 {{- end }}
