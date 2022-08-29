@@ -1,0 +1,291 @@
+# Endpoint config for local Docker build
+
+[shared]
+# Service versions address
+ssh_product_versions_address = "https://versions.ssh.com"
+
+# Tutorial base url
+guide_base_url = "https://privx-tutorial.ssh.engineering/"
+# Service version update check interval in minutes, 0 disables the check
+ssh_product_versions_check_interval = 1440
+
+# A custom PrivX instance name to be shown in the header and audit logs.
+# Can be used to identify the instances from each others on HA environment.
+privx_instance_name = ""
+
+# A node identifier, shown in the audit logs.
+# Can be used to identify the instances from each others on HA environment,
+# will be used if 'privx_instance_name' is empty.
+privx_node_name = ""
+
+# Service public IP address
+# Used for e-mail links and host deployment scripts.
+privx_public_ip_address = ""
+
+# Service FQDN. Public DNS name for the endpoint. Used instead of public IP address, if exists.
+privx_public_fqdn_address = "{{ .Values.ingress.common.host }}"
+
+# Additional public IP addresses as a comma separated list
+# Used for X.509 certificate CRL distribution points
+privx_additional_public_ip_addresses = ""
+
+# Additional public DNS names as a comma separated list
+# Used for X.509 certificate CRL distribution points
+privx_additional_public_fqdn_addresses = ""
+
+# PrivX UI
+frontend_address = "https://{{ .Values.ingress.common.host }}/privx"
+
+# Login page
+auth_ui_address = "/auth"
+auth_client_cert_ui_address = "https://localhost:8444/auth"
+
+# Server operating mode.
+# default:
+#  - Allows user logins
+#  - Scans cloud hosts
+#  - Scans target host service health
+#  - Processes transcripts and audit logs
+# worker-only:
+#  - Does not allow user logins
+#  - Scans cloud hosts
+#  - Scans target host service health
+#  - Processes transcripts and audit logs
+# server-only:
+# - Allows user logins
+# - Does not scan cloud hosts
+# - Does not scan target host service health
+# - Does not process transcripts or audit logs
+# Allowed values: default, worker-only, server-only
+server_mode = "default"
+
+# Perform health check from this node only if the host contains this tag.
+# If some of the hosts are unreachable by some PrivX node, this setting can be used to filter the health checks.
+# Leave the value empty to check all hosts.
+health_check_only_hosts_with_tag = ""
+
+# If routing traffic via PrivX Extender or Carrier, this setting defines if we should prefer using the extender with least active connections.
+# If set to false, we use round-robin for load balancing instead. If only one extender/carrier can be resolved for the connection, this setting has no effect.
+prefer_extender_or_carrier_with_least_connections = true
+
+###############################################################################
+# Backend services
+
+# Common auth
+auth_address = "https://{{ .Values.ms.auth.name }}:{{ .Values.ms.auth.service.port }}/auth/api/v1"
+
+# Role store
+rolestore_address = "https://{{ .Values.ms.rolestore.name }}:{{ .Values.ms.rolestore.service.port }}/role-store/api/v1"
+
+# Local user store
+local_user_store_address = "https://{{ .Values.ms.userstore.name }}:{{ .Values.ms.userstore.service.port }}/local-user-store/api/v1"
+
+# Default local user store address, if address is missing in DB config.
+local_user_store_default = "https://{{ .Values.ms.userstore.name }}:{{ .Values.ms.userstore.service.port }}"
+
+# Workflow engine
+workflow_engine_address = "https://{{ .Values.ms.workflowengine.name }}:{{ .Values.ms.workflowengine.service.port }}/workflow-engine/api/v1"
+
+# Host Store
+host_store_address = "https://{{ .Values.ms.hoststore.name }}:{{ .Values.ms.hoststore.service.port }}/host-store/api/v1"
+
+# Authorizer
+authorizer_address = "https://{{ .Values.ms.authorizer.name }}:{{ .Values.ms.authorizer.service.port }}/authorizer/api/v1"
+authorizer_crl_http_port = 8088
+
+# Keyvault
+keyvault_address = "https://{{ .Values.ms.keyvault.name }}:{{ .Values.ms.keyvault.service.port }}/keyvault/api/v1"
+
+# Network Access Manager
+networkaccessmanager_address = "https://{{ .Values.ms.networkaccessmanager.name }}:{{ .Values.ms.networkaccessmanager.service.port }}/network-access-manager/api/v1"
+
+# Connection manager
+connectionmanager_address = "https://{{ .Values.ms.connectionmanager.name }}:{{ .Values.ms.connectionmanager.service.port }}/connection-manager/api/v1"
+connectionmanager_ws_address = "wss://{{ .Values.ms.connectionmanager.name }}:{{ .Values.ms.connectionmanager.service.port }}/connection-manager/api/v1/websocket"
+
+# Syslog service
+syslog_service_address = "https://syslog-service:443/syslog-service/api/v1"
+
+# RDP Proxy Address
+rdp_proxy_address = "https://{{ .Values.ms.rdpproxy.name }}:{{ .Values.ms.rdpproxy.service.port }}/rdp-proxy/api/v1"
+
+# SSH Proxy Address
+ssh_proxy_address = "https://{{ .Values.ms.sshproxy.name }}:{{ .Values.ms.sshproxy.service.port }}/ssh-proxy/api/v1"
+
+# Monitor Address
+monitor_address = "https://{{ .Values.ms.monitorservice.name }}:{{ .Values.ms.monitorservice.service.port }}/monitor-service/api/v1"
+
+# RDP-MITM service
+rdpmitm_address = "https://{{ .Values.ms.rdpmitm.name }}:{{ .Values.ms.rdpmitm.service.port }}/rdp-mitm/api/v1"
+
+# Indexer Address
+trail-index_address = "https://{{ .Values.ms.trailindex.name }}:{{ .Values.ms.trailindex.service.port }}/trail-index/api/v1"
+
+# SSH-MITM service
+sshmitm_address = "https://{{ .Values.ms.sshmitm.name }}:{{ .Values.ms.sshmitm.service.port }}/ssh-mitm/api/v1"
+
+# Settings Service
+settings_address = "https://{{ .Values.ms.settings.name }}:{{ .Values.ms.settings.service.port }}/settings/api/v1"
+
+# vault Service
+vault_address = "https://{{ .Values.ms.vault.name }}:{{ .Values.ms.vault.service.port }}/vault/api/v1"
+
+# License Manager
+license_manager_address = "https://{{ .Values.ms.licensemanager.name }}:{{ .Values.ms.licensemanager.service.port }}/license-manager/api/v1"
+
+# Secrets Manager
+secrets_manager_address = "https://{{ .Values.ms.secretsmanager.name }}:{{ .Values.ms.secretsmanager.service.port }}/secrets-manager/api/v1"
+
+# Extender Service
+extenderservice_address = "https://{{ .Values.ms.extenderservice.name }}:{{ .Values.ms.extenderservice.service.port }}/extender-service/api/v1"
+extenderservice_connect_api_address = "{{ .Values.ms.extenderservice.name }}:{{ .Values.ms.extenderservice.service.port }}"
+
+###############################################################################
+
+# Should we send PrivX system events to stdout
+send_regular_events_to_stdout = true
+
+# Should we send PrivX audit events to syslog
+send_audit_events_to_syslog = {{ if .Values.privx.syslog.enabled -}} true {{- else -}} false {{- end }}
+
+# Should we send PrivX audit events to stdout
+send_audit_events_to_stdout = {{ if .Values.privx.syslog.enabled -}} false {{- else -}} true {{- end }}
+
+# Should we send PrivX system events to syslog
+send_regular_events_to_syslog = false
+
+# rsyslog address. Used for event and audit log messages, if enabled.
+syslog_protocol = "tcp"
+syslog_address = "{{ .Values.ms.syslogservice.name }}:{{ .Values.ms.syslogservice.service.port }}"
+
+# The used logging format for audit events, valid values: "syslog" and "cef".
+# audit_event_format = "syslog"
+audit_event_format = {{ if eq .Values.privx.syslog.audit.format "cef" -}} "cef" {{- else -}} "syslog" {{- end }}
+
+# Should we send audit events to AWS CloudWatchEvents
+# Use the following event pattern for CloudWatch event rules in AWS Console:
+#{
+#  "source": [
+#    "com.ssh.privx"
+#  ]
+#}
+# cloudwatch_events = false
+cloudwatch_events = true
+
+# Maximum number of seconds to wait before sending batched CloudWatch events
+cloudwatch_max_sending_delay = 5
+
+# Maximum number of events to collect to batch before sending to CloudWatch
+# Default maximum for AWS is 10
+cloudwatch_max_batch_size = 10
+
+# Should we end audit events to Azure Event Hub
+azure_events = true
+
+# Maximum number of seconds to wait before sending batched to Azure Event Hubs events
+azure_max_sending_delay = 5
+
+# Maximum number of events to collect to batch before sending to Azure Event Hubs
+azure_max_batch_size = 10
+
+# Sending timeout in seconds
+azure_event_timeout = 20
+
+###############################################################################
+# Notification cache
+
+[notificationCache]
+enable = true
+
+# Cache type
+# i.e. type = "redis"
+type = "db"
+
+# Default TTL. Keep it relatively large, as when the cache key changes or expires,
+# a notification is sent to all instances and DB data is refreshed.
+# i.e. ttl = 900
+ttl = 900
+
+# (Redis only) Cache endpoint
+# i.e. endpoint = "127.0.0.1:6379"
+endpoint = "redis:6379"
+#endpoint = "ordainredisdev.05f7bb.ng.0001.use1.cache.amazonaws.com:6379"
+
+# (Redis only) Optional password
+# i.e. password = ""
+password = ""
+
+# (Redis only) Database to be selected after connecting to the server.
+# i.e. dbnumber = 0
+dbnumber = 0
+
+###############################################################################
+# Database settings
+
+[db]
+# Host name of database
+# i.e. host = "pg.example.someserver.com"
+#host = "172.17.0.1"
+host = {{ required "A valid db.address value is required" .Values.db.address | quote }}
+#host = "db-psql"
+
+# Port number of the database
+# i.e. port = 5432
+port = {{ required "A valid db.port value is required" .Values.db.port }}
+
+# Driver name, i.e. postgres, mysql, ora
+# i.e. driver = "postgres"
+driver = "postgres"
+
+# Postgres SSLmode: disable, require, verify-ca, verify-full
+# i.e. sslmode = "verify-full"
+sslmode = '{{ .Values.db.sslmode | default "require" }}'
+
+# Additional Postgres database connection parameters
+# i.e. additional_params = "sslrootcert=/opt/privx/etc/privx-db-trust-anchor.pem"
+additional_params = ""
+
+###############################################################################
+# TLS settings
+
+[tls]
+# HTTPS/TLS/RestClient related settings
+
+# Validate HTTPS server certificate - construct path to trust anchor
+# checking validity of certificates en-route and perform the usual
+# checks, including the hostname check.
+insecure = false
+
+# trust_anchors_file, if set to file name, use only certificates on
+# the file as certificate path validation trust anchors. If set, but
+# not readable, fail startup, if unset or set to an empty string, use
+# system speficied trust anchors.
+trust_anchors_file = "/etc/nginx/ssl/privx-ca.crt"
+
+# append_to_system_trust_anchors, if set to true would append the certficates
+# defined in trust_anchors_file to the system trust certificates.
+append_to_system_trust_anchors = true
+
+[restapi]
+
+# client_cert_auth_required, caller must provide valid client certificate
+client_cert_auth_required = true
+
+# client_trust_anchors_file, used to verify caller
+client_trust_anchors_file = "/opt/privx/etc/privx-ca.crt"
+
+# Accept client certificate only if subject name matches this.
+client_cert_subject_name = "OU=PrivX Internal Web Server"
+
+# Which X-Forwarded-For IP address to use, when resolving client IP.
+# Counted from the end to the beginning.
+# i.e. with the following example: X-Forwarded-For: faked-ip.com, webproxy.ip, 123.11.12.3, elb-ip
+# using value 1 would pick the second item from the end, which would be 123.11.12.3
+# If not using load balancers, use the value 0
+# Used for resolving client IP for role IP restrictions, login rate limiter and auth token fingerprint.
+# Does not affect to SSH-MITM and RDP-MITM IP restrictions.
+# If role IP restrictions or login rate limiter are not used, this setting is ignored.
+# Default value 0 = use the last IP address in the provided X-Forwarded-For header
+strip_how_many_x_forwarded_for_client_ips = 0
+
+###############################################################################
