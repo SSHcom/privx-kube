@@ -70,6 +70,8 @@ spec:
               value: "true"
             - name: SSH_LOG_LEVEL
               value: "{{ $service.level.log | default "INFO" }}"
+            - name: SMARTCARD_LOG_LEVEL
+              value: "{{ $service.level.log | default "INFO" }}"
             - name: SSH_TRACE
               value: "{{ $service.level.trace | default "1" }}"
             - name: SSH_AUDIT_PRIORITY
