@@ -153,6 +153,9 @@ host_scanning_frequency = 300
 # AWS role scanning delay after starting the service
 first_role_scanning_delay = 10
 
+# Frequency for resolving explicit member counts for roles
+role_member_count_update_frequency = 15
+
 # LDAP settings
 [ROLE-STORE.ldap]
 # Default LDAP cache TTL (in seconds). Used if no TTL is given for LDAP data source on application UI.
