@@ -73,6 +73,93 @@ certificate_validity = 300000
 # Default value: 8 hours
 rdp_certificate_validity = 28800000
 
+# Certificate settings values.
+# The value of the settings need to be a string with the following duration pattern:
+# For days "30d", for hours "12h" or for minutes "60m".
+
+# Authorizer CA Certificate Validity
+x509_ca_valid = "1825d"
+
+# Authorizer CA Certificate Validity start offset
+x509_ca_valid_before = "1d"
+
+# Authorizer CA Certificate Expiration margin for warnings/audit events
+x509_ca_valid_margin = "30d"
+
+# Authorizer CA CRL Validity
+x509_ca_crl_valid = "24h"
+
+# Authorizer CA CRL Validity start offset
+x509_ca_crl_valid_before = "5m"
+
+# Authorizer CA CRL revoked cert expiry offset
+# When generating a CRL, only revoked certificates that
+# have not expired this much before are added to the CRL.
+x509_ca_crl_cert_expiry_offset = "24h"
+
+# Extender CA Certificate Validity
+x509_extender_ca_valid_before = "1d"
+
+# Extender CA Certificate Expiration margin for warnings/audit events
+x509_extender_ca_valid_margin = "30d"
+
+# Extender CA CRL Validity
+x509_extender_ca_crl_valid = "24h"
+
+# Extender CA CRL Validity start offset
+x509_extender_ca_crl_valid_before = "5m"
+
+# Extender CA CRL revoked cert expiry offset
+x509_extender_ca_crl_cert_expiry_offset = "24h"
+
+# ICAP CA Certificate Validity
+x509_icap_ca_valid = "1825d"
+
+# ICAP CA Certificate Validity start offset
+x509_icap_ca_valid_before = "1d"
+
+# ICAP CA Certificate Expiration margin for warnings/audit events
+x509_icap_ca_valid_margin = "30d"
+
+# ICAP CA CRL Validity
+x509_icap_ca_crl_valid = "24h"
+
+# ICAP CA CRL Validity start offset
+x509_icap_ca_crl_valid_before = "5m"
+
+# ICAP CA CRL revoked cert expiry offset
+x509_icap_ca_crl_cert_expiry_offset = "24h"
+
+# ICAP IM Certificate Validity
+x509_icap_im_valid = "1825d"
+
+# ICAP IM Certificate Validity start offset
+x509_icap_im_valid_before = "1d"
+
+# ICAP IM Certificate Expiration margin for warnings/audit events
+x509_icap_im_valid_margin = "30d"
+
+# ICAP IM CRL Validity
+x509_icap_im_crl_valid = "24h"
+
+# ICAP IM CRL Validity start offset
+x509_icap_im_crl_valid_before = "5m"
+
+# ICAP IM CRL revoked cert expiry offset
+x509_icap_im_crl_cert_expiry_offset = "24h"
+
+# Extender EE Certificate Validity
+x509_extender_ee_valid = "730d"
+
+# Extender EE Certificate Validity start offset
+x509_extender_ee_valid_before = "1d"
+
+# EE Certificate expiry offset value for housekeeping
+x509_ee_cert_expiry_offset = "24h"
+
+# EE Certificate expiration margin for warnings/audit events
+x509_ee_cert_valid_margin = "30d"
+
 # Allow PrivX to manage target host roles on behalf of target host.
 # This enables PrivX authorizer to allow using "--delegated-principals" and "--delegated-personal-account-roles" configuration flags of deploy script.
 # If disabled, the target host SSHD config is locked down and adding new roles to target host requires re-running deploy script.

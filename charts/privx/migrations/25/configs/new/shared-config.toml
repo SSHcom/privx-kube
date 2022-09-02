@@ -59,6 +59,11 @@ auth_client_cert_ui_address = "https://localhost:8444/auth"
 # Allowed values: default, worker-only, server-only
 server_mode = "default"
 
+# Perform health check from this node only if the host contains this tag.
+# If some of the hosts are unreachable by some PrivX node, this setting can be used to filter the health checks.
+# Leave the value empty to check all hosts.
+health_check_only_hosts_with_tag = ""
+
 # If routing traffic via PrivX Extender or Carrier, this setting defines if we should prefer using the extender with least active connections.
 # If set to false, we use round-robin for load balancing instead. If only one extender/carrier can be resolved for the connection, this setting has no effect.
 prefer_extender_or_carrier_with_least_connections = true

@@ -1,7 +1,7 @@
 migration:
   enabled: true
-  from: 24
-  to: 23
+  from: 25
+  to: 24
 
 # Keep all the microservices shutdown so that the previous version can be roll
 # backed using helm rollback.
@@ -17,14 +17,14 @@ jobs:
     image:
       repository: public.ecr.aws/sshprivx/upgrader
       pullPolicy: IfNotPresent
-      tag: "24.0"
+      tag: "25.0"
     imagePullSecrets:
       - name: docker-pull-secret
     environment:
       - name: UPGRADER_CMD
         value: restore
       - name: PREVIOUS_VERSION
-        value: 23.2.0
+        value: 24.0.0
       - name: BACKUP_DIR
         value: <generated-backup-folder-placeholder>
     useGlobalPodSecurityContext: true

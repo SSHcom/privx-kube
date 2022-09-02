@@ -248,9 +248,13 @@ data_version = "2"
 [24.0.rolestore.db]
 data_version = "10"
 
+# These changes only apply to the Kubernetes deployment
 [24.0.shared-config.shared]
 send_audit_events_to_syslog = {{ if .Values.privx.syslog.enabled -}} true {{- else -}} false {{- end }}
 send_audit_events_to_stdout = {{ if .Values.privx.syslog.enabled -}} false {{- else -}} true {{- end }}
 syslog_address = "{{ .Values.ms.syslogservice.name }}:{{ .Values.ms.syslogservice.service.port }}"
 audit_event_format = {{ if eq .Values.privx.syslog.audit.format "cef" -}} "cef" {{- else -}} "syslog" {{- end }}
 
+################################# PrivX 25.0 #################################
+[25.0.user-store.db]
+data_version = "10"

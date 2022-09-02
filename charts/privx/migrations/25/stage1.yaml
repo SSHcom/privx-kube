@@ -1,7 +1,7 @@
 migration:
   enabled: true
-  from: 23
-  to: 24
+  from: 24
+  to: 25
 
 # Before anything else, PrivX is shutdown
 shutdown: true
@@ -16,14 +16,14 @@ jobs:
     image:
       repository: public.ecr.aws/sshprivx/upgrader
       pullPolicy: IfNotPresent
-      tag: "24.0"
+      tag: "25.0"
     imagePullSecrets:
       - name: docker-pull-secret
     environment:
       - name: UPGRADER_CMD
         value: backup
       - name: PRIVX_VERSION
-        value: 23.2.0
+        value: 24.0.0
     useGlobalPodSecurityContext: true
     securityContext: {}
     resources: {}
