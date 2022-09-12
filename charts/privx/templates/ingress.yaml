@@ -31,8 +31,12 @@ metadata:
     {{- end }}
   {{- end}}
 spec:
-  {{- if and $ingress.className (semverCompare ">=1.18-0" $globalContext.Capabilities.KubeVersion.GitVersion) }}
+  {{- if and (or $ingress.className $globalContext.Values.ingress.common.className) (semverCompare ">=1.18-0" $globalContext.Capabilities.KubeVersion.GitVersion) }}
+    {{- if $ingress.className }}
   ingressClassName: {{ $ingress.className }}
+    {{- else }}
+  ingressClassName: {{ $globalContext.Values.ingress.common.className }}
+    {{- end }}
   {{- end }}
   {{- if $ingress.tls }}
   tls:

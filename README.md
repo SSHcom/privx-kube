@@ -4,10 +4,8 @@ privx-kube is a means to deploy [PrivX](https://www.ssh.com/products/privx/) in
 a kubernetes cluster.
 
 ## Introduction
-This repo contains the PrivX chart and in addition uses [Bitnami Nginx Ingress
-Controller](https://github.com/bitnami/charts/tree/master/bitnami/nginx-ingress-controller). The purpose of the
-ingress controller is to setup ingress to the PrivX microservices in a dynamic
-way.
+This repo contains the PrivX helm chart that can be used to deploy the supported
+versions of PrivX on Kubernetes.
 
 ## Prequisites
 
@@ -40,7 +38,13 @@ for PrivX to work.
 
 ### Ingress Controller
 
-privx-kube provides a file [ingress.yaml](values-overrides/ingress.yaml) with
+As in any kubernetes cluster, a gateway or ingress is required to reach the
+application. PrivX uses [Bitnami Nginx Ingress Controller](https://github.com/bitnami/charts/tree/master/bitnami/nginx-ingress-controller)
+as the ingress controller.
+
+The purpose of the ingress controller is to setup ingress to the PrivX
+microservices in a dynamic way.
+privx-kube provides an override file [ingress.yaml](values-overrides/ingress.yaml) with
 extra settings for deploying the Bitnami nginx ingress controller. The purpose
 of the file is to provide settings that are crucial to the workings of PrivX.
 
@@ -49,14 +53,36 @@ settings (e.g Load balancer settings). But the main requirement after installing
 the ingress controller is that it should be accessible for the clients that
 would end up using PrivX.
 
+The installation instructions are split in to two sections depending on the
+version of Kubernetes in use =1.19 or >1.19. This is because of the backward
+incompatible changes done by the developers of the ingress controller helm chart.
 To install the ingress controller chart, do the following:
 
+
+##### Kubernetes =1.19:
 ```
+helm repo add bitnami-full-index https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
 helm install \
     -n ingress --create-namespace \
     -f values-overrides/ingress.yaml \
-    ingress charts/nginx-ingress-controller/
+    --version 7.6.6 \
+    ingress  bitnami-full-index/nginx-ingress-controller
 ```
+
+##### Kubernetes >1.19:
+```
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm install \
+    -n ingress --create-namespace \
+    -f values-overrides/ingress.yaml \
+    --version 9.3.8 \
+    ingress  bitnami-full-index/nginx-ingress-controller
+```
+
+Up to date instructions on new releases and any breaking changes can be found
+in the original
+[repo](https://github.com/bitnami/charts/tree/master/bitnami/nginx-ingress-controller#upgrading).
+
 #### Restricted access Ingress Controller
 
 If the ingress controller is deployed in a more secure fashion, then the

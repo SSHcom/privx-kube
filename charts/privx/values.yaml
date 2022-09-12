@@ -5,6 +5,7 @@ fullnameOverride: ""
 nameOverride: ""
 ingress:
   common:
+    className: "nginx"
     host: localhost
     annotations:
       nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
