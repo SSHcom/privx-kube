@@ -91,7 +91,7 @@ host_store_address = "https://{{ .Values.ms.hoststore.name }}:{{ .Values.ms.host
 
 # Authorizer
 authorizer_address = "https://{{ .Values.ms.authorizer.name }}:{{ .Values.ms.authorizer.service.port }}/authorizer/api/v1"
-authorizer_crl_http_port = 8088
+authorizer_crl_http_port = 80
 
 # Keyvault
 keyvault_address = "https://{{ .Values.ms.keyvault.name }}:{{ .Values.ms.keyvault.service.port }}/keyvault/api/v1"
