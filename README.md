@@ -75,7 +75,7 @@ helm repo add bitnami https://charts.bitnami.com/bitnami
 helm install \
     -n ingress --create-namespace \
     -f values-overrides/ingress.yaml \
-    --version 9.3.8 \
+    --version 9.3.0 \
     ingress bitnami/nginx-ingress-controller
 ```
 
