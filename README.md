@@ -66,7 +66,7 @@ helm install \
     -n ingress --create-namespace \
     -f values-overrides/ingress.yaml \
     --version 7.6.6 \
-    ingress  bitnami-full-index/nginx-ingress-controller
+    ingress bitnami-full-index/nginx-ingress-controller
 ```
 
 ##### Kubernetes >1.19:
@@ -76,7 +76,7 @@ helm install \
     -n ingress --create-namespace \
     -f values-overrides/ingress.yaml \
     --version 9.3.8 \
-    ingress  bitnami-full-index/nginx-ingress-controller
+    ingress bitnami/nginx-ingress-controller
 ```
 
 Up to date instructions on new releases and any breaking changes can be found
