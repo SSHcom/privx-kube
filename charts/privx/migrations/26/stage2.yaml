@@ -19,6 +19,11 @@ migration:
       hook: pre-upgrade
       weight: "-5"
       files: "migrations/26/configs/syslog/*"
+    nginx:
+      name: nginx
+      hook: pre-upgrade
+      weight: "-5"
+      files: "migrations/26/configs/nginx/*"
 # ==========Upgrader===============
 jobs:
   upgrader:
@@ -66,6 +71,9 @@ jobs:
         - name: privx-common-config
           configMap:
             name: common-config
+        - name: privx-nginx-config
+          configMap:
+            name: nginx-config
     initContainers:
       - name: config-copier
         image: k8s.gcr.io/busybox
@@ -76,6 +84,8 @@ jobs:
             cp -f /new-templates-mount/* /opt/privx/etc/new/;
             echo copying common configs;
             cp -f /common-config-mount/* /opt/privx/etc/;
+            echo copying nginx configs;
+            cp -f /upgraded-nginx-config/* /etc/nginx/privx/;
         volumeMounts:
           - name: privx-new-config
             mountPath: /new-templates-mount
@@ -84,6 +94,11 @@ jobs:
           - name: privx-config
             mountPath: /opt/privx/etc
             subPath: privxetc
+          - name: privx-nginx-config
+            mountPath: /upgraded-nginx-config
+          - name: privx-config
+            mountPath: /etc/nginx/privx
+            subPath: nginxprivx
         resources: {}
           # limits:
           #   cpu: 100m
