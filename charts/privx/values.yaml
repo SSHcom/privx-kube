@@ -143,7 +143,7 @@ jobs:
       repository: public.ecr.aws/sshprivx/installer
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "25.0"
+      tag: "26.0"
     imagePullSecrets:
       - name: docker-pull-secret
     useGlobalPodSecurityContext: true
@@ -263,7 +263,7 @@ jobs:
       repository: public.ecr.aws/sshprivx/installer
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "25.0"
+      tag: "26.0"
     imagePullSecrets:
       - name: docker-pull-secret
     useGlobalPodSecurityContext: true
@@ -312,7 +312,7 @@ jobs:
       repository: public.ecr.aws/sshprivx/secrets-generator
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "25.0"
+      tag: "26.0"
     imagePullSecrets:
       - name: docker-pull-secret
     useGlobalPodSecurityContext: true
@@ -392,7 +392,7 @@ ms:
       repository: public.ecr.aws/sshprivx/rdp-proxy
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "25.0"
+      tag: "26.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -522,7 +522,7 @@ ms:
       repository: public.ecr.aws/sshprivx/ssh-proxy
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "25.0"
+      tag: "26.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -643,7 +643,7 @@ ms:
       repository: public.ecr.aws/sshprivx/auth
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "25.0"
+      tag: "26.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -668,6 +668,11 @@ ms:
       enabled: true
       type: ClusterIP
       port: 8083
+      internal:
+        oidc:
+          name: oidc
+          port: 8183
+          protocol: TCP
 
     ingress:
       https:
@@ -677,6 +682,9 @@ ms:
         className: ""
         annotations:
           nginx.ingress.kubernetes.io/proxy-ssl-name: "auth"
+          nginx.ingress.kubernetes.io/proxy-buffering: "on"
+          nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
+          nginx.ingress.kubernetes.io/proxy-busy-buffer-size: "16k"
         hosts:
           - host: localhost
             paths:
@@ -747,7 +755,7 @@ ms:
       repository: public.ecr.aws/sshprivx/keyvault
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "25.0"
+      tag: "26.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -850,7 +858,7 @@ ms:
       repository: public.ecr.aws/sshprivx/authorizer
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "25.0"
+      tag: "26.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -978,7 +986,7 @@ ms:
       repository: public.ecr.aws/sshprivx/connection-manager
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "25.0"
+      tag: "26.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1084,7 +1092,7 @@ ms:
       repository: public.ecr.aws/sshprivx/host-store
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "25.0"
+      tag: "26.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1187,7 +1195,7 @@ ms:
       repository: public.ecr.aws/sshprivx/license-manager
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "25.0"
+      tag: "26.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1297,7 +1305,7 @@ ms:
       repository: public.ecr.aws/sshprivx/monitor-service
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "25.0"
+      tag: "26.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1400,7 +1408,7 @@ ms:
       repository: public.ecr.aws/sshprivx/rdp-mitm
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "25.0"
+      tag: "26.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1409,7 +1417,7 @@ ms:
 
     initContainers:
       - name: conf-copier
-        image: public.ecr.aws/sshprivx/rdp-mitm-conf:25.0
+        image: public.ecr.aws/sshprivx/rdp-mitm-conf:26.0
         imagePullPolicy: IfNotPresent
         command: [ "/bin/sh", "-c" ]
         env:
@@ -1547,7 +1555,7 @@ ms:
       repository: public.ecr.aws/sshprivx/ssh-mitm
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "25.0"
+      tag: "26.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1662,7 +1670,7 @@ ms:
       repository: public.ecr.aws/sshprivx/trail-index
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "25.0"
+      tag: "26.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1768,7 +1776,7 @@ ms:
       repository: public.ecr.aws/sshprivx/role-store
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "25.0"
+      tag: "26.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1873,7 +1881,7 @@ ms:
       repository: public.ecr.aws/sshprivx/settings
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "25.0"
+      tag: "26.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1967,16 +1975,16 @@ ms:
         - name: privx-config
           claimName: privx-claim
 
-  #==========userstore values===============
+  #==========user-store values===============
   userstore:
-    name: userstore
+    name: user-store
     replicaCount: 1
 
     image:
-      repository: public.ecr.aws/sshprivx/userstore
+      repository: public.ecr.aws/sshprivx/user-store
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "25.0"
+      tag: "26.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1991,7 +1999,7 @@ ms:
       annotations: {}
       # The name of the service account to use.
       # If not set and create is true, a name is generated using the fullname template
-      name: userstore
+      name: user-store
 
     podAnnotations: {}
     useGlobalPodSecurityContext: true
@@ -2009,7 +2017,7 @@ ms:
         useCommonAnnotations: true
         className: ""
         annotations:
-          nginx.ingress.kubernetes.io/proxy-ssl-name: "userstore"
+          nginx.ingress.kubernetes.io/proxy-ssl-name: "user-store"
         hosts:
           - host: localhost
             paths:
@@ -2079,7 +2087,7 @@ ms:
       repository: public.ecr.aws/sshprivx/vault
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "25.0"
+      tag: "26.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2183,7 +2191,7 @@ ms:
       repository: public.ecr.aws/sshprivx/workflow-engine
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "25.0"
+      tag: "26.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2192,7 +2200,7 @@ ms:
 
     initContainers:
       - name: conf-copier
-        image: public.ecr.aws/sshprivx/workflow-engine-conf:25.0
+        image: public.ecr.aws/sshprivx/workflow-engine-conf:26.0
         imagePullPolicy: IfNotPresent
         command: [ "/bin/sh", "-c" ]
         args:
@@ -2309,7 +2317,7 @@ ms:
       repository: public.ecr.aws/sshprivx/nginx
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "25.0"
+      tag: "26.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2371,6 +2379,8 @@ ms:
               - path: /auth/change-password
                 pathType: Prefix
               - path: /auth/mfa
+                pathType: Prefix
+              - path: /oidc
                 pathType: Prefix
         tls:
           - secretName: privx-tls
@@ -2449,7 +2459,7 @@ ms:
       repository: public.ecr.aws/sshprivx/installer
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "25.0"
+      tag: "26.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2527,7 +2537,7 @@ ms:
       repository: public.ecr.aws/sshprivx/network-access-manager
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "25.0"
+      tag: "26.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2630,7 +2640,7 @@ ms:
       repository: public.ecr.aws/sshprivx/secrets-manager
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "25.0"
+      tag: "26.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2733,7 +2743,7 @@ ms:
       repository: public.ecr.aws/sshprivx/extender-service
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "25.0"
+      tag: "26.0"
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2831,12 +2841,14 @@ ms:
   syslogservice:
     name: syslog-service
     replicaCount: 1
-
+    hook: pre-install,pre-upgrade
+    weight: "-1"
+    hookDeletePolicy: before-hook-creation
     image:
       repository: public.ecr.aws/sshprivx/syslog-service
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "25.0"
+      tag: "26.0"
 
     imagePullSecrets:
       - name: docker-pull-secret

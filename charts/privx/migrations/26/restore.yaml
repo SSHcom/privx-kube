@@ -1,0 +1,69 @@
+migration:
+  enabled: true
+  from: 26
+  to: 25
+
+# Keep all the microservices shutdown so that the previous version can be roll
+# backed using helm rollback.
+shutdown: true
+
+# ========== Privx settings restore ===============
+jobs:
+  restore:
+    name: restore
+    hook: post-upgrade
+    weight: "-5"
+    hookDeletePolicy: before-hook-creation
+    image:
+      repository: public.ecr.aws/sshprivx/upgrader
+      pullPolicy: IfNotPresent
+      tag: "26.0"
+    imagePullSecrets:
+      - name: docker-pull-secret
+    environment:
+      - name: UPGRADER_CMD
+        value: restore
+      - name: PREVIOUS_VERSION
+        value: 25.0.0
+      - name: BACKUP_DIR
+        value: <generated-backup-folder-placeholder>
+    useGlobalPodSecurityContext: true
+    securityContext: {}
+    resources: {}
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+    volumes:
+      enabled: true
+      volumeMounts:
+        - mountPath: /opt/privx/keyvault
+          name: privx-config
+          subPath: keyvault
+        - mountPath: /opt/privx/etc
+          name: privx-config
+          subPath: privxetc
+        - mountPath: /etc/nginx/ssl
+          name: privx-config
+          subPath: nginxssl
+        - mountPath: /var/backups/privx/
+          name: privx-config-backup
+          subPath: privxbackup
+        - mountPath: /etc/nginx/ca
+          name: privx-ca-vol
+      claims:
+        - name: privx-config
+          claimName: privx-claim
+        - name: privx-config-backup
+          claimName: privx-backup-claim
+      secrets:
+        - name: privx-ca-vol
+          secretName: privx-ca-secret
+    serviceAccount:
+      create: false
+      annotations: {}
+      name: upgrader
+    rbac:
+      create: false

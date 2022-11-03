@@ -1,0 +1,15 @@
+servicename = "extender-service"
+
+# Default port for extender service
+listen_port = 8981
+
+# Extender-service keyvault credentials.
+keyvault_id = "@EXTENDER_SERVICE_ID@"
+keyvault_secret = "@EXTENDER_SERVICE_SECRET@"
+
+
+[tls]
+# Microservice https server settings
+enable_https_server = true
+certificate = "/opt/privx/cert/extender-service.crt"
+private_key = "/opt/privx/cert/extender-service.key"
