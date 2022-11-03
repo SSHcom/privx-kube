@@ -19,6 +19,11 @@ kerberos_service_name = ""
 kerberos_directory_name = ""
 kerberos_realm_name = ""
 
+[db]
+# DB data version number
+# Do not modify
+data_version = "1"
+
 [tls]
 # Microservice https server settings
 enable_https_server = true

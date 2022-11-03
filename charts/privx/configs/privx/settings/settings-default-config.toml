@@ -136,6 +136,12 @@ icap_service_name = ""
 # ICAP client binary path
 icap_client_binary_path = "/opt/privx/bin/c-icap-client"
 
+[GLOBAL.live_monitoring]
+# Disable live monitoring for services
+enable_live_ssh = true
+enable_live_rdp = true
+enable_live_vnc = true
+enable_live_web = true
 
 ##########################################################################################
 
@@ -173,8 +179,8 @@ default_user_filter = "(|(objectClass=user)(objectClass=person)(objectClass=inet
 # LDAP attributes filter
 # Tells which attributes to fetch from LDAP for caching. Leaving this empty will fetch all attributes for LDAP objects.
 # Filtering out unused attributes will make the memory consumption smaller and improve query times.
-# i.e. attributes = "objectClass cn dn distinguishedName whenCreated whenChanged name userPrincipalName givenName company departmentNumber mail email mobile sAMAccountName uid memberOf entryDN displayName userAccountControl groupType servicePrincipalName objectCategory objectGUID objectSID"
-attributes = "objectClass cn dn distinguishedName whenCreated whenChanged name userPrincipalName givenName company departmentNumber mail email mobile sAMAccountName uid memberOf entryDN displayName userAccountControl groupType servicePrincipalName objectCategory objectGUID objectSID"
+# i.e. attributes = "objectClass cn dn distinguishedName whenCreated whenChanged name userPrincipalName givenName company departmentNumber mail email mobile sAMAccountName uid memberOf entryDN displayName userAccountControl groupType servicePrincipalName objectCategory objectGUID objectSID sn"
+attributes = "objectClass cn dn distinguishedName whenCreated whenChanged name userPrincipalName givenName company departmentNumber mail email mobile sAMAccountName uid memberOf entryDN displayName userAccountControl groupType servicePrincipalName objectCategory objectGUID objectSID sn"
 
 # Automatically append this filter to AD requests when fetching users or mapping roles
 # Can be used to filter out disabled users and such.
