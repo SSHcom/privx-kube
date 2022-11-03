@@ -1,4 +1,4 @@
-servicename = "network_access_manager"
+servicename = "network-access-manager"
 
 # Default port for network access manager
 listen_port = 8899

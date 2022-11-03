@@ -1,4 +1,4 @@
-servicename = "rolestore"
+servicename = "role-store"
 
 # Default port for role store
 listen_port = 8081
@@ -15,5 +15,5 @@ data_version = "10"
 [tls]
 # Microservice https server settings
 enable_https_server = true
-certificate = "/opt/privx/cert/rolestore.crt"
-private_key = "/opt/privx/cert/rolestore.key"
+certificate = "/opt/privx/cert/role-store.crt"
+private_key = "/opt/privx/cert/role-store.key"

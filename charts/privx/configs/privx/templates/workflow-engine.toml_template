@@ -1,4 +1,4 @@
-servicename = "workflowengine"
+servicename = "workflow-engine"
 
 listen_port = 8085
 
@@ -14,5 +14,5 @@ data_version = "7"
 [tls]
 # Microservice https server settings
 enable_https_server = true
-certificate = "/opt/privx/cert/workflowengine.crt"
-private_key = "/opt/privx/cert/workflowengine.key"
+certificate = "/opt/privx/cert/workflow-engine.crt"
+private_key = "/opt/privx/cert/workflow-engine.key"

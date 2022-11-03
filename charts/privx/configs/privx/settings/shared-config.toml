@@ -40,6 +40,12 @@ frontend_address = "https://{{ .Values.ingress.common.host }}/privx"
 auth_ui_address = "/auth"
 auth_client_cert_ui_address = "https://localhost:8444/auth"
 
+# OIDC Identity Provider endpoint enabled
+oidc_provider_enabled = true
+
+# PrivX OIDC identity provider endpoint
+oidc_address = "https://{{ .Values.ingress.common.host }}/oidc"
+
 # Server operating mode.
 # default:
 #  - Allows user logins

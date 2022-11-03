@@ -10,7 +10,7 @@ smartcard_authentication_enabled = true
 [2.2.user-store.db]
 data_version = "2"
 
-[2.2.workflowengine.db]
+[2.2.workflow-engine.db]
 data_version = "2"
 
 ################################# PrivX 2.3 #################################
@@ -24,7 +24,7 @@ auth_address = "https://localhost/auth/api"
 ################################# PrivX 2.4 #################################
 
 # Add global AD user filter to filter out disabled AD users by default
-[2.4.rolestore.ldap]
+[2.4.role-store.ldap]
 global_ad_user_filter = "(!userAccountControl:1.2.840.113556.1.4.803:=2)"
 
 ################################# PrivX 3.0 #################################
@@ -34,32 +34,32 @@ auth_address = "https://localhost/auth/api/v1"
 
 ################################# PrivX 4.0 #################################
 
-[4.0.connectionmanager.db]
+[4.0.connection-manager.db]
 data_version = "3"
 
-[4.0.monitorservice.db]
+[4.0.monitor-service.db]
 data_version = "2"
 
 ################################# PrivX 5.0 #################################
 
-[5.0.connectionmanager.db]
+[5.0.connection-manager.db]
 data_version = "4"
 
-[5.0.monitorservice.db]
+[5.0.monitor-service.db]
 data_version = "3"
 
-[5.0.hoststore.db]
+[5.0.host-store.db]
 data_version = "5"
 
-[5.0.rolestore.db]
+[5.0.role-store.db]
 data_version = "2"
 
 ################################# PrivX 6.0 #################################
 
-[6.0.workflowengine.db]
+[6.0.workflow-engine.db]
 data_version = "3"
 
-[6.0.monitorservice.db]
+[6.0.monitor-service.db]
 data_version = "4"
 
 [6.0.keyvault.db]
@@ -67,10 +67,10 @@ data_version = "2"
 
 ################################# PrivX 7.0 #################################
 
-[7.0.rolestore.db]
+[7.0.role-store.db]
 data_version = "3"
 
-[7.0.connectionmanager.db]
+[7.0.connection-manager.db]
 data_version = "5"
 
 ################################# PrivX 8.0 #################################
@@ -81,13 +81,13 @@ data_version = "6"
 [8.0.keyvault.db]
 data_version = "3"
 
-[8.0.monitorservice]
+[8.0.monitor-service]
 status_check_interval = 1
 
-[8.0.rolestore.db]
+[8.0.role-store.db]
 data_version = "4"
 
-[8.0.hoststore.db]
+[8.0.host-store.db]
 data_version = "6"
 
 [8.0.oauth-shared-config]
@@ -99,31 +99,31 @@ client_ids = [
 
 ################################# PrivX 9.0 #################################
 
-[9.0.connectionmanager.db]
+[9.0.connection-manager.db]
 data_version = "7"
 
-[9.0.monitorservice.monitorservice]
+[9.0.monitor-service.monitor-service]
 status_check_interval = 10
 housekeeping_interval = 8
 
-[9.0.rolestore.db]
+[9.0.role-store.db]
 data_version = "5"
 
-[9.0.hoststore]
+[9.0.host-store]
 listen_port = 8882
 
-[9.0.monitorservice.db]
+[9.0.monitor-service.db]
 data_version = "6"
 
 ################################# PrivX 10.0 #################################
 
-[10.0.hoststore.db]
+[10.0.host-store.db]
 data_version = "7"
 
 
 ################################# PrivX 11.0 #################################
 
-[11.0.hoststore.db]
+[11.0.host-store.db]
 data_version = "8"
 
 ################################# PrivX 12.0 #################################
@@ -131,21 +131,21 @@ data_version = "8"
 [12.0.user-store.db]
 data_version = "7"
 
-[12.0.hoststore.db]
+[12.0.host-store.db]
 data_version = "9"
 
 ################################# PrivX 13.0 #################################
 
-[13.0.rolestore.db]
+[13.0.role-store.db]
 data_version = "6"
 
-[13.0.hoststore.db]
+[13.0.host-store.db]
 data_version = "10"
 
-[13.0.monitorservice.db]
+[13.0.monitor-service.db]
 data_version = "7"
 
-[13.0.workflowengine.db]
+[13.0.workflow-engine.db]
 data_version = "4"
 
 ################################# PrivX 14.0 #################################
@@ -156,55 +156,55 @@ data_version = "8"
 [14.0.authorizer.db]
 data_version = "2"
 
-[14.0.rolestore.db]
+[14.0.role-store.db]
 data_version = "7"
 
-[14.0.hoststore.db]
+[14.0.host-store.db]
 data_version = "11"
 
-[14.0.connectionmanager.db]
+[14.0.connection-manager.db]
 data_version = "8"
 
-[14.0.monitorservice.db]
+[14.0.monitor-service.db]
 data_version = "8"
 
 ################################# PrivX 15.0 #################################
 
-[15.0.workflowengine.db]
+[15.0.workflow-engine.db]
 data_version = "5"
 
 [15.0.license-manager.db]
 data_version = "2"
 
-[15.0.rolestore.db]
+[15.0.role-store.db]
 data_version = "8"
 
 [15.0.user-store.db]
 data_version = "9"
 
-[15.0.monitorservice.db]
+[15.0.monitor-service.db]
 data_version = "9"
 
 ################################# PrivX 16.0 #################################
 
-[16.0.hoststore.db]
+[16.0.host-store.db]
 data_version = "12"
 
-[16.0.connectionmanager.db]
+[16.0.connection-manager.db]
 data_version = "9"
 
-[16.0.rolestore.db]
+[16.0.role-store.db]
 data_version = "9"
 
 ################################# PrivX 17.0 #################################
-[17.0.hoststore.db]
+[17.0.host-store.db]
 data_version = "14"
 
 ################################# PrivX 18.0 #################################
-[18.0.workflowengine.db]
+[18.0.workflow-engine.db]
 data_version = "6"
 
-[18.0.hoststore.db]
+[18.0.host-store.db]
 data_version = "16"
 
 [18.0.settings.db]
@@ -224,28 +224,28 @@ data_version = "3"
 [21.0.license-manager.db]
 data_version = "3"
 
-[21.0.monitorservice.db]
+[21.0.monitor-service.db]
 data_version = "10"
 
 ################################# PrivX 22.0 #################################
-[22.0.workflowengine.db]
+[22.0.workflow-engine.db]
 data_version = "7"
 
-[22.0.connectionmanager.db]
+[22.0.connection-manager.db]
 data_version = "10"
 
-[22.0.hoststore.db]
+[22.0.host-store.db]
 data_version = "17"
 
 ################################# PrivX 23.0 #################################
-[23.0.hoststore.db]
+[23.0.host-store.db]
 data_version = "18"
 
-[23.0.networkaccessmanager.db]
+[23.0.network-access-manager.db]
 data_version = "2"
 
 ################################# PrivX 24.0 #################################
-[24.0.rolestore.db]
+[24.0.role-store.db]
 data_version = "10"
 
 # These changes only apply to the Kubernetes deployment
@@ -258,3 +258,62 @@ audit_event_format = {{ if eq .Values.privx.syslog.audit.format "cef" -}} "cef" 
 ################################# PrivX 25.0 #################################
 [25.0.user-store.db]
 data_version = "10"
+
+################################# PrivX 26.0 #################################
+[26.0.shared-config.shared]
+local_user_store_address = "https://{{ .Values.ms.userstore.name }}:{{ .Values.ms.userstore.service.port }}/local-user-store/api/v1"
+local_user_store_default = "https://{{ .Values.ms.userstore.name }}:{{ .Values.ms.userstore.service.port }}"
+
+[26.0.vault.db]
+data_version = "3"
+
+[26.0.user-store.db]
+data_version = "11"
+
+[26.0.settings.db]
+data_version = "4"
+
+[26.0.connection-manager]
+servicename = "connection-manager"
+[26.0.connection-manager.tls]
+certificate = "/opt/privx/cert/connection-manager.crt"
+private_key = "/opt/privx/cert/connection-manager.key"
+
+[26.0.host-store]
+servicename = "host-store"
+[26.0.host-store.tls]
+certificate = "/opt/privx/cert/host-store.crt"
+private_key = "/opt/privx/cert/host-store.key"
+
+[26.0.license-manager]
+servicename = "license-manager"
+[26.0.license-manager.tls]
+certificate = "/opt/privx/cert/license-manager.crt"
+private_key = "/opt/privx/cert/license-manager.key"
+
+[26.0.monitor-service]
+servicename = "monitor-service"
+[26.0.monitor-service.tls]
+certificate = "/opt/privx/cert/monitor-service.crt"
+private_key = "/opt/privx/cert/monitor-service.key"
+
+[26.0.network-access-manager]
+servicename = "network-access-manager"
+
+[26.0.role-store]
+servicename = "role-store"
+[26.0.role-store.tls]
+certificate = "/opt/privx/cert/role-store.crt"
+private_key = "/opt/privx/cert/role-store.key"
+
+[26.0.user-store]
+servicename = "user-store"
+[26.0.user-store.tls]
+certificate = "/opt/privx/cert/user-store.crt"
+private_key = "/opt/privx/cert/user-store.key"
+
+[26.0.workflow-engine]
+servicename = "workflow-engine"
+[26.0.workflow-engine.tls]
+certificate = "/opt/privx/cert/workflow-engine.crt"
+private_key = "/opt/privx/cert/workflow-engine.key"

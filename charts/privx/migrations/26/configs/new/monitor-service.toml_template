@@ -1,0 +1,17 @@
+servicename = "monitor-service"
+listen_port = 8092
+
+# Keyvault credentials.
+keyvault_id = "@MONITORSERVICE_ID@"
+keyvault_secret = "@MONITORSERVICE_SECRET@"
+
+[db]
+# DB data version number
+# Do not modify
+data_version = "10"
+
+[tls]
+# Microservice https server settings
+enable_https_server = true
+certificate = "/opt/privx/cert/monitor-service.crt"
+private_key = "/opt/privx/cert/monitor-service.key"

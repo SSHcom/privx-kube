@@ -8,6 +8,12 @@ metadata:
   name: {{ include "privx.fullname" $globalContext }}-{{ $service.name }}
   labels:
     app.kubernetes.io/name: {{ include "privx.name" $globalContext }}-{{ $service.name }}
+  annotations:
+    {{- if $service.hook }}
+    "helm.sh/hook": "{{ $service.hook }}"
+    "helm.sh/hook-weight": "{{ $service.weight | default "0" }}"
+    "helm.sh/hook-delete-policy": "{{ $service.hookDeletePolicy | default "before-hook-creation" }}"
+    {{- end }}
 spec:
   {{- if or (not $service.autoscaling.enabled) $globalContext.Values.shutdown }}
   {{- if $globalContext.Values.shutdown }}

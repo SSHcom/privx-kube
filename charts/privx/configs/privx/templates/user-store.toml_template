@@ -1,4 +1,4 @@
-servicename = "userstore"
+servicename = "user-store"
 
 listen_port = 8084
 
@@ -9,10 +9,10 @@ keyvault_secret = "@USERSTORE_SECRET@"
 [db]
 # DB data version number
 # Do not modify
-data_version = "10"
+data_version = "11"
 
 [tls]
 # Microservice https server settings
 enable_https_server = true
-certificate = "/opt/privx/cert/userstore.crt"
-private_key = "/opt/privx/cert/userstore.key"
+certificate = "/opt/privx/cert/user-store.crt"
+private_key = "/opt/privx/cert/user-store.key"

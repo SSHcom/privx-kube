@@ -1,4 +1,4 @@
-servicename = "hoststore"
+servicename = "host-store"
 
 # Default port for host store
 listen_port = 8882
@@ -28,5 +28,5 @@ data_version = "18"
 [tls]
 # Microservice https server settings
 enable_https_server = true
-certificate = "/opt/privx/cert/hoststore.crt"
-private_key = "/opt/privx/cert/hoststore.key"
+certificate = "/opt/privx/cert/host-store.crt"
+private_key = "/opt/privx/cert/host-store.key"

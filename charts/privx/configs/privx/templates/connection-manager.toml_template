@@ -1,4 +1,4 @@
-servicename = "connectionmanager"
+servicename = "connection-manager"
 
 # Default config for connection manager
 listen_port = 8091
@@ -15,5 +15,5 @@ data_version = "10"
 [tls]
 # Microservice https server settings
 enable_https_server = true
-certificate = "/opt/privx/cert/connectionmanager.crt"
-private_key = "/opt/privx/cert/connectionmanager.key"
+certificate = "/opt/privx/cert/connection-manager.crt"
+private_key = "/opt/privx/cert/connection-manager.key"

@@ -1,29 +1,32 @@
 migration:
   enabled: true
-  from: 24
+  from: 26
   to: 25
 
-# Before anything else, PrivX is shutdown
+# Keep all the microservices shutdown so that the previous version can be roll
+# backed using helm rollback.
 shutdown: true
 
-# ========== Privx settings backup ===============
+# ========== Privx settings restore ===============
 jobs:
-  backup:
-    name: backup
+  restore:
+    name: restore
     hook: post-upgrade
     weight: "-5"
     hookDeletePolicy: before-hook-creation
     image:
       repository: public.ecr.aws/sshprivx/upgrader
       pullPolicy: IfNotPresent
-      tag: "25.0"
+      tag: "26.0"
     imagePullSecrets:
       - name: docker-pull-secret
     environment:
       - name: UPGRADER_CMD
-        value: backup
-      - name: PRIVX_VERSION
-        value: 24.0.0
+        value: restore
+      - name: PREVIOUS_VERSION
+        value: 25.0.0
+      - name: BACKUP_DIR
+        value: <generated-backup-folder-placeholder>
     useGlobalPodSecurityContext: true
     securityContext: {}
     resources: {}
@@ -55,13 +58,6 @@ jobs:
           claimName: privx-claim
         - name: privx-config-backup
           claimName: privx-backup-claim
-      configMaps:
-        - name: privx-new-config
-          configMap:
-            name: new-config
-        - name: privx-version-config
-          configMap:
-            name: version-config
       secrets:
         - name: privx-ca-vol
           secretName: privx-ca-secret
