@@ -2365,6 +2365,9 @@ ms:
           nginx.ingress.kubernetes.io/ssl-ciphers: "AESGCM+EECDH:AESGCM+EDH:AES+EECDH:AES+EDH:AES128-GCM-SHA256:AES128-SHA256:AES128-SHA:-DSS:-EDH"
           nginx.ingress.kubernetes.io/ssl-prefer-server-ciphers: "true"
           nginx.ingress.kubernetes.io/proxy-ssl-protocols: "TLSv1.2"
+          nginx.ingress.kubernetes.io/proxy-buffering: "on"
+          nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
+          nginx.ingress.kubernetes.io/proxy-busy-buffer-size: "16k"
         hosts:
           - host: localhost
             paths:
