@@ -13,6 +13,10 @@ data_folder = "/var/privx/audit/"
 # -1 means trails are not removed.
 trail_expiry = 180
 
+# How many days a transferred file for a trail is available.
+# -1 means transferred files are not removed.
+transferred_files_expiry = 180
+
 # Timeout for connections when no connection manager, in minutes.
 # 0 means no timeout, connections are kept open.
 timeout_when_no_connmgr = 5
@@ -142,6 +146,42 @@ enable_live_ssh = true
 enable_live_rdp = true
 enable_live_vnc = true
 enable_live_web = true
+
+[GLOBAL.invalidated_session_cache]
+# Change size of invalidated session cache
+cache_size = 1000000
+
+[GLOBAL.watermarking]
+# Example:
+# host_heading: [
+#   {
+#     "selectors": ["tags=*production*", "address=*.amazonaws.com"],
+#     "heading": {
+#       "text": "Zone1 - %U@%H",
+#       "color": "#ff4c13"
+#     }
+#   },
+#   {
+#     "selectors": ["address=172.16.0.0/24", "account=admin"],
+#     "heading": {
+#       "text": "Zone 2 - %u - %T",
+#       "style": "orange"
+#     }
+#   }
+# ]
+#
+# host_watermark: [
+#   {
+#     "selectors": ["common_name=*production*", "address=*.amazonaws.com"],
+#     "watermark": {
+#       "text": "Zone2 - %U@%H"
+#     }
+#   }
+# ]
+host_heading = '''[]'''
+host_watermark = '''[]'''
+
+
 
 ##########################################################################################
 
@@ -347,6 +387,15 @@ max_open_conns = 20
 # If n <= 0, no idle connections are retained
 max_idle_conns = 2
 
+[ROLE-STORE.scim]
+# maximum result count for SCIM GET
+max_results = 100
+
+[ROLE-STORE.auditevents]
+# skip_list sets the IDs of auditevents ignored from persisting to db.
+# if skip_event_ids = "",  all the events persisted to DB.
+# i.e. skip_event_ids = "10,44,100-200,250-290"
+skip_event_ids = ""
 ##########################################################################################
 
 [HOST-STORE]
@@ -421,6 +470,11 @@ max_open_conns = 20
 # If n <= 0, no idle connections are retained
 max_idle_conns = 2
 
+[HOST-STORE.auditevents]
+# skip_list sets the IDs of auditevents ignored from persisting to db.
+# if skip_event_ids = "",  all the events persisted to DB.
+# i.e. skip_event_ids = "10,44,100-200,250-290"
+skip_event_ids = ""
 ##########################################################################################
 
 [MONITOR-SERVICE]
@@ -467,7 +521,11 @@ max_open_conns = 20
 # If n <= 0, no idle connections are retained
 max_idle_conns = 2
 
-
+[MONITOR-SERVICE.auditevents]
+# skip_list sets the IDs of auditevents ignored from persisting to db.
+# if skip_event_ids = "",  all the events persisted to DB.
+# i.e. skip_event_ids = "10,44,100-200,250-290"
+skip_event_ids = ""
 ##########################################################################################
 
 [TRAIL-INDEX]
@@ -497,6 +555,11 @@ max_open_conns = 10
 # If n <= 0, no idle connections are retained
 max_idle_conns = 2
 
+[TRAIL-INDEX.auditevents]
+# skip_list sets the IDs of auditevents ignored from persisting to db.
+# if skip_event_ids = "",  all the events persisted to DB.
+# i.e. skip_event_ids = "10,44,100-200,250-290"
+skip_event_ids = ""
 ##########################################################################################
 
 [RDP-PROXY]
@@ -573,6 +636,12 @@ max_open_conns = 5
 # Maximum number of idle DB connections
 # If n <= 0, no idle connections are retained
 max_idle_conns = 2
+
+[RDP-PROXY.auditevents]
+# skip_list sets the IDs of auditevents ignored from persisting to db.
+# if skip_event_ids = "",  all the events persisted to DB.
+# i.e. skip_event_ids = "10,44,100-200,250-290"
+skip_event_ids = ""
 ##########################################################################################
 
 [RDP-MITM]
@@ -648,6 +717,12 @@ max_open_conns = 5
 # Maximum number of idle DB connections
 # If n <= 0, no idle connections are retained
 max_idle_conns = 2
+
+[RDP-MITM.auditevents]
+# skip_list sets the IDs of auditevents ignored from persisting to db.
+# if skip_event_ids = "",  all the events persisted to DB.
+# i.e. skip_event_ids = "10,44,100-200,250-290"
+skip_event_ids = ""
 ##########################################################################################
 
 [SSH-PROXY]
@@ -702,6 +777,12 @@ max_open_conns = 5
 # Maximum number of idle DB connections
 # If n <= 0, no idle connections are retained
 max_idle_conns = 2
+
+[SSH-PROXY.auditevents]
+# skip_list sets the IDs of auditevents ignored from persisting to db.
+# if skip_event_ids = "",  all the events persisted to DB.
+# i.e. skip_event_ids = "10,44,100-200,250-290"
+skip_event_ids = ""
 ##########################################################################################
 
 [SSH-MITM]
@@ -776,6 +857,11 @@ max_open_conns = 5
 # If n <= 0, no idle connections are retained
 max_idle_conns = 2
 
+[SSH-MITM.auditevents]
+# skip_list sets the IDs of auditevents ignored from persisting to db.
+# if skip_event_ids = "",  all the events persisted to DB.
+# i.e. skip_event_ids = "10,44,100-200,250-290"
+skip_event_ids = ""
 ##########################################################################################
 
 [CONNECTION-MANAGER]
@@ -817,6 +903,11 @@ max_open_conns = 20
 # If n <= 0, no idle connections are retained
 max_idle_conns = 2
 
+[CONNECTION-MANAGER.auditevents]
+# skip_list sets the IDs of auditevents ignored from persisting to db.
+# if skip_event_ids = "",  all the events persisted to DB.
+# i.e. skip_event_ids = "10,44,100-200,250-290"
+skip_event_ids = ""
 ##########################################################################################
 [NETWORK-ACCESS-MANAGER]
 [NETWORK-ACCESS-MANAGER.db]
@@ -888,6 +979,11 @@ extender_connect_timeout_sec = 10
 # }
 routers = '[]'
 
+[NETWORK-ACCESS-MANAGER.auditevents]
+# skip_list sets the IDs of auditevents ignored from persisting to db.
+# if skip_event_ids = "",  all the events persisted to DB.
+# i.e. skip_event_ids = "10,44,100-200,250-290"
+skip_event_ids = ""
 ##########################################################################################
 [EXTENDER-SERVICE]
 
@@ -930,6 +1026,11 @@ listener_port_max = 11999
 # Web socket keepalive interval in seconds
 ws_keepalive_interval_sec = 30
 
+[EXTENDER-SERVICE.auditevents]
+# skip_list sets the IDs of auditevents ignored from persisting to db.
+# if skip_event_ids = "",  all the events persisted to DB.
+# i.e. skip_event_ids = "10,44,100-200,250-290"
+skip_event_ids = ""
 ##########################################################################################
 [WORKFLOW-ENGINE]
 [WORKFLOW-ENGINE.housekeeping]
@@ -954,6 +1055,12 @@ max_open_conns = 10
 # Maximum number of idle DB connections
 # If n <= 0, no idle connections are retained
 max_idle_conns = 2
+
+[WORKFLOW-ENGINE.auditevents]
+# skip_list sets the IDs of auditevents ignored from persisting to db.
+# if skip_event_ids = "",  all the events persisted to DB.
+# i.e. skip_event_ids = "10,44,100-200,250-290"
+skip_event_ids = ""
 ##########################################################################################
 
 [AUTH]
@@ -1005,6 +1112,18 @@ max_open_conns = 5
 # If n <= 0, no idle connections are retained
 max_idle_conns = 2
 
+[AUTH.auditevents]
+# skip_list sets the IDs of auditevents ignored from persisting to db.
+# if skip_event_ids = "",  all the events persisted to DB.
+# i.e. skip_event_ids = "10,44,100-200,250-290"
+skip_event_ids = ""
+
+[AUTH.loginmethods]
+# Enable webauthn credential registration and webauthn login
+webauthn_enabled = false
+
+# Enable or disable Single Sign On
+sso_enabled = false
 
 ##########################################################################################
 
@@ -1056,6 +1175,12 @@ max_open_conns = 10
 # If n <= 0, no idle connections are retained
 max_idle_conns = 2
 
+[VAULT.auditevents]
+# skip_list sets the IDs of auditevents ignored from persisting to db.
+# if skip_event_ids = "",  all the events persisted to DB.
+# i.e. skip_event_ids = "10,44,100-200,250-290"
+skip_event_ids = ""
+
 ##########################################################################################
 [USER-STORE]
 [USER-STORE.db]
@@ -1075,6 +1200,12 @@ max_open_conns = 10
 # Maximum number of idle DB connections
 # If n <= 0, no idle connections are retained
 max_idle_conns = 2
+
+[USER-STORE.auditevents]
+# skip_list sets the IDs of auditevents ignored from persisting to db.
+# if skip_event_ids = "",  all the events persisted to DB.
+# i.e. skip_event_ids = "10,44,100-200,250-290"
+skip_event_ids = ""
 
 ##########################################################################################
 [AUTHORIZER]
@@ -1144,6 +1275,12 @@ ssh_cert_templates='''
 }]
 '''
 
+[AUTHORIZER.auditevents]
+# skip_list sets the IDs of auditevents ignored from persisting to db.
+# if skip_event_ids = "",  all the events persisted to DB.
+# i.e. skip_event_ids = "10,44,100-200,250-290"
+skip_event_ids = ""
+
 ##########################################################################################
 
 [LICENSE-MANAGER]
@@ -1165,6 +1302,12 @@ max_open_conns = 10
 # If n <= 0, no idle connections are retained
 max_idle_conns = 2
 
+[LICENSE-MANAGER.auditevents]
+# skip_list sets the IDs of auditevents ignored from persisting to db.
+# if skip_event_ids = "",  all the events persisted to DB.
+# i.e. skip_event_ids = "10,44,100-200,250-290"
+skip_event_ids = ""
+
 ##########################################################################################
 
 [SECRETS-MANAGER]
@@ -1185,5 +1328,11 @@ max_open_conns = 10
 # Maximum number of idle DB connections
 # If n <= 0, no idle connections are retained
 max_idle_conns = 2
+
+[SECRETS-MANAGER.auditevents]
+# skip_list sets the IDs of auditevents ignored from persisting to db.
+# if skip_event_ids = "",  all the events persisted to DB.
+# i.e. skip_event_ids = "10,44,100-200,250-290"
+skip_event_ids = ""
 
 ##########################################################################################
