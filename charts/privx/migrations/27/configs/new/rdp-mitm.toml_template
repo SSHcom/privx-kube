@@ -1,0 +1,14 @@
+servicename = "rdp-mitm"
+
+# Keyvault credentials.
+keyvault_id = "@RDPMITM_ID@"
+keyvault_secret = "@RDPMITM_SECRET@"
+
+# Default port for rdp-mitm
+listen_port = 8093
+
+[tls]
+# Microservice https server settings
+enable_https_server = true
+certificate = "/opt/privx/cert/rdp-mitm.crt"
+private_key = "/opt/privx/cert/rdp-mitm.key"

@@ -1,0 +1,31 @@
+servicename = "auth"
+
+# Default config for auth
+listen_port = 8083
+
+# Keyvault credentials.
+keyvault_id = "@AUTH_ID@"
+keyvault_secret = "@AUTH_SECRET@"
+
+# visible in claims
+issuer = "oam.auth.ssh.com"
+# key_path is path where signing keys are stored
+key_path = "/opt/privx/etc"
+
+kerberos_enabled = false
+kerberos_config_file = "/etc/krb5.conf"
+kerberos_keytab_file = "/etc/krb5.keytab"
+kerberos_service_name = ""
+kerberos_directory_name = ""
+kerberos_realm_name = ""
+
+[db]
+# DB data version number
+# Do not modify
+data_version = "2"
+
+[tls]
+# Microservice https server settings
+enable_https_server = true
+certificate = "/opt/privx/cert/auth.crt"
+private_key = "/opt/privx/cert/auth.key"

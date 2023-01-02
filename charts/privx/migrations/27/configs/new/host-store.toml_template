@@ -1,0 +1,32 @@
+servicename = "host-store"
+
+# Default port for host store
+listen_port = 8882
+
+# Host store keyvault credentials.
+keyvault_id = "@HOSTSTORE_ID@"
+keyvault_secret = "@HOSTSTORE_SECRET@"
+
+# Authorizer keyvault ID
+authorizer_keyvault_id = "@AUTHORIZER_ID@"
+
+encrypt_passwords = false
+
+[db]
+
+# Maximum number of Parallel Batch Operation DB connections
+#  i.e. should be a value >=1 , recommended maximum is 10
+max_host_parallel_batch_db_conns = 10
+
+#DB Index for hosts table - allowed values MC - multicolumn index, SC - single column index for all columns individually, NO - no index at all
+index = "SC"
+
+# DB data version number
+# Do not modify
+data_version = "18"
+
+[tls]
+# Microservice https server settings
+enable_https_server = true
+certificate = "/opt/privx/cert/host-store.crt"
+private_key = "/opt/privx/cert/host-store.key"

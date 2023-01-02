@@ -1,0 +1,245 @@
+[sshtarget]
+
+#
+# sshtarget section defines overrides for ssh-proxy and ssh-mitm connections
+# to target host when PrivX is the SSH client-side.
+#
+
+# Override pattern format:
+#   "[extender prefix/]fqdn(hostname pattern):comma separated list of algorithms"
+#   "[extender prefix/]cidr(IP):comma separated list of algorithms"
+#   "[extender prefix/]cidr(IP/mask):comma separated list of algorithms"
+#   "*:comma separated list of algorithms"
+#
+#   Hostname patterns supports extender prefixes and glob wildcard characters.
+#   The wildcard pattern "*" matches everything and should be used as the last
+#   pattern to specify the default algorithm set. The target address is matched
+#   to patterns in the order they are listed and the algorithms for first match
+#   are used.
+#
+# Example:
+#    kex = [
+#       "extender/fqdn(*.privx.io):diffie-hellman-group14-sha1,diffie-hellman-group1-sha1",
+#       "cidr(192.168.0.1):diffie-hellman-group14-sha1,diffie-hellman-group1-sha1",
+#       "cidr(10.0.0.0/8):curve25519-sha256@libssh.org",
+#       "*:curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521"
+#    ]
+
+# Key exchange algorithm override patterns
+#
+# Default algorithms (in order of preference):
+#   "ecdh-nistp521-kyber1024-sha512@ssh.com"
+#   "curve25519-frodokem1344-sha512@ssh.com"
+#   "sntrup761x25519-sha512@openssh.com"
+#   "curve25519-sha256"
+#   "curve25519-sha256@libssh.org"
+#   "ecdh-sha2-nistp521"
+#   "ecdh-sha2-nistp384"
+#   "ecdh-sha2-nistp256"
+#   "diffie-hellman-group-exchange-sha256"
+#   "diffie-hellman-group14-sha256"
+#   "diffie-hellman-group14-sha1"
+#
+# Supported algorithms:
+#   "ecdh-nistp521-kyber1024-sha512@ssh.com"
+#   "curve25519-frodokem1344-sha512@ssh.com"
+#   "sntrup761x25519-sha512@openssh.com"
+#   "diffie-hellman-group1-sha1"
+#   "diffie-hellman-group14-sha1"
+#   "diffie-hellman-group14-sha256"
+#   "ecdh-sha2-nistp256"
+#   "ecdh-sha2-nistp384"
+#   "ecdh-sha2-nistp521"
+#   "curve25519-sha256"
+#   "curve25519-sha256@libssh.org"
+#   "diffie-hellman-group-exchange-sha1"
+#   "diffie-hellman-group-exchange-sha256"
+kex = [
+
+]
+
+# Cipher algorithm override patterns
+#
+# Default algorithms (in order of preference):
+#   "aes128-gcm@openssh.com"
+#   "chacha20-poly1305@openssh.com"
+#   "aes128-ctr"
+#   "aes192-ctr"
+#   "aes256-ctr"
+#
+# Supported algorithms:
+#   "aes128-ctr"
+#   "aes192-ctr"
+#   "aes256-ctr"
+#   "aes128-gcm@openssh.com"
+#   "chacha20-poly1305@openssh.com"
+#   "arcfour256"
+#   "arcfour128"
+#   "arcfour"
+#   "aes128-cbc"
+#   "3des-cbc"
+ciphers = [
+
+]
+
+# Mac algorithm override patterns
+#
+# Default algorithms (in order of preference):
+#   "hmac-sha2-256-etm@openssh.com"
+#   "hmac-sha2-256"
+#   "hmac-sha1"
+#   "hmac-sha1-96"
+#
+# Supported algorithms:
+#   "hmac-sha2-256-etm@openssh.com"
+#   "hmac-sha2-256"
+#   "hmac-sha1"
+#   "hmac-sha1-96"
+macs = [
+
+]
+
+# Rekey threshold in bytes
+#
+# Override pattern format:
+#   "[extender prefix/]fqdn(hostname pattern):value"
+#   "[extender prefix/]cidr(IP):value"
+#   "[extender prefix/]cidr(IP/mask):value"
+#   "*:value"
+#
+# Minimum value: 1048576 (1 MB)
+# Maximum value: 9223372036854775807 (1<<63-1 B)
+# Default value: algorithm specific default (0)
+rekey_threshold = [
+
+]
+
+# SFTP protocol version override
+#
+# This override setting specifies what SFTP protocol version is advertised to
+# the target server.
+#
+# Override pattern format:
+#   "[extender prefix/]fqdn(hostname pattern):version"
+#   "[extender prefix/]cidr(IP):version"
+#   "[extender prefix/]cidr(IP/mask):version"
+#   "*:version"
+#
+# Valid values: 3, 4, 5, 6
+# Default value: 6
+#
+# Example:
+#    sftp_protocol_version = [
+#       "cidr(10.0.0.0/8):5", 
+#       "cidr(192.168.200.13):5", 
+#       "fqdn(*.domain.com):4", 
+#       "fqdn(host.domain.com):3", 
+#       "extendername/cidr(10.0.0.0/8):3", 
+#       "extendername/fqdn(*.domain.com):3"
+#    ]
+sftp_protocol_version = [
+
+]
+
+[sshclient]
+
+#
+# sshclient section defines overrides for ssh-mitm client connections when
+# PrivX is the SSH server-side.
+#
+
+# Override pattern format:
+#   "cidr(IP):comma separated list of algorithms"
+#   "cidr(IP/mask):comma separated list of algorithms"
+#   "*:comma separated list of algorithms"
+#
+#   the fqdn pattern cannot be used in the sshclient section. The client
+#   address is matched to patterns in the order they are listed and the
+#   algorithms for first match are used.
+#
+# Example:
+#    kex = [
+#       "cidr(192.168.0.1):diffie-hellman-group14-sha1,diffie-hellman-group1-sha1",
+#       "cidr(10.0.0.0/8):curve25519-sha256@libssh.org",
+#       "*:curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521"
+#    ]
+
+# Key exchange algorithm override patterns
+#
+# Default algorithms (in order of preference):
+#   "ecdh-nistp521-kyber1024-sha512@ssh.com"
+#   "curve25519-frodokem1344-sha512@ssh.com"
+#   "sntrup761x25519-sha512@openssh.com"
+#   "curve25519-sha256"
+#   "curve25519-sha256@libssh.org"
+#   "ecdh-sha2-nistp521"
+#   "ecdh-sha2-nistp384"
+#   "ecdh-sha2-nistp256"
+#   "diffie-hellman-group14-sha256"
+#   "diffie-hellman-group14-sha1"
+#
+# Supported algorithms:
+#   "ecdh-nistp521-kyber1024-sha512@ssh.com"
+#   "curve25519-frodokem1344-sha512@ssh.com"
+#   "sntrup761x25519-sha512@openssh.com"
+#   "diffie-hellman-group1-sha1"
+#   "diffie-hellman-group14-sha1"
+#   "diffie-hellman-group14-sha256"
+#   "ecdh-sha2-nistp256"
+#   "ecdh-sha2-nistp384"
+#   "ecdh-sha2-nistp521"
+#   "curve25519-sha256"
+#   "curve25519-sha256@libssh.org"
+kex = [
+
+]
+
+# Cipher algorithm override patterns
+#
+# Default algorithms (in order of preference):
+#   "aes128-gcm@openssh.com"
+#   "chacha20-poly1305@openssh.com"
+#   "aes128-ctr"
+#   "aes192-ctr"
+#   "aes256-ctr"
+#
+# Supported algorithms:
+#   "aes128-ctr"
+#   "aes192-ctr"
+#   "aes256-ctr"
+#   "aes128-gcm@openssh.com"
+#   "chacha20-poly1305@openssh.com"
+#   "arcfour256"
+#   "arcfour128"
+#   "arcfour"
+#   "aes128-cbc"
+#   "3des-cbc"
+ciphers = [
+
+]
+
+# Mac algorithm override patterns
+#
+# Default algorithms (in order of preference):
+#   "hmac-sha2-256-etm@openssh.com"
+#   "hmac-sha2-256"
+#   "hmac-sha1"
+#   "hmac-sha1-96"
+#
+# Supported algorithms:
+#   "hmac-sha2-256-etm@openssh.com"
+#   "hmac-sha2-256"
+#   "hmac-sha1"
+#   "hmac-sha1-96"
+macs = [
+
+]
+
+# Rekey threshold in bytes
+#
+# Minimum value: 1048576 (1 MB)
+# Maximum value: 9223372036854775807 (1<<63-1 B)
+# Default value: algorithm specific default (0)
+rekey_threshold = [
+
+]
