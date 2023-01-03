@@ -28,6 +28,9 @@
 # Key exchange algorithm override patterns
 #
 # Default algorithms (in order of preference):
+#   "ecdh-nistp521-kyber1024-sha512@ssh.com"
+#   "curve25519-frodokem1344-sha512@ssh.com"
+#   "sntrup761x25519-sha512@openssh.com"
 #   "curve25519-sha256"
 #   "curve25519-sha256@libssh.org"
 #   "ecdh-sha2-nistp521"
@@ -38,6 +41,9 @@
 #   "diffie-hellman-group14-sha1"
 #
 # Supported algorithms:
+#   "ecdh-nistp521-kyber1024-sha512@ssh.com"
+#   "curve25519-frodokem1344-sha512@ssh.com"
+#   "sntrup761x25519-sha512@openssh.com"
 #   "diffie-hellman-group1-sha1"
 #   "diffie-hellman-group14-sha1"
 #   "diffie-hellman-group14-sha256"
@@ -161,6 +167,9 @@ sftp_protocol_version = [
 # Key exchange algorithm override patterns
 #
 # Default algorithms (in order of preference):
+#   "ecdh-nistp521-kyber1024-sha512@ssh.com"
+#   "curve25519-frodokem1344-sha512@ssh.com"
+#   "sntrup761x25519-sha512@openssh.com"
 #   "curve25519-sha256"
 #   "curve25519-sha256@libssh.org"
 #   "ecdh-sha2-nistp521"
@@ -170,6 +179,9 @@ sftp_protocol_version = [
 #   "diffie-hellman-group14-sha1"
 #
 # Supported algorithms:
+#   "ecdh-nistp521-kyber1024-sha512@ssh.com"
+#   "curve25519-frodokem1344-sha512@ssh.com"
+#   "sntrup761x25519-sha512@openssh.com"
 #   "diffie-hellman-group1-sha1"
 #   "diffie-hellman-group14-sha1"
 #   "diffie-hellman-group14-sha256"

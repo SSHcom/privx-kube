@@ -1,9 +1,9 @@
-Upgrade Guide to Privx 26.X
+Upgrade Guide to Privx 27.0
 ======================================
 
 ## Current Helm revision for PrivX
 
-Before proceeding to upgrade PrivX from 25.X to 26.X, take a note of the current
+Before proceeding to upgrade PrivX from 26.0 to 27.0, take a note of the current
 Helm revision for the PrivX release. To do this, run the following command:
 
 ```
@@ -31,7 +31,7 @@ To shutdown PrivX and take a backup, run the following command:
 ```
 helm upgrade --history-max 0 \
     -f values-overrides/privx.yaml \
-    -f charts/privx/migrations/26/stage1.yaml \
+    -f charts/privx/migrations/27/stage1.yaml \
     --wait privx -n privx charts/privx/
 ```
 
@@ -39,7 +39,7 @@ The backup will be created under the volume that was mounted as the claim
 `privx-backup-claim`. The backup folder will have the following naming
 structure:
 
-`privx-backup-PPPPP_YYYY-MM-DD-hhmm_25.0.0`
+`privx-backup-PPPPP_YYYY-MM-DD-hhmm_26.0.0`
 
 Where the `P` is a random alpha-numeric representation of the backup pod, `Y` is
 the year the backup was generated, `M` is the month, `D` the day, `h` the hour
@@ -53,12 +53,12 @@ provided by the database service in use.
 ## Upgrade PrivX
 
 After the database and PrivX are successfully backed up, run the following
-command to upgrade to Privx 26.X.
+command to upgrade to Privx 27.0.
 
 ```
 helm upgrade --history-max 0 \
     -f values-overrides/privx.yaml \
-    -f charts/privx/migrations/26/stage2.yaml \
+    -f charts/privx/migrations/27/stage2.yaml \
     privx -n privx charts/privx/
 ```
 
@@ -82,7 +82,7 @@ helm upgrade --history-max 0 \
 
 3. Replace the placeholder backup folder name for the environment variable
 `BACKUP_DIR` in the file [restore.yaml](../restore.yaml) with the one from
-when the backup was taken (`privx-backup-PPPPP_YYYY-MM-DD-hhmm_25.0.0`). Make
+when the backup was taken (`privx-backup-PPPPP_YYYY-MM-DD-hhmm_26.0.0`). Make
 sure the correct backup folder is used. The backup folder name can also be
 copied from the logs of the backup job by running the following command:
 
@@ -94,7 +94,7 @@ kubectl logs -n privx <name-of-the-backup-pod>
 ```
 helm upgrade --history-max 0 \
     -f values-overrides/privx.yaml \
-    -f charts/privx/migrations/26/restore.yaml \
+    -f charts/privx/migrations/27/restore.yaml \
     privx -n privx charts/privx/
 ```
 

@@ -317,3 +317,10 @@ servicename = "workflow-engine"
 [26.0.workflow-engine.tls]
 certificate = "/opt/privx/cert/workflow-engine.crt"
 private_key = "/opt/privx/cert/workflow-engine.key"
+
+################################# PrivX 27.0 #################################
+[27.0.role-store.db]
+data_version = "11"
+
+[27.0.auth-default-config.db]
+data_version = "2"
