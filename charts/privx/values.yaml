@@ -921,11 +921,11 @@ ms:
           - host: localhost
             paths:
               - path: /authorizer/api/v1/cas
-                pathType: Exact
+                pathType: Prefix
               - path: /authorizer/api/v1/extender/cas
-                pathType: Exact
+                pathType: Prefix
               - path: /authorizer/api/v1/icap/cas
-                pathType: Exact
+                pathType: Prefix
 
     resources: {}
       # We usually recommend not to specify default resources and to leave this as a conscious
