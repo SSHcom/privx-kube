@@ -369,6 +369,10 @@ max_entries = 100000
 # Set to 0 to disable periodic in-mem cache synchronization.
 sync_interval_seconds = 60
 
+# Size of the cache that stores deleted roles in memory.
+# min = 1000, max = 10000000, default = 1000000
+deleted_roles_cache_size = 1000000
+
 [ROLE-STORE.db]
 # Maximum amount of time a connection may be reused (in seconds)
 # 0 = connections are reused forever
@@ -396,6 +400,10 @@ max_results = 100
 # if skip_event_ids = "",  all the events persisted to DB.
 # i.e. skip_event_ids = "10,44,100-200,250-290"
 skip_event_ids = ""
+
+[ROLE-STORE.principal_keys]
+add_on_role_creation = false
+
 ##########################################################################################
 
 [HOST-STORE]
@@ -502,6 +510,10 @@ cache_db_expiry_interval = 300
 # Warning threshold for running low on disk space for external components,
 # in GB
 external_component_low_storage_warning_threshold = 5
+
+# Max age of inactive components status, in hours.
+# -1 disables the component status deletion
+status_expunction_delay = 24
 
 [MONITOR-SERVICE.db]
 # Maximum amount of time a connection may be reused (in seconds)
@@ -1033,10 +1045,6 @@ ws_keepalive_interval_sec = 30
 skip_event_ids = ""
 ##########################################################################################
 [WORKFLOW-ENGINE]
-[WORKFLOW-ENGINE.housekeeping]
-# Interval for housekeeping, in hours.
-# 0 disables the housekeeping
-housekeeping_interval = 24
 
 [WORKFLOW-ENGINE.db]
 # Maximum amount of time a connection may be reused (in seconds)
@@ -1334,5 +1342,12 @@ max_idle_conns = 2
 # if skip_event_ids = "",  all the events persisted to DB.
 # i.e. skip_event_ids = "10,44,100-200,250-290"
 skip_event_ids = ""
+
+[SECRETS-MANAGER.winrm]
+# Trust anchor certificates for WinRM host certificate validation. If WinRM host certificate
+# is valid and signed by one of the trust anchors then the host certificate is
+# silently accepted. Trust anchor certificates are configured as one or multiple
+# concatenated PEM certificates.
+winrm_host_certificate_trust_anchors = ""
 
 ##########################################################################################

@@ -324,3 +324,19 @@ data_version = "11"
 
 [27.0.auth-default-config.db]
 data_version = "2"
+
+################################# PrivX 28.0 #################################
+[28.0.authorizer.db]
+data_version = "4"
+
+[28.0.role-store.db]
+data_version = "12"
+
+[28.0.secrets-manager.db]
+data_version = "2"
+
+[28.0.monitor-service.db]
+data_version = "11"
+
+[28.0.settings.db]
+data_version = "5"
