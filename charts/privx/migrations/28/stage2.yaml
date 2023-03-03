@@ -1,29 +1,29 @@
 migration:
   enabled: true
-  from: 26
-  to: 27
+  from: 27
+  to: 28
 
   configs:
     new:
       name: new
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/27/configs/new/*"
+      files: "migrations/28/configs/new/*"
     common:
       name: common
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/27/configs/common/*"
+      files: "migrations/28/configs/common/*"
     syslog:
       name: syslog
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/27/configs/syslog/*"
+      files: "migrations/28/configs/syslog/*"
     nginx:
       name: nginx
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/27/configs/nginx/*"
+      files: "migrations/28/configs/nginx/*"
 # ==========Upgrader===============
 jobs:
   upgrader:
@@ -34,7 +34,7 @@ jobs:
     image:
       repository: public.ecr.aws/sshprivx/upgrader
       pullPolicy: IfNotPresent
-      tag: "27.0"
+      tag: "28.0"
     imagePullSecrets:
       - name: docker-pull-secret
     environment:

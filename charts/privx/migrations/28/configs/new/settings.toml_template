@@ -27,7 +27,7 @@ max_idle_conns = 2
 
 # DB data version number
 # Do not modify
-data_version = "4"
+data_version = "5"
 
 [tls]
 # Microservice https server settings
