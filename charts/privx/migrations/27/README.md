@@ -1,9 +1,9 @@
-Upgrade Guide to Privx 27.0
+Upgrade Guide to Privx 27.X
 ======================================
 
 ## Current Helm revision for PrivX
 
-Before proceeding to upgrade PrivX from 26.0 to 27.0, take a note of the current
+Before proceeding to upgrade PrivX from 26.X to 27.X, take a note of the current
 Helm revision for the PrivX release. To do this, run the following command:
 
 ```
@@ -39,7 +39,7 @@ The backup will be created under the volume that was mounted as the claim
 `privx-backup-claim`. The backup folder will have the following naming
 structure:
 
-`privx-backup-PPPPP_YYYY-MM-DD-hhmm_26.0.0`
+`privx-backup-PPPPP_YYYY-MM-DD-hhmm_26.X.X`
 
 Where the `P` is a random alpha-numeric representation of the backup pod, `Y` is
 the year the backup was generated, `M` is the month, `D` the day, `h` the hour
@@ -53,7 +53,7 @@ provided by the database service in use.
 ## Upgrade PrivX
 
 After the database and PrivX are successfully backed up, run the following
-command to upgrade to Privx 27.0.
+command to upgrade to Privx 27.X.
 
 ```
 helm upgrade --history-max 0 \
@@ -82,7 +82,7 @@ helm upgrade --history-max 0 \
 
 3. Replace the placeholder backup folder name for the environment variable
 `BACKUP_DIR` in the file [restore.yaml](../restore.yaml) with the one from
-when the backup was taken (`privx-backup-PPPPP_YYYY-MM-DD-hhmm_26.0.0`). Make
+when the backup was taken (`privx-backup-PPPPP_YYYY-MM-DD-hhmm_26.X.X`). Make
 sure the correct backup folder is used. The backup folder name can also be
 copied from the logs of the backup job by running the following command:
 
