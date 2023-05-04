@@ -1,14 +1,17 @@
 ingress:
   common:
-    host: privx.yourdomain.com
+    hosts:
+      - host: privx.yourdomain.com
 
 db:
   # database address (required)
   address:
   # database port (required)
   port:
-  # database admin user name and password (required)
+  # database admin user name and password (required if db or admin user is to be created)
   admin:
+    createDB: true
+    createDBUser: true
     name:
     password:
   # database user name and password (required)

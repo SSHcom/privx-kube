@@ -43,6 +43,9 @@ spec:
           {{- else }}
         - securityContext: {}
           {{- end }}
+          {{- if not $initContainer.image }}
+          image: "{{ $globalContext.Values.privxRepository | default "public.ecr.aws/sshprivx"}}/{{ $initContainer.name }}:{{ $globalContext.Values.privxVersion | default "latest" }}"
+          {{- end }}
           {{- with $initContainer }}
             {{- toYaml . | nindent 10 }}
           {{- end }}
@@ -67,7 +70,7 @@ spec:
             {{- else }}
               {{- toYaml $service.securityContext | nindent 12 }}
             {{- end }}
-          image: "{{ $service.image.repository }}:{{ $service.image.tag | default "latest" }}"
+          image: "{{ $service.image.repository | default "public.ecr.aws/sshprivx" }}/{{ $service.image.name }}:{{ $service.image.tag | default "latest" }}"
           imagePullPolicy: {{ $service.image.pullPolicy }}
           env:
             - name: IS_DOCKER_ENV

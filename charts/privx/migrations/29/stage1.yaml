@@ -1,10 +1,16 @@
 migration:
   enabled: true
-  from: 27
-  to: 28
+  from: 28
+  to: 29
 
 # Before anything else, PrivX is shutdown
 shutdown: true
+
+# global value to define the PrivX images' repository
+privxRepository: &privxRepo public.ecr.aws/sshprivx
+
+# global value to define the PrivX images' version tag
+privxVersion: &privxTag "29.0"
 
 # ========== Privx settings backup ===============
 jobs:
@@ -14,16 +20,18 @@ jobs:
     weight: "-5"
     hookDeletePolicy: before-hook-creation
     image:
-      repository: public.ecr.aws/sshprivx/upgrader
+      repository: *privxRepo
+      name: upgrader
       pullPolicy: IfNotPresent
-      tag: "28.1"
+      tag: *privxTag
+
     imagePullSecrets:
       - name: docker-pull-secret
     environment:
       - name: UPGRADER_CMD
         value: backup
       - name: PRIVX_VERSION
-        value: 27.0.0
+        value: 28.1.0
     useGlobalPodSecurityContext: true
     securityContext: {}
     resources: {}

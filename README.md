@@ -208,4 +208,4 @@ helm install \
 ```
 
 # PrivX Version Upgrade
-For upgrading privx to the current version, follow the instructions [here](charts/privx/migrations/28/README.md)
+For upgrading privx to the current version, follow the instructions [here](charts/privx/migrations/29/README.md)
