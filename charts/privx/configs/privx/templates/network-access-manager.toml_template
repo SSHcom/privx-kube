@@ -16,4 +16,4 @@ private_key = "/opt/privx/cert/network-access-manager.key"
 [db]
 # DB data version number
 # Do not modify
-data_version = "2"
+data_version = "3"

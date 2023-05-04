@@ -12,14 +12,16 @@ spec:
     organizations:
      {{- toYaml . | nindent 6 }}
   {{- end }}
-  commonName: {{ .Values.ingress.common.host }}
+  commonName: {{ include "getHostnamesWithCommas" (list .Values.ingress.common.hosts) }}
   isCA: {{ .Values.cert.isAuthority }}
   {{- with .Values.cert.usages }}
   usages:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   dnsNames:
-  - {{ .Values.ingress.common.host }}
+    {{- range .Values.ingress.common.hosts }}
+    - {{ .host }}
+    {{- end }}
   issuerRef:
     name: selfsigned
     kind: ClusterIssuer

@@ -23,6 +23,9 @@ spec:
           {{- with $initContainer }}
             {{- toYaml . | nindent 10 }}
           {{- end }}
+          {{- if not $initContainer.image }}
+          image: "{{ $globalContext.Values.privxRepository | default "public.ecr.aws/sshprivx" }}/{{ $initContainer.name }}:{{ $globalContext.Values.privxVersion | default "latest" }}"
+          {{- end }}
         {{- end }}
       {{- end }}
       {{- if $job.serviceAccount.create }}
@@ -46,7 +49,7 @@ spec:
             {{- else }}
               {{- toYaml $job.securityContext | nindent 12 }}
             {{- end }}
-          image: "{{ $job.image.repository }}:{{ $job.image.tag | default "latest" }}"
+          image: "{{ $job.image.repository | default "public.ecr.aws/sshprivx" }}/{{ $job.image.name }}:{{ $job.image.tag | default "latest" }}"
           imagePullPolicy: {{ $job.image.pullPolicy }}
           {{- with $job.environment }}
           env:

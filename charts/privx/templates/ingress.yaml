@@ -43,22 +43,45 @@ spec:
     {{- range $ingress.tls }}
     - hosts:
         {{- if $ingress.useCommonHost }}
-        - {{ $globalContext.Values.ingress.common.host | quote }}
+          {{- range $globalContext.Values.ingress.common.hosts }}
+        - {{ .host | quote }}
+          {{- end }}
         {{- else }}
-        {{- range .hosts }}
+          {{- range .hosts }}
         - {{ . | quote }}
-        {{- end }}
+          {{- end }}
         {{- end }}
       secretName: {{ .secretName }}
     {{- end }}
   {{- end }}
   rules:
-    {{- range $ingress.hosts }}
     {{- if $ingress.useCommonHost }}
-    - host: {{ $globalContext.Values.ingress.common.host | quote }}
-    {{- else }}
+      {{- range $globalContext.Values.ingress.common.hosts }}
     - host: {{ .host | quote }}
-    {{- end}}
+      http:
+        paths:
+          {{- range $ingress.hosts }}
+            {{- range .paths }}
+          - path: {{ .path }}
+            {{- if and .pathType (semverCompare ">=1.18-0" $globalContext.Capabilities.KubeVersion.GitVersion) }}
+            pathType: {{ .pathType }}
+            {{- end }}
+            backend:
+              {{- if semverCompare ">=1.19-0" $globalContext.Capabilities.KubeVersion.GitVersion }}
+              service:
+                name: {{ $service.name }}
+                port:
+                  number: {{ $svcPort }}
+              {{- else }}
+              serviceName: {{ $service.name }}
+              servicePort: {{ $svcPort }}
+              {{- end }}
+            {{- end }}
+          {{- end }}
+      {{- end }}
+    {{- else }}
+      {{- range $ingress.hosts }}
+    - host: {{ .host | quote }}
       http:
         paths:
           {{- range .paths }}
@@ -77,6 +100,7 @@ spec:
               servicePort: {{ $svcPort }}
               {{- end }}
           {{- end }}
+      {{- end }}
     {{- end }}
 ---
 {{- end }}

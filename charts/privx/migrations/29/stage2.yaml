@@ -1,29 +1,36 @@
 migration:
   enabled: true
-  from: 27
-  to: 28
+  from: 28
+  to: 29
 
   configs:
     new:
       name: new
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/28/configs/new/*"
+      files: "migrations/29/configs/new/*"
     common:
       name: common
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/28/configs/common/*"
+      files: "migrations/29/configs/common/*"
     syslog:
       name: syslog
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/28/configs/syslog/*"
+      files: "migrations/29/configs/syslog/*"
     nginx:
       name: nginx
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/28/configs/nginx/*"
+      files: "migrations/29/configs/nginx/*"
+
+# global value to define the PrivX images' repository
+privxRepository: &privxRepo public.ecr.aws/sshprivx
+
+# global value to define the PrivX images' version tag
+privxVersion: &privxTag "29.0"
+
 # ==========Upgrader===============
 jobs:
   upgrader:
@@ -32,9 +39,11 @@ jobs:
     weight: "-4"
     hookDeletePolicy: before-hook-creation
     image:
-      repository: public.ecr.aws/sshprivx/upgrader
+      repository: *privxRepo
+      name: upgrader
       pullPolicy: IfNotPresent
-      tag: "28.1"
+      tag: *privxTag
+
     imagePullSecrets:
       - name: docker-pull-secret
     environment:
@@ -76,7 +85,7 @@ jobs:
             name: nginx-config
     initContainers:
       - name: config-copier
-        image: k8s.gcr.io/busybox
+        image: registry.k8s.io/busybox
         command: [ "/bin/sh", "-c" ]
         args:
           - mkdir -p /opt/privx/etc/new;

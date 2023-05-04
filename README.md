@@ -118,17 +118,16 @@ Once the database is present, the following values in the file
 [privx.yaml](values-overrides/privx.yaml) should be changed for privx to be able
 to reach and interact with the database.
 
-    - db.address (database address)
-    - db.port (database port)
-    - db.name (database name)
-    - db.sslmode (database sslmode (optional: default value=`require`))
-    - db.admin.name (database admin username)
-    - db.admin.password (database admin password)
-    - db.user.name (database privx user)
-    - db.user.password (database privx user password)
-
-**NOTE: Apart from the db.sslmode, all the other settings are mandatory and
-PrivX deployment will not work without setting these.**
+    - db.address (database address) [mandatory]
+    - db.port (database port) [mandatory]
+    - db.name (database name) [mandatory]
+    - db.sslmode (database sslmode) [optional: default value=`require`]
+    - db.admin.createDB (true: create db.name, false: skip) [optional: default value=`true`]
+    - db.admin.createDBUser (true: create db.user, false: skip) [optional: default value=`true`]
+    - db.admin.name (database admin username) [mandatory if either db.admin.createDB or db.admin.createDBUser is true]
+    - db.admin.password (database admin password) [mandatory if either db.admin.createDB or db.admin.createDBUser is true]
+    - db.user.name (database privx user) [mandatory]
+    - db.user.password (database privx user password) [mandatory]
 
 ### Namespace
 
@@ -151,9 +150,9 @@ are present in the `privx` namespace.
 The first certificate can be valid for a short duration and is used for securing
 the ingress endpoints. The purpose of the second certificate is to be valid for
 a longer duration so that any clients that rely on proxies and extenders can
-utilize it for a long-living configuration. The value `ingress.common.host` in
+utilize it for a long-living configuration. The value `ingress.common.hosts[*].host` in
 the file [privx.yaml](values-overrides/privx.yaml) should be changed to the
-domain that these certificates are issued for.
+domain(s) that these certificates are issued for.
 
 To create `privx-tls` use the following command:
 
@@ -208,4 +207,4 @@ helm install \
 ```
 
 # PrivX Version Upgrade
-For upgrading privx to the current version, follow the instructions [here](charts/privx/migrations/28/README.md)
+For upgrading privx to the current version, follow the instructions [here](charts/privx/migrations/29/README.md)

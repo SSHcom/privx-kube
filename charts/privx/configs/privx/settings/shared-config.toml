@@ -23,7 +23,7 @@ privx_node_name = ""
 privx_public_ip_address = ""
 
 # Service FQDN. Public DNS name for the endpoint. Used instead of public IP address, if exists.
-privx_public_fqdn_address = "{{ .Values.ingress.common.host }}"
+privx_public_fqdn_address = "{{  index .Values.ingress.common.hosts 0 "host" }}"
 
 # Additional public IP addresses as a comma separated list
 # Used for X.509 certificate CRL distribution points
@@ -31,10 +31,10 @@ privx_additional_public_ip_addresses = ""
 
 # Additional public DNS names as a comma separated list
 # Used for X.509 certificate CRL distribution points
-privx_additional_public_fqdn_addresses = ""
+privx_additional_public_fqdn_addresses = "{{ include "getHostnamesWithCommas" (list .Values.ingress.common.hosts 0) }}"
 
-# PrivX UI
-frontend_address = "https://{{ .Values.ingress.common.host }}/privx"
+# PrivX UI. By default, the scripts will use the first host in a list of hosts.
+frontend_address = "https://{{ index .Values.ingress.common.hosts 0 "host" }}/privx"
 
 # Login page
 auth_ui_address = "/auth"
@@ -43,8 +43,9 @@ auth_client_cert_ui_address = "https://localhost:8444/auth"
 # OIDC Identity Provider endpoint enabled
 oidc_provider_enabled = true
 
-# PrivX OIDC identity provider endpoint
-oidc_address = "https://{{ .Values.ingress.common.host }}/oidc"
+# PrivX OIDC identity provider endpoint.
+# By default, the scripts will use the first host in a list of hosts.
+oidc_address = "https://{{ index .Values.ingress.common.hosts 0 "host" }}/oidc"
 
 # Server operating mode.
 # default:
@@ -198,6 +199,30 @@ azure_max_batch_size = 10
 azure_event_timeout = 20
 
 ###############################################################################
+# UI Configuration
+
+# Make login form inconspicuos, default is false
+collapsed_password_form = false
+
+# Disable feature nav item visibility in UI
+ui_disabled_features = [
+
+]
+
+# Example:  
+# ui_disabled_features = [
+#     "secrets"
+# ]
+
+# valid values for disabled_features are listed below:
+# - "secrets"
+
+###############################################################################
+
+# Hide File Write Operations in UI for proxy connections
+hide_web_ui_file_upload = false
+
+###############################################################################
 # Notification cache
 
 [notificationCache]
@@ -290,7 +315,6 @@ client_cert_subject_name = "OU=PrivX Internal Web Server"
 # If not using load balancers, use the value 0
 # Used for resolving client IP for role IP restrictions, login rate limiter and auth token fingerprint.
 # Does not affect to SSH-MITM and RDP-MITM IP restrictions.
-# If role IP restrictions or login rate limiter are not used, this setting is ignored.
 # Default value 0 = use the last IP address in the provided X-Forwarded-For header
 strip_how_many_x_forwarded_for_client_ips = 0
 

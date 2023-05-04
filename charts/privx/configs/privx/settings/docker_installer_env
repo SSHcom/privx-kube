@@ -4,7 +4,7 @@
 # appliance addresses #
 #######################
 # Space-separated DNS addresses
-export  PRIVX_DNS_NAMES="{{ .Values.ingress.common.host }}"
+export  PRIVX_DNS_NAMES="{{ include "getHostnamesWithSpaces" .Values.ingress.common.hosts }}"
 # Space-separated IP addresses
 export  PRIVX_IP_ADDRESSES=" "
 ##########################################
@@ -14,9 +14,20 @@ export  PRIVX_IP_ADDRESSES=" "
 export  PRIVX_USE_EXTERNAL_DATABASE="1"
 export  PRIVX_POSTGRES_ADDRESS="{{ required "A valid db.address value is required" .Values.db.address }}"
 export  PRIVX_POSTGRES_PORT="{{ required "A valid db.port value is required" .Values.db.port }}"
-# PostgreSQL username/password
+
+# Variables to decide whether to create the database and its user or not
+export DB_EXTERNAL_CREATE_PSQL_DATABASE="{{ .Values.db.admin.createDB }}"
+export DB_EXTERNAL_CREATE_PSQL_USER="{{ .Values.db.admin.createDBUser }}"
+
+# PostgreSQL admin username/password is required only when the db and/or its user are to be created
+{{- if or .Values.db.admin.createDB .Values.db.admin.createDBUser }}
 export  PRIVX_POSTGRES_USER="{{ required "A valid db.admin.name value is required" .Values.db.admin.name }}"
 export  PRIVX_POSTGRES_PASSWORD="{{ required "A valid db.admin.password value is required" .Values.db.admin.password }}"
+{{- else }}
+export  PRIVX_POSTGRES_USER="{{ .Values.db.admin.name }}"
+export  PRIVX_POSTGRES_PASSWORD="{{ .Values.db.admin.password }}"
+{{- end }}
+
 # Database name
 export  PRIVX_DATABASE_NAME="{{ required "A valid db.name value is required" .Values.db.name }}"
 # Database-user name

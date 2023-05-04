@@ -8,7 +8,7 @@ keyvault_secret = "@MONITORSERVICE_SECRET@"
 [db]
 # DB data version number
 # Do not modify
-data_version = "11"
+data_version = "12"
 
 [tls]
 # Microservice https server settings
