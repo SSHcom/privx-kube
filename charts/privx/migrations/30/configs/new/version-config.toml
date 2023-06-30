@@ -353,3 +353,27 @@ data_version = "11"
 
 [29.0.monitor-service.db]
 data_version = "12"
+
+################################# PrivX 30.0 #################################
+[30.0.connection-manager.db]
+data_version = "12"
+
+[30.0.authorizer.db]
+data_version = "5"
+
+[30.0.role-store.db]
+data_version = "13"
+
+[30.0.host-store.db]
+data_version = "19"
+
+[30.0.oauth-shared-config]
+client_ids = [
+    "privx-ui",
+    "privx-service",
+    "privx-external",
+    "privx-web-container",
+]
+
+[30.0.auth-default-config.db]
+data_version = "3"

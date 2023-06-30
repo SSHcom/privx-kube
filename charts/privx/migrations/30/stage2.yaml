@@ -1,35 +1,35 @@
 migration:
   enabled: true
-  from: 28
-  to: 29
+  from: 29
+  to: 30
 
   configs:
     new:
       name: new
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/29/configs/new/*"
+      files: "migrations/30/configs/new/*"
     common:
       name: common
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/29/configs/common/*"
+      files: "migrations/30/configs/common/*"
     syslog:
       name: syslog
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/29/configs/syslog/*"
+      files: "migrations/30/configs/syslog/*"
     nginx:
       name: nginx
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/29/configs/nginx/*"
+      files: "migrations/30/configs/nginx/*"
 
 # global value to define the PrivX images' repository
 privxRepository: &privxRepo public.ecr.aws/sshprivx
 
 # global value to define the PrivX images' version tag
-privxVersion: &privxTag "29.0"
+privxVersion: &privxTag "30.0"
 
 # ==========Upgrader===============
 jobs:

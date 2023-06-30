@@ -23,7 +23,7 @@ index = "SC"
 
 # DB data version number
 # Do not modify
-data_version = "18"
+data_version = "19"
 
 [tls]
 # Microservice https server settings

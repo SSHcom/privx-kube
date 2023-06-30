@@ -23,6 +23,7 @@ clients = [
   "license-manager:@LICENSE_MANAGER_CLIENTID@",
   "networkaccessmanager:@NETWORK_ACCESS_MANAGER_CLIENTID@",
   "extenderservice:@EXTENDER_SERVICE_CLIENTID@",
+  "dbproxy:@DBPROXY_CLIENTID@",
 ]
 
 # Keyvault backend.
