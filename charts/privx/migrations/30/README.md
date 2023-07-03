@@ -1,9 +1,9 @@
-Upgrade Guide to Privx 29.X
-======================================
+Upgrade Guide to Privx 30.X
+===========================
 
 ## Current Helm revision for PrivX
 
-Before proceeding to upgrade PrivX from 28.X to 29.X, take a note of the current
+Before proceeding to upgrade PrivX from 29.X to 30.X, take a note of the current
 Helm revision for the PrivX release. To do this, run the following command:
 
 ```
@@ -39,7 +39,7 @@ The backup will be created under the volume that was mounted as the claim
 `privx-backup-claim`. The backup folder will have the following naming
 structure:
 
-`privx-backup-PPPPP_YYYY-MM-DD-hhmm_28.1.0`
+`privx-backup-PPPPP_YYYY-MM-DD-hhmm_29.X.X`
 
 Where the `P` is a random alpha-numeric representation of the backup pod, `Y` is
 the year the backup was generated, `M` is the month, `D` the day, `h` the hour
@@ -53,12 +53,12 @@ provided by the database service in use.
 ## Upgrade PrivX
 
 After the database and PrivX are successfully backed up, run the following
-command to upgrade to Privx 29.X.
+command to upgrade to Privx 30.X.
 
 ```
 helm upgrade --history-max 0 \
     -f values-overrides/privx.yaml \
-    -f charts/privx/migrations/29/stage2.yaml \
+    -f charts/privx/migrations/30/stage2.yaml \
     privx -n privx charts/privx/
 ```
 
@@ -71,6 +71,7 @@ If things go south at any point during the upgrade, follow these instructions to
 get back to the original revision of PrivX:
 
 1. Shutdown PrivX using the following command:
+
 ```
 helm upgrade --history-max 0 \
     -f values-overrides/privx.yaml \
@@ -79,18 +80,18 @@ helm upgrade --history-max 0 \
 ```
 
 2. Restore the database that was previously backed up
-
 3. Replace the placeholder backup folder name for the environment variable
-`BACKUP_DIR` in the file [restore.yaml](../restore.yaml) with the one from
-when the backup was taken (`privx-backup-PPPPP_YYYY-MM-DD-hhmm_28.1.0`). Make
-sure the correct backup folder is used. The backup folder name can also be
-copied from the logs of the backup job by running the following command:
+   `BACKUP_DIR` in the file [restore.yaml](../restore.yaml) with the one from
+   when the backup was taken (`privx-backup-PPPPP_YYYY-MM-DD-hhmm_29.X.X`). Make
+   sure the correct backup folder is used. The backup folder name can also be
+   copied from the logs of the backup job by running the following command:
 
 ```
 kubectl logs -n privx <name-of-the-backup-pod>
 ```
 
 4. Restore PrivX settings using the following command:
+
 ```
 helm upgrade --history-max 0 \
     -f values-overrides/privx.yaml \
@@ -103,5 +104,6 @@ helm upgrade --history-max 0 \
 ```
 helm rollback --namespace privx privx <revision-number>
 ```
+
 The revision-number above should be the same as noted in the first step
 before the upgrade.

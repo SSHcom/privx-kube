@@ -12,6 +12,7 @@ client_ids = [
     "privx-ui",
     "privx-service",
     "privx-external",
+    "privx-web-container",
 ]
 
 
@@ -71,3 +72,30 @@ audience = "privx-external"
 access_token_valid = "30m"
 signing_method = "Ed25519"
 client_type = "public"
+
+
+# Carrier browser SSO sessions use this client definition
+[privx-web-container]
+id = "privx-web-container"
+
+#audience will be in standard claims and is required to fetch
+#client specific signature verification key
+audience = "privx-web-container"
+
+# privx-web-container client type is always public
+client_type = "public"
+
+authorize_token_valid = "5m"
+access_token_valid = "5m"
+refresh_token_valid = "8h"
+
+# session_valid defines maximum session validity time from logon.
+# if session_valid is defined, "refresh" request to /token returns also refesh
+# tokens until session_valid is reached.
+session_valid = "8h"
+
+signing_method = "Ed25519"
+
+# If enabled, extra fingerprint is added to secure the access and refresh
+# tokens. Disabled by default.
+use_fingerprint = false

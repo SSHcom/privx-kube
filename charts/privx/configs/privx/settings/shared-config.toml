@@ -147,6 +147,9 @@ secrets_manager_address = "https://{{ .Values.ms.secretsmanager.name }}:{{ .Valu
 extenderservice_address = "https://{{ .Values.ms.extenderservice.name }}:{{ .Values.ms.extenderservice.service.port }}/extender-service/api/v1"
 extenderservice_connect_api_address = "{{ .Values.ms.extenderservice.name }}:{{ .Values.ms.extenderservice.service.port }}"
 
+# Database Proxy
+dbproxy_address = "https://{{ .Values.ms.dbproxy.name }}:{{ .Values.ms.dbproxy.service.port }}/db-proxy/api/v1"
+dbproxy_connect_api_address = "{{ .Values.ms.dbproxy.name }}:{{ .Values.ms.dbproxy.service.port }}"
 ###############################################################################
 
 # Should we send PrivX system events to stdout

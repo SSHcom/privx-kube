@@ -160,6 +160,24 @@ x509_ee_cert_expiry_offset = "24h"
 # EE Certificate expiration margin for warnings/audit events
 x509_ee_cert_valid_margin = "30d"
 
+# Database Proxy CA Certificate Validity
+x509_dbproxy_ca_valid = "1825d"
+
+# Database Proxy CA Certificate Validity start offset
+x509_dbproxy_ca_valid_before = "1d"
+
+# Database Proxy CA Certificate Expiration margin for warnings/audit events
+x509_dbproxy_ca_valid_margin = "30d"
+
+# Database Proxy CA CRL Validity
+x509_dbproxy_ca_crl_valid = "24h"
+
+# Database Proxy CA CRL Validity start offset
+x509_dbproxy_ca_crl_valid_before = "5m"
+
+# Database Proxy CA CRL revoked cert expiry offset
+x509_dbproxy_ca_crl_cert_expiry_offset = "24h"
+
 # Allow PrivX to manage target host roles on behalf of target host.
 # This enables PrivX authorizer to allow using "--delegated-principals" and "--delegated-personal-account-roles" configuration flags of deploy script.
 # If disabled, the target host SSHD config is locked down and adding new roles to target host requires re-running deploy script.
@@ -170,7 +188,7 @@ allow_delegated_ssh_roles = true
 [db]
 # DB data version number
 # Do not modify
-data_version = "4"
+data_version = "5"
 
 [tls]
 # Microservice https server settings

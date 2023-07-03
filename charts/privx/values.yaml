@@ -93,7 +93,7 @@ privx:
 privxRepository: &privxRepo public.ecr.aws/sshprivx
 
 # global value to define the PrivX images' version tag
-privxVersion: &privxTag "29.0"
+privxVersion: &privxTag "30.0"
 
 # When enabled migration will do the backup + upgrade (while using the correct override values)
 migration:
@@ -1040,6 +1040,24 @@ ms:
             hosts:
               - localhost
 
+      connection-manager-search:
+        name: search
+        useCommonHost: true
+        useCommonAnnotations: true
+        className: ""
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-ssl-name: "connection-manager"
+          nginx.ingress.kubernetes.io/proxy-read-timeout: "120"
+        hosts:
+          - host: localhost
+            paths:
+              - path: /connection-manager/api/v1/connections/search
+                pathType: Prefix
+        tls:
+          - secretName: privx-tls
+            hosts:
+              - localhost
+
     resources: {}
       # We usually recommend not to specify default resources and to leave this as a conscious
       # choice for the user. This also increases chances charts run on environments with little
@@ -1333,6 +1351,10 @@ ms:
       # If not set and create is true, a name is generated using the fullname template
       name: monitor-service
 
+    environment:
+      - name: MONITORSERVICE_AUDIT_HOUSEKEEPING_BATCH_SIZE
+        value: "10000"
+
     podAnnotations: {}
     useGlobalPodSecurityContext: true
     securityContext: {}
@@ -1354,6 +1376,24 @@ ms:
           - host: localhost
             paths:
               - path: /monitor-service
+                pathType: Prefix
+        tls:
+          - secretName: privx-tls
+            hosts:
+              - localhost
+
+      monitor-service-search:
+        name: search
+        useCommonHost: true
+        useCommonAnnotations: true
+        className: ""
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-ssl-name: "monitor-service"
+          nginx.ingress.kubernetes.io/proxy-read-timeout: "120"
+        hosts:
+          - host: localhost
+            paths:
+              - path: /monitor-service/api/v1/auditevents/search
                 pathType: Prefix
         tls:
           - secretName: privx-tls
@@ -2957,3 +2997,110 @@ ms:
         - name: privx-syslog-config
           configMap:
             name: syslog-config
+
+  #==========db-proxy values===============
+  dbproxy:
+    name: db-proxy
+    replicaCount: 1
+
+    image:
+      repository: *privxRepo
+      name: db-proxy
+      pullPolicy: IfNotPresent
+      tag: *privxTag
+
+
+    imagePullSecrets:
+      - name: docker-pull-secret
+    nameOverride: ""
+    fullnameOverride: ""
+
+    initContainers: []
+    serviceAccount:
+      # Specifies whether a service account should be created
+      create: true
+      # Annotations to add to the service account
+      annotations: {}
+      # The name of the service account to use.
+      # If not set and create is true, a name is generated using the fullname template
+      name: db-proxy
+
+    podAnnotations: {}
+    useGlobalPodSecurityContext: true
+    securityContext: {}
+
+    service:
+      enabled: true
+      type: ClusterIP
+      port: 8983
+
+    ingress:
+      https:
+        name: https
+        useCommonHost: true
+        useCommonAnnotations: true
+        className: ""
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-ssl-name: "db-proxy"
+        hosts:
+          - host: localhost
+            paths:
+              - path: /db-proxy
+                pathType: Prefix
+        tls:
+          - secretName: privx-tls
+            hosts:
+              - localhost
+
+    resources: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious
+      # choice for the user. This also increases chances charts run on environments with little
+      # resources, such as Minikube. If you do want to specify resources, uncomment the following
+      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+
+    rbac:
+      create: false
+
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 100
+      targetCPUUtilizationPercentage: 80
+      # targetMemoryUtilizationPercentage: 80
+
+    nodeSelector: {}
+
+    tolerations: []
+
+    affinity: {}
+    level:
+      log: DEBUG
+      trace: 3
+
+    volumes:
+      enabled: true
+      volumeMounts:
+        - mountPath: /opt/privx/cert
+          name: privx-config
+          subPath: privxcert
+        - mountPath: /opt/privx/keyvault
+          name: privx-config
+          subPath: keyvault
+        - mountPath: /opt/privx/etc
+          name: privx-config
+          subPath: privxetc
+        - mountPath: /etc/nginx/ssl
+          name: privx-config
+          subPath: nginxssl
+        - mountPath: /var/privx/audit
+          name: privx-config
+          subPath: privxaudit
+      claims:
+        - name: privx-config
+          claimName: privx-claim
