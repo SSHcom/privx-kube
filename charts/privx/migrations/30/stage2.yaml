@@ -29,7 +29,7 @@ migration:
 privxRepository: &privxRepo public.ecr.aws/sshprivx
 
 # global value to define the PrivX images' version tag
-privxVersion: &privxTag "30.0"
+privxVersion: &privxTag "30.1"
 
 # ==========Upgrader===============
 jobs:
