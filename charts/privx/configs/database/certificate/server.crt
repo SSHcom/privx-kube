@@ -1,0 +1,16 @@
+{{- $expectedFormat := "^-----BEGIN CERTIFICATE-----\n(.+\n)*-----END CERTIFICATE-----$" }}
+{{- if or (eq .Values.db.sslmode "verify-full") (eq .Values.db.sslmode "verify-ca") }}
+{{- if .Values.db.sslDBcertificate }}
+  {{- $certificate := .Values.db.sslDBcertificate }}
+  {{- if not (regexMatch $expectedFormat $certificate) }}
+    {{- fail "ERROR: Invalid certificate format for certificate." }}
+  {{- end }}
+  {{- $certificateLines := splitList "\n" $certificate }}
+  {{- $indentedCertificate := index $certificateLines 0 | printf "%s\n" }}
+  {{- range $index, $line := (slice $certificateLines 1) }}
+    {{- $indentedLine := printf "%s%s" (indent 4 $line) "\n" }}
+    {{- $indentedCertificate = printf "%s%s" $indentedCertificate $indentedLine }}
+  {{- end }}
+{{ $indentedCertificate }}
+{{- end }}
+{{- end }}

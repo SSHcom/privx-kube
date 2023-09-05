@@ -273,7 +273,7 @@ driver = "postgres"
 
 # Postgres SSLmode: disable, require, verify-ca, verify-full
 # i.e. sslmode = "verify-full"
-sslmode = '{{ .Values.db.sslmode | default "require" }}'
+sslmode = '{{ .Values.db.sslmode | default "verify-full" }}'
 
 # Additional Postgres database connection parameters
 # i.e. additional_params = "sslrootcert=/opt/privx/etc/privx-db-trust-anchor.pem"

@@ -1,35 +1,44 @@
 migration:
   enabled: true
-  from: 29
-  to: 30
+  from: 30
+  to: 31
 
   configs:
     new:
       name: new
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/30/configs/new/*"
+      files: "migrations/31/configs/new/*"
     common:
       name: common
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/30/configs/common/*"
+      files: "migrations/31/configs/common/*"
     syslog:
       name: syslog
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/30/configs/syslog/*"
+      files: "migrations/31/configs/syslog/*"
     nginx:
       name: nginx
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/30/configs/nginx/*"
-
+      files: "migrations/31/configs/nginx/*"
+    db-cert:
+      name: db-cert
+      hook: pre-upgrade
+      weight: "-5"
+      files: "migrations/31/configs/database/certificate/*"
+    upgrade-scripts:
+      name: upgrade-scripts
+      hook: pre-upgrade
+      weight: "-5"
+      files: "migrations/31/configs/scripts/*"
 # global value to define the PrivX images' repository
 privxRepository: &privxRepo public.ecr.aws/sshprivx
 
 # global value to define the PrivX images' version tag
-privxVersion: &privxTag "30.1"
+privxVersion: &privxTag "31.0"
 
 # ==========Upgrader===============
 jobs:
@@ -83,10 +92,21 @@ jobs:
         - name: privx-nginx-config
           configMap:
             name: nginx-config
+        - name: privx-database-certificate
+          configMap:
+            name: db-cert-config
+        - name: privx-upgrade-scripts
+          configMap:
+            name: upgrade-scripts-config
+    initContainersEnvironment:
+      - name: config-copier
+        env:
+          - name: "SSLMODE"
+            valueFromTemplate: "{{ .Values.db.sslmode }}"
     initContainers:
       - name: config-copier
-        image: registry.k8s.io/busybox
-        command: [ "/bin/sh", "-c" ]
+        image: "bash:5.2"
+        command: [ "bash", "-c" ]
         args:
           - mkdir -p /opt/privx/etc/new;
             echo copying new template tomls;
@@ -95,6 +115,13 @@ jobs:
             cp -f /common-config-mount/* /opt/privx/etc/;
             echo copying nginx configs;
             cp -f /upgraded-nginx-config/* /etc/nginx/privx/;
+            echo copying the database certificate;
+            cp /certificate-mount/server.crt /opt/privx/etc/privx-db-trust-anchor.pem;
+            echo setting sslrootcert if needed;
+            cp /upgradescripts/check-db-cert.sh /opt/privx/etc/check-db-cert.sh;
+            chmod +x /opt/privx/etc/check-db-cert.sh;
+            /opt/privx/etc/check-db-cert.sh /opt/privx/etc/privx-db-trust-anchor.pem;
+            echo done with sslrootcert changes
         volumeMounts:
           - name: privx-new-config
             mountPath: /new-templates-mount
@@ -108,6 +135,12 @@ jobs:
           - name: privx-config
             mountPath: /etc/nginx/privx
             subPath: nginxprivx
+          - name: privx-database-certificate
+            mountPath: /certificate-mount
+            readOnly: true
+          - name: privx-upgrade-scripts
+            mountPath: /upgradescripts
+
         resources: {}
           # limits:
           #   cpu: 100m

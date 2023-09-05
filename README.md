@@ -1,3 +1,9 @@
+# **BREAKING CHANGES IN PRIVX HELM CHART 31.0.0 **
+
+- default value for db.sslmode is changed from `require` to `verify-full`. This
+also adds an addition variable `db.sslDBcertificate` for possibly setting
+the database server/CA certificate. For more information, please check the extra
+documentation [here](db-certificate.md).
 # privx-kube
 
 privx-kube is a means to deploy [PrivX](https://www.ssh.com/products/privx/) in
@@ -121,13 +127,17 @@ to reach and interact with the database.
     - db.address (database address) [mandatory]
     - db.port (database port) [mandatory]
     - db.name (database name) [mandatory]
-    - db.sslmode (database sslmode) [optional: default value=`require`]
+    - db.sslmode (database sslmode) [optional: default value=`verify-full`]
+    - db.sslDBcertificate (database string certificate) [mandatory if db.sslmode is `verify-full` or `verify-ca` and certificate file is not uploaded and the certificate is not inherently trusted]
     - db.admin.createDB (true: create db.name, false: skip) [optional: default value=`true`]
     - db.admin.createDBUser (true: create db.user, false: skip) [optional: default value=`true`]
     - db.admin.name (database admin username) [mandatory if either db.admin.createDB or db.admin.createDBUser is true]
     - db.admin.password (database admin password) [mandatory if either db.admin.createDB or db.admin.createDBUser is true]
     - db.user.name (database privx user) [mandatory]
     - db.user.password (database privx user password) [mandatory]
+
+**NOTE: The values db.sslmode and db.sslDBcertificate are important to setup**
+**correctly. More details on how to use these can be found [here](db-certificate.md).**
 
 ### Namespace
 
@@ -207,4 +217,4 @@ helm install \
 ```
 
 # PrivX Version Upgrade
-For upgrading privx to the current version, follow the instructions [here](charts/privx/migrations/30/README.md)
+For upgrading privx to the current version, follow the instructions [here](charts/privx/migrations/31/README.md)

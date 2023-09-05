@@ -20,8 +20,14 @@ db:
     password:
   # database name (required)
   name:
-  # database ssl mode (require by default. Complete list of options can be checked from the postgresql version used)
-  sslmode: require
+  # database ssl mode (verify-full by default. Complete list of options can be checked from the postgresql version used)
+  sslmode: verify-full
+  # To add multiline DB certificate for sslmode verify-full/verify-ca, use the following example format:
+  #ssllDBcertificate: |-
+  #   -----BEGIN CERTIFICATE-----
+  #   CONTENT HERE
+  #   -----END CERTIFICATE-----
+  sslDBcertificate:
 
 privx:
   admin:
