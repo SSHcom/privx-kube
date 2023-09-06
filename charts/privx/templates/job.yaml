@@ -26,6 +26,20 @@ spec:
           {{- if not $initContainer.image }}
           image: "{{ $globalContext.Values.privxRepository | default "public.ecr.aws/sshprivx" }}/{{ $initContainer.name }}:{{ $globalContext.Values.privxVersion | default "latest" }}"
           {{- end }}
+          {{- $containerName := $initContainer.name }}
+          {{- range $icEnv := $job.initContainersEnvironment }}
+            {{- if eq $icEnv.name $containerName}}
+          env:
+                {{- range $env := $icEnv.env}}
+            - name: {{ $env.name }}
+                  {{- if $env.valueFromTemplate }}
+              value: {{ tpl $env.valueFromTemplate $globalContext | toString }}
+                  {{- else }}
+              value: {{ $env.value }}
+                  {{- end}}
+                {{- end}}
+            {{- end}}
+          {{- end}}
         {{- end }}
       {{- end }}
       {{- if $job.serviceAccount.create }}

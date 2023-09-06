@@ -188,7 +188,7 @@ allow_delegated_ssh_roles = true
 [db]
 # DB data version number
 # Do not modify
-data_version = "5"
+data_version = "6"
 
 [tls]
 # Microservice https server settings

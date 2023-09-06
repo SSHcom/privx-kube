@@ -377,3 +377,10 @@ client_ids = [
 
 [30.0.auth-default-config.db]
 data_version = "3"
+
+################################# PrivX 31.0 #################################
+[31.0.authorizer.db]
+data_version = "6"
+
+[31.0.shared-config.db]
+sslmode = '{{ .Values.db.sslmode | default "verify-full" }}'
