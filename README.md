@@ -1,4 +1,4 @@
-# **BREAKING CHANGES IN PRIVX HELM CHART 31.0.0 **
+# **BREAKING CHANGES IN PRIVX HELM CHART 31.X.X**
 
 - default value for db.sslmode is changed from `require` to `verify-full`. This
 also adds an addition variable `db.sslDBcertificate` for possibly setting
