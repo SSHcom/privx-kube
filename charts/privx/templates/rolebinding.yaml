@@ -15,7 +15,7 @@ roleRef:
 subjects:
   {{- range $subject := $service.rbac.subjects }}
 - kind: {{ $subject.kind }}
-  name: {{ $subject.kind }}
+  name: {{ $subject.name }}
   namespace: {{ $service.rbac.namespace }}
   {{- end }}
 ---
