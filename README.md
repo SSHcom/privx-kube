@@ -13,6 +13,13 @@ a kubernetes cluster.
 This repo contains the PrivX helm chart that can be used to deploy the supported
 versions of PrivX on Kubernetes.
 
+For more information on PrivX, please find the documentation
+[here](https://privx.docs.ssh.com/). An architecture diagram for PrivX on
+Kubernetes can be found [here](https://privx.docs.ssh.com/docs/privx-on-kubernetes#architecture-diagram-for-privx-on-kubernetes).
+
+For a list of Kubernetes resources that are deployed, please check
+[here](docs/resources.md).
+
 ## Prequisites
 
 - Kubernetes >= 1.19
@@ -47,6 +54,9 @@ for PrivX to work.
 As in any kubernetes cluster, a gateway or ingress is required to reach the
 application. PrivX uses [Bitnami Nginx Ingress Controller](https://github.com/bitnami/charts/tree/master/bitnami/nginx-ingress-controller)
 as the ingress controller.
+
+**NOTE: Please keep [this](docs/ingress.md) information in mind if an Ingress
+Controller or a similar component other than the one mentioned above is used.**
 
 The purpose of the ingress controller is to setup ingress to the PrivX
 microservices in a dynamic way.
