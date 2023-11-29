@@ -152,25 +152,37 @@ dbproxy_address = "https://{{ .Values.ms.dbproxy.name }}:{{ .Values.ms.dbproxy.s
 dbproxy_connect_api_address = "{{ .Values.ms.dbproxy.name }}:{{ .Values.ms.dbproxy.service.port }}"
 ###############################################################################
 
-# Should we send PrivX system events to stdout
-send_regular_events_to_stdout = true
+###  Audit event logging. ###  
 
-# Should we send PrivX audit events to syslog
+# The most important events in PrivX are transmitted as audit events. 
+# Typically, these are forwarded to a SIEM for further analysis.
 send_audit_events_to_syslog = {{ if .Values.privx.syslog.enabled -}} true {{- else -}} false {{- end }}
 
-# Should we send PrivX audit events to stdout
+# This configuration records to log files located in /var/log/privx/
 send_audit_events_to_stdout = {{ if .Values.privx.syslog.enabled -}} false {{- else -}} true {{- end }}
 
-# Should we send PrivX system events to syslog
+###  System event logging. ###  
+
+# System event logs are primarily beneficial for debugging configurations.
+# At elevated trace levels, logging will be extensive and it is advisable to 
+# either activate the syslog UDP protocol or opt for file-based logging.
 send_regular_events_to_syslog = false
 
-# rsyslog address. Used for event and audit log messages, if enabled.
-syslog_protocol = "tcp"
-syslog_address = "{{ .Values.ms.syslogservice.name }}:{{ .Values.ms.syslogservice.service.port }}"
+# This configuration records to log files located in /var/log/privx/
+send_regular_events_to_stdout = true
 
 # The used logging format for audit events, valid values: "syslog" and "cef".
 # audit_event_format = "syslog"
 audit_event_format = {{ if eq .Values.privx.syslog.audit.format "cef" -}} "cef" {{- else -}} "syslog" {{- end }}
+
+# rsyslog address. Used for event log messages, if enabled.
+syslog_protocol = "tcp"
+syslog_address = "{{ .Values.ms.syslogservice.name }}:{{ .Values.ms.syslogservice.service.port }}"
+
+# Audit events should use TCP protocol by default to avoid message loss.
+# If this setting is disabled, PrivX will default to 'syslog_protocol' and 'syslog_address' settings for audit events instead.
+#audit_event_syslog_protocol = "tcp"
+#audit_event_syslog_address = "{{ .Values.ms.syslogservice.name }}:{{ .Values.ms.syslogservice.service.port }}"
 
 # Should we send audit events to AWS CloudWatchEvents
 # Use the following event pattern for CloudWatch event rules in AWS Console:
@@ -299,6 +311,14 @@ trust_anchors_file = "/etc/nginx/ssl/privx-ca.crt"
 # append_to_system_trust_anchors, if set to true would append the certficates
 # defined in trust_anchors_file to the system trust certificates.
 append_to_system_trust_anchors = true
+
+# Maximum number of HTTPS client TLS connections per microservice per host. 
+# Primarily impacts communication between microservices and might have a positive
+# effect on the throughput of role-store and ssh/rdp proxies on high-latency environments.
+# For most systems, the default value is enough.
+# If you increase this value, make sure your system ulimits can handle it.
+# If undefined, the default is 64
+max_conns_per_host = 128
 
 [restapi]
 

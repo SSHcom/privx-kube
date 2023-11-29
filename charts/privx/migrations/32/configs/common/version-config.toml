@@ -384,3 +384,13 @@ data_version = "6"
 
 [31.0.shared-config.db]
 sslmode = '{{ .Values.db.sslmode | default "verify-full" }}'
+
+################################# PrivX 32.0 #################################
+[32.0.host-store.db]
+data_version = "20"
+
+[32.0.auth-default-config.db]
+data_version = "4"
+
+[32.0.keyvault.db]
+data_version = "4"
