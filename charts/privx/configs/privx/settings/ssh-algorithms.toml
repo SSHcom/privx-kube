@@ -38,7 +38,6 @@
 #   "ecdh-sha2-nistp256"
 #   "diffie-hellman-group-exchange-sha256"
 #   "diffie-hellman-group14-sha256"
-#   "diffie-hellman-group14-sha1"
 #
 # Supported algorithms:
 #   "ecdh-nistp521-kyber1024-sha512@ssh.com"
@@ -61,12 +60,12 @@ kex = [
 # Cipher algorithm override patterns
 #
 # Default algorithms (in order of preference):
-#   "aes128-gcm@openssh.com"
-#   "aes256-gcm@openssh.com"
 #   "chacha20-poly1305@openssh.com"
-#   "aes128-ctr"
-#   "aes192-ctr"
+#   "aes256-gcm@openssh.com"
 #   "aes256-ctr"
+#   "aes192-ctr"
+#   "aes128-gcm@openssh.com"
+#   "aes128-ctr"
 #
 # Supported algorithms:
 #   "aes128-ctr"
@@ -87,14 +86,18 @@ ciphers = [
 # Mac algorithm override patterns
 #
 # Default algorithms (in order of preference):
+#   "hmac-sha2-512-etm@openssh.com"
+#   "hmac-sha2-512"
 #   "hmac-sha2-256-etm@openssh.com"
 #   "hmac-sha2-256"
 #   "hmac-sha1"
 #   "hmac-sha1-96"
 #
 # Supported algorithms:
+#   "hmac-sha2-512-etm@openssh.com"
 #   "hmac-sha2-256-etm@openssh.com"
 #   "hmac-sha2-256"
+#   "hmac-sha2-512"
 #   "hmac-sha1"
 #   "hmac-sha1-96"
 macs = [
@@ -178,7 +181,6 @@ sftp_protocol_version = [
 #   "ecdh-sha2-nistp384"
 #   "ecdh-sha2-nistp256"
 #   "diffie-hellman-group14-sha256"
-#   "diffie-hellman-group14-sha1"
 #
 # Supported algorithms:
 #   "ecdh-nistp521-kyber1024-sha512@ssh.com"
@@ -199,12 +201,12 @@ kex = [
 # Cipher algorithm override patterns
 #
 # Default algorithms (in order of preference):
-#   "aes128-gcm@openssh.com"
-#   "aes256-gcm@openssh.com"
 #   "chacha20-poly1305@openssh.com"
-#   "aes128-ctr"
-#   "aes192-ctr"
+#   "aes256-gcm@openssh.com"
 #   "aes256-ctr"
+#   "aes192-ctr"
+#   "aes128-gcm@openssh.com"
+#   "aes128-ctr"
 #
 # Supported algorithms:
 #   "aes128-ctr"
@@ -225,14 +227,18 @@ ciphers = [
 # Mac algorithm override patterns
 #
 # Default algorithms (in order of preference):
+#   "hmac-sha2-512-etm@openssh.com"
+#   "hmac-sha2-512"
 #   "hmac-sha2-256-etm@openssh.com"
 #   "hmac-sha2-256"
 #   "hmac-sha1"
 #   "hmac-sha1-96"
 #
 # Supported algorithms:
+#   "hmac-sha2-512-etm@openssh.com"
 #   "hmac-sha2-256-etm@openssh.com"
 #   "hmac-sha2-256"
+#   "hmac-sha2-512"
 #   "hmac-sha1"
 #   "hmac-sha1-96"
 macs = [

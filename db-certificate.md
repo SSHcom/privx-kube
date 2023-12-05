@@ -37,14 +37,29 @@ Both methods of providing the database certificate to PrivX are explained below:
 
 Users can upload a certificate file to PrivX. The certificate file contains the database server/CA certificate information and must be in PEM format.
 
-For uploading certificate file, the certificate file must be copied to ```charts/privx/configs/database/certificate/server.crt```.
+There are two conditions when uploading the certificate file, deploying a new PrivX instance or upgrading an existing PrivX installation.
 
-**Before copying the new certificate, it is recommended to back up the ```server.crt``` file if the ```server.crt``` already has a database server/CA certificate.**
+- **New Installation**
 
-```
-# Upload file
-cp <certificate-path>/<certificate-fileName> charts/privx/configs/database/certificate/server.crt
-```
+    For uploading certificate file, the certificate file must be copied to ```charts/privx/configs/database/certificate/server.crt```.
+
+    **Before copying the new certificate, it is recommended to back up the ```server.crt``` file if the ```server.crt``` already has a database server/CA certificate.**
+
+    ```
+    # Upload file
+    cp <certificate-path>/<certificate-fileName> charts/privx/configs/database/certificate/server.crt
+    ```
+
+- **Upgrade**
+
+    For uploading certificate file, the certificate file must be copied to ```charts/privx/migrations/<version>/configs/database/certificate/server.crt```. 
+    
+    **All the ```<version>``` mentioned in this chapter needs to be changed to the target Privx version.**
+
+    ```
+    # Upload file
+    cp <certificate-path>/<certificate-fileName> charts/privx/migrations/<version>/configs/database/certificate/server.crt
+    ```
 ### 2. Use string certificate
 
 Users can provide the database server/CA certificate as a string. This means that the contents of the certificate are directly included in the configuration.

@@ -1,7 +1,7 @@
 migration:
   enabled: true
-  from: 30
-  to: 31
+  from: 31
+  to: 32
 
 # Before anything else, PrivX is shutdown
 shutdown: true
@@ -10,7 +10,7 @@ shutdown: true
 privxRepository: &privxRepo public.ecr.aws/sshprivx
 
 # global value to define the PrivX images' version tag
-privxVersion: &privxTag "31.1"
+privxVersion: &privxTag "32.0"
 
 # ========== Privx settings backup ===============
 jobs:
@@ -31,7 +31,7 @@ jobs:
       - name: UPGRADER_CMD
         value: backup
       - name: PRIVX_VERSION
-        value: 30.2.0
+        value: 32.0.0
     useGlobalPodSecurityContext: true
     securityContext: {}
     resources: {}
