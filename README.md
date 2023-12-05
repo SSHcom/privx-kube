@@ -1,4 +1,4 @@
-# **BREAKING CHANGES IN PRIVX HELM CHART 31.X.X**
+# **BREAKING CHANGES IN PRIVX HELM CHART 31.0.0**
 
 - default value for db.sslmode is changed from `require` to `verify-full`. This
 also adds an addition variable `db.sslDBcertificate` for possibly setting
@@ -171,7 +171,7 @@ The first certificate can be valid for a short duration and is used for securing
 the ingress endpoints. The purpose of the second certificate is to be valid for
 a longer duration so that any clients that rely on proxies and extenders can
 utilize it for a long-living configuration. The value `ingress.common.hosts[*].host` in
-the file [privx.yaml](values-overrides/privx.yaml) should be changed to the
+the file [privx.yaml](values-overrides/privx.yaml) must be changed to the
 domain(s) that these certificates are issued for.
 
 To create `privx-tls` use the following command:
@@ -215,6 +215,14 @@ installing PrivX in the file [privx.yaml](values-overrides/privx.yaml).
     - privx.admin.password (admin password for PrivX UI login)
     - privx.admin.email (admin email for PrivX UI login)
 
+### Privx Container Custom User ID and Group ID
+
+By default, PrivX containers are runing under User ID (`uid`) and Group ID (`gid`) `5111`. To run containers under a custom `uid/gid`, customize the following values in `charts/privx/values.yaml`:
+
+    - podSecurityContext.fsGroup (Custom gid)
+    - podSecurityContext.runAsUser (Custom uid)
+    - securityContext.runAsUser (Custom uid)
+
 ## Install PrivX
 
 To install Privx use the following command:
@@ -227,4 +235,4 @@ helm install \
 ```
 
 # PrivX Version Upgrade
-For upgrading privx to the current version, follow the instructions [here](charts/privx/migrations/31/README.md)
+For upgrading privx to the current version, follow the instructions [here](charts/privx/migrations/32/README.md)

@@ -184,6 +184,8 @@ cache_size = 1000000
 host_heading = '''[]'''
 host_watermark = '''[]'''
 
+[GLOBAL.mobile_gw]
+use_static_ips = false
 
 
 ##########################################################################################
@@ -517,6 +519,10 @@ external_component_low_storage_warning_threshold = 5
 # Max age of inactive components status, in hours.
 # -1 disables the component status deletion
 status_expunction_delay = 24
+
+# Interval for database certificate check, in hours.
+# 0 disables the check.
+db_certificate_check_interval = 1
 
 [MONITOR-SERVICE.db]
 # Maximum amount of time a connection may be reused (in seconds)
@@ -1037,6 +1043,13 @@ listener_addresses = [
 # Port range for extender listener ports
 listener_port_min = 11000
 listener_port_max = 11999
+
+# UDP port range for extender service listener ports
+udp_listener_port_min = 12000
+udp_listener_port_max = 12999
+
+# Number of attempts of reconnecting to extender for UDP connections
+udp_connection_reconnect_count = 2
 
 # Web socket keepalive interval in seconds
 ws_keepalive_interval_sec = 30
