@@ -1,13 +1,13 @@
 # Information on outside ports needed to be opened
 
-PrivX requries that the port 443 (HTTPS) be open for it to function. The
+PrivX requires that the port 443 (HTTPS) be open for it to function. The
 following ports are optional and are needed to be opened for allowing specific
 features to work correctly:
 
 - 1080 (Needed by SSH Bastion for SOCKS proxy connections)
 - 2222 (Needed by SSH Bastion for SSH native connections)
-- 3389 (Needed by RDP Bastion for RDP native conenctions)
-- 8443 (Needed by Authorizer for Client Cert endpoints)
+- 3389 (Needed by RDP Bastion for RDP native connections)
+- 8443 (Needed by Authorizer for client certification authentication endpoints)
 
 # Information on Sticky Sessions
 
