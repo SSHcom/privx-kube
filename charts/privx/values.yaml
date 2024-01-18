@@ -93,7 +93,7 @@ privx:
 privxRepository: &privxRepo public.ecr.aws/sshprivx
 
 # global value to define the PrivX images' version tag
-privxVersion: &privxTag "30.2"
+privxVersion: &privxTag "30.3"
 
 # When enabled migration will do the backup + upgrade (while using the correct override values)
 migration:
