@@ -54,7 +54,7 @@ There are two conditions when uploading the certificate file, deploying a new Pr
 
     For uploading certificate file, the certificate file must be copied to ```charts/privx/migrations/<version>/configs/database/certificate/server.crt```. 
     
-    **All the ```<version>``` mentioned in this chapter needs to be changed to the target Privx version.**
+    **All the ```<version>``` mentioned in this chapter needs to be changed to the target PrivX version.**
 
     ```
     # Upload file

@@ -207,7 +207,7 @@ The value for `ms.licensemanager.licenseCode.prod.value` in the file
 valid license value. **NOTE:** If offline licenses are used, then please wait
 for more instructions as support for that is still under work.
 
-### Privx Admin user
+### PrivX Admin user
 The values for the following are **mandatory** and need to be set before
 installing PrivX in the file [privx.yaml](values-overrides/privx.yaml).
 
@@ -215,7 +215,7 @@ installing PrivX in the file [privx.yaml](values-overrides/privx.yaml).
     - privx.admin.password (admin password for PrivX UI login)
     - privx.admin.email (admin email for PrivX UI login)
 
-### Privx Container Custom User ID and Group ID
+### PrivX Container Custom User ID and Group ID
 
 By default, PrivX containers are runing under User ID (`uid`) and Group ID (`gid`) `5111`. To run containers under a custom `uid/gid`, customize the following values in `charts/privx/values.yaml`:
 
@@ -225,7 +225,7 @@ By default, PrivX containers are runing under User ID (`uid`) and Group ID (`gid
 
 ## Install PrivX
 
-To install Privx use the following command:
+To install PrivX use the following command:
 
 ```
 helm install \
@@ -235,4 +235,4 @@ helm install \
 ```
 
 # PrivX Version Upgrade
-For upgrading privx to the current version, follow the instructions [here](charts/privx/migrations/32/README.md)
+For upgrading privx to the current version, follow the instructions [here](charts/privx/migrations/33/README.md)

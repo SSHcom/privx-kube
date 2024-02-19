@@ -6,10 +6,15 @@ listen_port = 8085
 keyvault_id = "@WORKFLOWENGINE_ID@"
 keyvault_secret = "@WORKFLOWENGINE_SECRET@"
 
+# Templates used for send smtp settings/requests email notifications
+[templates]
+access_request = "access-template.tmpl"
+smtp_settings = "smtp-settings-template.tmpl"
+
 [db]
 # DB data version number
 # Do not modify
-data_version = "7"
+data_version = "8"
 
 [tls]
 # Microservice https server settings
