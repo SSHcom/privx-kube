@@ -204,8 +204,13 @@ host_scanning_frequency = 300
 # AWS role scanning delay after starting the service
 first_role_scanning_delay = 10
 
+# Whether or not the role membership counts are automatically updated in the background.
+# Enabling this feature on large environments may cause slowness issues, so proceed carefully. 
+# Even if disabled, the individual role member counts can still be viewed.
+role_member_count_update_enabled = false
+
 # Frequency for resolving explicit member counts for roles
-role_member_count_update_frequency = 15
+role_member_count_update_frequency = 600
 
 # LDAP settings
 [ROLE-STORE.ldap]
@@ -361,6 +366,10 @@ rule_evaluation_cache_enabled = true
 # i.e. user_cache_refresh_ttl = 60
 user_cache_refresh_ttl = 60
 
+# Caching the count of role members (both implicit and explicit) on the role details page and in the API response
+# This has no effect on role memberships, only on the reported membership counts.
+role_member_count_cache_ttl = 60
+
 # Cache type
 # Possible values: "local" (in-mem LRU cache), "redis"
 # i.e. type = "local"
@@ -409,6 +418,17 @@ skip_event_ids = ""
 [ROLE-STORE.principal_keys]
 add_on_role_creation = false
 
+[ROLE-STORE.logging]
+# Log level set in the database.
+# If log_level = "DEFAULT", the environment value will be used.
+# Values: "DEFAULT" "DEBUG" "INFO" "WARNING" "ERROR"
+log_level = "DEFAULT"
+
+# Trace level set in the database.
+# If trace_level = -1, the environment value will be used.
+# Values: -1 <= trace_level <= 10
+trace_level = -1
+
 ##########################################################################################
 
 [HOST-STORE]
@@ -448,8 +468,8 @@ service_health_check_max_workers = 3
 service_health_check_max_requests_per_second = 1
 
 # Delay between health check runs in seconds
-# Default 600 seconds
-service_health_check_wait = 600
+# Default 7200 seconds
+service_health_check_wait = 7200
 
 # Housekeeping settings
 [HOST-STORE.host-house-keeping]
@@ -488,6 +508,18 @@ max_idle_conns = 2
 # if skip_event_ids = "",  all the events persisted to DB.
 # i.e. skip_event_ids = "10,44,100-200,250-290"
 skip_event_ids = ""
+
+[HOST-STORE.logging]
+# Log level set in the database.
+# If log_level = "DEFAULT", the environment value will be used.
+# Values: "DEFAULT" "DEBUG" "INFO" "WARNING" "ERROR"
+log_level = "DEFAULT"
+
+# Trace level set in the database.
+# If trace_level = -1, the environment value will be used.
+# Values: -1 <= trace_level <= 10
+trace_level = -1
+
 ##########################################################################################
 
 [MONITOR-SERVICE]
@@ -512,9 +544,8 @@ system_health_check_interval = 1
 # Interval for removing expired keys from the db cache table, in Seconds
 cache_db_expiry_interval = 300
 
-# Warning threshold for running low on disk space for external components,
-# in GB
-external_component_low_storage_warning_threshold = 5
+# Disk mount points for checking the available space. PrivX will raise alerts, if disk space on these mount points falls below the warning threshold.
+verify_instance_disk_mounts = "/:5GB,/var/log:5GB,/var/privx/audit:10GB"
 
 # Max age of inactive components status, in hours.
 # -1 disables the component status deletion
@@ -547,6 +578,18 @@ max_idle_conns = 2
 # if skip_event_ids = "",  all the events persisted to DB.
 # i.e. skip_event_ids = "10,44,100-200,250-290"
 skip_event_ids = ""
+
+[MONITOR-SERVICE.logging]
+# Log level set in the database.
+# If log_level = "DEFAULT", the environment value will be used.
+# Values: "DEFAULT" "DEBUG" "INFO" "WARNING" "ERROR"
+log_level = "DEFAULT"
+
+# Trace level set in the database.
+# If trace_level = -1, the environment value will be used.
+# Values: -1 <= trace_level <= 10
+trace_level = -1
+
 ##########################################################################################
 
 [TRAIL-INDEX]
@@ -581,6 +624,18 @@ max_idle_conns = 2
 # if skip_event_ids = "",  all the events persisted to DB.
 # i.e. skip_event_ids = "10,44,100-200,250-290"
 skip_event_ids = ""
+
+[TRAIL-INDEX.logging]
+# Log level set in the database.
+# If log_level = "DEFAULT", the environment value will be used.
+# Values: "DEFAULT" "DEBUG" "INFO" "WARNING" "ERROR"
+log_level = "DEFAULT"
+
+# Trace level set in the database.
+# If trace_level = -1, the environment value will be used.
+# Values: -1 <= trace_level <= 10
+trace_level = -1
+
 ##########################################################################################
 
 [RDP-PROXY]
@@ -663,6 +718,18 @@ max_idle_conns = 2
 # if skip_event_ids = "",  all the events persisted to DB.
 # i.e. skip_event_ids = "10,44,100-200,250-290"
 skip_event_ids = ""
+
+[RDP-PROXY.logging]
+# Log level set in the database.
+# If log_level = "DEFAULT", the environment value will be used.
+# Values: "DEFAULT" "DEBUG" "INFO" "WARNING" "ERROR"
+log_level = "DEFAULT"
+
+# Trace level set in the database.
+# If trace_level = -1, the environment value will be used.
+# Values: -1 <= trace_level <= 10
+trace_level = -1
+
 ##########################################################################################
 
 [RDP-MITM]
@@ -744,6 +811,18 @@ max_idle_conns = 2
 # if skip_event_ids = "",  all the events persisted to DB.
 # i.e. skip_event_ids = "10,44,100-200,250-290"
 skip_event_ids = ""
+
+[RDP-MITM.logging]
+# Log level set in the database.
+# If log_level = "DEFAULT", the environment value will be used.
+# Values: "DEFAULT" "DEBUG" "INFO" "WARNING" "ERROR"
+log_level = "DEFAULT"
+
+# Trace level set in the database.
+# If trace_level = -1, the environment value will be used.
+# Values: -1 <= trace_level <= 10
+trace_level = -1
+
 ##########################################################################################
 
 [SSH-PROXY]
@@ -804,6 +883,18 @@ max_idle_conns = 2
 # if skip_event_ids = "",  all the events persisted to DB.
 # i.e. skip_event_ids = "10,44,100-200,250-290"
 skip_event_ids = ""
+
+[SSH-PROXY.logging]
+# Log level set in the database.
+# If log_level = "DEFAULT", the environment value will be used.
+# Values: "DEFAULT" "DEBUG" "INFO" "WARNING" "ERROR"
+log_level = "DEFAULT"
+
+# Trace level set in the database.
+# If trace_level = -1, the environment value will be used.
+# Values: -1 <= trace_level <= 10
+trace_level = -1
+
 ##########################################################################################
 
 [SSH-MITM]
@@ -883,6 +974,18 @@ max_idle_conns = 2
 # if skip_event_ids = "",  all the events persisted to DB.
 # i.e. skip_event_ids = "10,44,100-200,250-290"
 skip_event_ids = ""
+
+[SSH-MITM.logging]
+# Log level set in the database.
+# If log_level = "DEFAULT", the environment value will be used.
+# Values: "DEFAULT" "DEBUG" "INFO" "WARNING" "ERROR"
+log_level = "DEFAULT"
+
+# Trace level set in the database.
+# If trace_level = -1, the environment value will be used.
+# Values: -1 <= trace_level <= 10
+trace_level = -1
+
 ##########################################################################################
 
 [CONNECTION-MANAGER]
@@ -929,6 +1032,18 @@ max_idle_conns = 2
 # if skip_event_ids = "",  all the events persisted to DB.
 # i.e. skip_event_ids = "10,44,100-200,250-290"
 skip_event_ids = ""
+
+[CONNECTION-MANAGER.logging]
+# Log level set in the database.
+# If log_level = "DEFAULT", the environment value will be used.
+# Values: "DEFAULT" "DEBUG" "INFO" "WARNING" "ERROR"
+log_level = "DEFAULT"
+
+# Trace level set in the database.
+# If trace_level = -1, the environment value will be used.
+# Values: -1 <= trace_level <= 10
+trace_level = -1
+
 ##########################################################################################
 [NETWORK-ACCESS-MANAGER]
 [NETWORK-ACCESS-MANAGER.db]
@@ -1005,6 +1120,18 @@ routers = '[]'
 # if skip_event_ids = "",  all the events persisted to DB.
 # i.e. skip_event_ids = "10,44,100-200,250-290"
 skip_event_ids = ""
+
+[NETWORK-ACCESS-MANAGER.logging]
+# Log level set in the database.
+# If log_level = "DEFAULT", the environment value will be used.
+# Values: "DEFAULT" "DEBUG" "INFO" "WARNING" "ERROR"
+log_level = "DEFAULT"
+
+# Trace level set in the database.
+# If trace_level = -1, the environment value will be used.
+# Values: -1 <= trace_level <= 10
+trace_level = -1
+
 ##########################################################################################
 [EXTENDER-SERVICE]
 
@@ -1059,6 +1186,18 @@ ws_keepalive_interval_sec = 30
 # if skip_event_ids = "",  all the events persisted to DB.
 # i.e. skip_event_ids = "10,44,100-200,250-290"
 skip_event_ids = ""
+
+[EXTENDER-SERVICE.logging]
+# Log level set in the database.
+# If log_level = "DEFAULT", the environment value will be used.
+# Values: "DEFAULT" "DEBUG" "INFO" "WARNING" "ERROR"
+log_level = "DEFAULT"
+
+# Trace level set in the database.
+# If trace_level = -1, the environment value will be used.
+# Values: -1 <= trace_level <= 10
+trace_level = -1
+
 ##########################################################################################
 [WORKFLOW-ENGINE]
 
@@ -1085,6 +1224,18 @@ max_idle_conns = 2
 # if skip_event_ids = "",  all the events persisted to DB.
 # i.e. skip_event_ids = "10,44,100-200,250-290"
 skip_event_ids = ""
+
+[WORKFLOW-ENGINE.logging]
+# Log level set in the database.
+# If log_level = "DEFAULT", the environment value will be used.
+# Values: "DEFAULT" "DEBUG" "INFO" "WARNING" "ERROR"
+log_level = "DEFAULT"
+
+# Trace level set in the database.
+# If trace_level = -1, the environment value will be used.
+# Values: -1 <= trace_level <= 10
+trace_level = -1
+
 ##########################################################################################
 
 [AUTH]
@@ -1149,6 +1300,17 @@ webauthn_enabled = false
 # Enable or disable Single Sign On
 sso_enabled = false
 
+[AUTH.logging]
+# Log level set in the database.
+# If log_level = "DEFAULT", the environment value will be used.
+# Values: "DEFAULT" "DEBUG" "INFO" "WARNING" "ERROR"
+log_level = "DEFAULT"
+
+# Trace level set in the database.
+# If trace_level = -1, the environment value will be used.
+# Values: -1 <= trace_level <= 10
+trace_level = -1
+
 ##########################################################################################
 
 [VAULT]
@@ -1205,6 +1367,17 @@ max_idle_conns = 2
 # i.e. skip_event_ids = "10,44,100-200,250-290"
 skip_event_ids = ""
 
+[VAULT.logging]
+# Log level set in the database.
+# If log_level = "DEFAULT", the environment value will be used.
+# Values: "DEFAULT" "DEBUG" "INFO" "WARNING" "ERROR"
+log_level = "DEFAULT"
+
+# Trace level set in the database.
+# If trace_level = -1, the environment value will be used.
+# Values: -1 <= trace_level <= 10
+trace_level = -1
+
 ##########################################################################################
 [USER-STORE]
 [USER-STORE.db]
@@ -1230,6 +1403,17 @@ max_idle_conns = 2
 # if skip_event_ids = "",  all the events persisted to DB.
 # i.e. skip_event_ids = "10,44,100-200,250-290"
 skip_event_ids = ""
+
+[USER-STORE.logging]
+# Log level set in the database.
+# If log_level = "DEFAULT", the environment value will be used.
+# Values: "DEFAULT" "DEBUG" "INFO" "WARNING" "ERROR"
+log_level = "DEFAULT"
+
+# Trace level set in the database.
+# If trace_level = -1, the environment value will be used.
+# Values: -1 <= trace_level <= 10
+trace_level = -1
 
 ##########################################################################################
 [AUTHORIZER]
@@ -1305,6 +1489,17 @@ ssh_cert_templates='''
 # i.e. skip_event_ids = "10,44,100-200,250-290"
 skip_event_ids = ""
 
+[AUTHORIZER.logging]
+# Log level set in the database.
+# If log_level = "DEFAULT", the environment value will be used.
+# Values: "DEFAULT" "DEBUG" "INFO" "WARNING" "ERROR"
+log_level = "DEFAULT"
+
+# Trace level set in the database.
+# If trace_level = -1, the environment value will be used.
+# Values: -1 <= trace_level <= 10
+trace_level = -1
+
 ##########################################################################################
 
 [LICENSE-MANAGER]
@@ -1331,6 +1526,17 @@ max_idle_conns = 2
 # if skip_event_ids = "",  all the events persisted to DB.
 # i.e. skip_event_ids = "10,44,100-200,250-290"
 skip_event_ids = ""
+
+[LICENSE-MANAGER.logging]
+# Log level set in the database.
+# If log_level = "DEFAULT", the environment value will be used.
+# Values: "DEFAULT" "DEBUG" "INFO" "WARNING" "ERROR"
+log_level = "DEFAULT"
+
+# Trace level set in the database.
+# If trace_level = -1, the environment value will be used.
+# Values: -1 <= trace_level <= 10
+trace_level = -1
 
 ##########################################################################################
 
@@ -1365,6 +1571,17 @@ skip_event_ids = ""
 # silently accepted. Trust anchor certificates are configured as one or multiple
 # concatenated PEM certificates.
 winrm_host_certificate_trust_anchors = ""
+
+[SECRETS-MANAGER.logging]
+# Log level set in the database.
+# If log_level = "DEFAULT", the environment value will be used.
+# Values: "DEFAULT" "DEBUG" "INFO" "WARNING" "ERROR"
+log_level = "DEFAULT"
+
+# Trace level set in the database.
+# If trace_level = -1, the environment value will be used.
+# Values: -1 <= trace_level <= 10
+trace_level = -1
 
 ##########################################################################################
 
@@ -1417,5 +1634,30 @@ reauthorization_interval_sec = 300
 # silently accepted. Trust anchor certificates are configured as one or multiple
 # concatenated PEM certificates.
 host_certificate_trust_anchors = ""
+
+[DB-PROXY.logging]
+# Log level set in the database.
+# If log_level = "DEFAULT", the environment value will be used.
+# Values: "DEFAULT" "DEBUG" "INFO" "WARNING" "ERROR"
+log_level = "DEFAULT"
+
+# Trace level set in the database.
+# If trace_level = -1, the environment value will be used.
+# Values: -1 <= trace_level <= 10
+trace_level = -1
+
+##########################################################################################
+
+[SETTINGS]
+[SETTINGS.logging]
+# Log level set in the database.
+# If log_level = "DEFAULT", the environment value will be used.
+# Values: "DEFAULT" "DEBUG" "INFO" "WARNING" "ERROR"
+log_level = "DEFAULT"
+
+# Trace level set in the database.
+# If trace_level = -1, the environment value will be used.
+# Values: -1 <= trace_level <= 10
+trace_level = -1
 
 ##########################################################################################
