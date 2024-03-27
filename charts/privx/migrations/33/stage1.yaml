@@ -10,7 +10,7 @@ shutdown: true
 privxRepository: &privxRepo public.ecr.aws/sshprivx
 
 # global value to define the PrivX images' version tag
-privxVersion: &privxTag "33.0"
+privxVersion: &privxTag "33.1"
 
 # ========== Privx settings backup ===============
 jobs:
