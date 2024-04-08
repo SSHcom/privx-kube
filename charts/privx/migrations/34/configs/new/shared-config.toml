@@ -244,26 +244,13 @@ hide_web_ui_file_upload = false
 enable = true
 
 # Cache type
-# i.e. type = "redis"
+# i.e. type = "db"
 type = "db"
 
 # Default TTL. Keep it relatively large, as when the cache key changes or expires,
 # a notification is sent to all instances and DB data is refreshed.
 # i.e. ttl = 900
 ttl = 900
-
-# (Redis only) Cache endpoint
-# i.e. endpoint = "127.0.0.1:6379"
-endpoint = "redis:6379"
-#endpoint = "ordainredisdev.05f7bb.ng.0001.use1.cache.amazonaws.com:6379"
-
-# (Redis only) Optional password
-# i.e. password = ""
-password = ""
-
-# (Redis only) Database to be selected after connecting to the server.
-# i.e. dbnumber = 0
-dbnumber = 0
 
 ###############################################################################
 # Database settings

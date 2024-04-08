@@ -7,9 +7,9 @@
 export  PRIVX_DNS_NAMES="{{ include "getHostnamesWithSpaces" .Values.ingress.common.hosts }}"
 # Space-separated IP addresses
 export  PRIVX_IP_ADDRESSES=" "
-##########################################
-# database (external) + redis (external) #
-##########################################
+#######################
+# database (external) #
+#######################
 # External database configuration
 export  PRIVX_USE_EXTERNAL_DATABASE="1"
 export  PRIVX_POSTGRES_ADDRESS="{{ required "A valid db.address value is required" .Values.db.address }}"
@@ -38,12 +38,8 @@ export  PRIVX_DATABASE_PASSWORD="{{ required "A valid db.user.password value is 
 export  PRIVX_DATABASE_SSLMODE="{{ .Values.db.sslmode | default "require" }}"
 # Database additional params
 export PRIVX_DATABASE_ADDITIONAL_PARAMS=$(grep -E "^[^#]*additional_params" /opt/privx/etc/shared-config.toml | awk -F "=" '{for (i=2; i<=NF; i++) printf("%s%s", $i, (i<NF) ? "=" : "");}')
-# Notification backend, "db" or "redis"
+# Notification backend, "db"
 export  PRIVX_NOTIFICATION_BACKEND="db"
-# Redis-server address
-export  PRIVX_REDIS_ADDRESS="redis"
-# Redis-service port number
-export  PRIVX_REDIS_PORT="6379"
 
 # PrivX superuser
 export PRIVX_SUPERUSER="{{ required "A valid privx.admin.username value is required" .Values.privx.admin.username }}"

@@ -370,11 +370,6 @@ user_cache_refresh_ttl = 60
 # This has no effect on role memberships, only on the reported membership counts.
 role_member_count_cache_ttl = 60
 
-# Cache type
-# Possible values: "local" (in-mem LRU cache), "redis"
-# i.e. type = "local"
-type = "local"
-
 # (Local cache only) LRU cache size. If cache gets full, the least recently used values are purged.
 # i.e. max_entries = 100000
 max_entries = 100000
@@ -1235,6 +1230,10 @@ log_level = "DEFAULT"
 # If trace_level = -1, the environment value will be used.
 # Values: -1 <= trace_level <= 10
 trace_level = -1
+
+[WORKFLOW-ENGINE.housekeeping]
+# Requests housekeeping interval in Hours
+requests_housekeeping_interval = 24
 
 ##########################################################################################
 
