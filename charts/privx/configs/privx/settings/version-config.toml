@@ -398,3 +398,10 @@ data_version = "4"
 ################################# PrivX 33.0 #################################
 [33.0.workflow-engine.db]
 data_version = "8"
+
+################################# PrivX 34.0 #################################
+[34.0.workflow-engine.db]
+data_version = "9"
+
+[34.0.shared-config.notificationCache]
+type = "db"

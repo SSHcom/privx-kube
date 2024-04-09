@@ -29,13 +29,14 @@ audience = "privx-ui"
 # privx-ui client type is always public
 client_type = "public"
 
+# The shortest allowed value for token validity is 2m
 authorize_token_valid = "5m"
 access_token_valid = "5m"
 refresh_token_valid = "8h"
 
 # session_valid defines maximum session validity time from logon.
 # if session_valid is defined, "refresh" request to /token returns also refesh
-# tokens until session_valid is reached.
+# tokens until session_valid is reached. The shortest allowed value is 2m.
 session_valid = "8h"
 
 signing_method = "Ed25519"
@@ -85,13 +86,14 @@ audience = "privx-web-container"
 # privx-web-container client type is always public
 client_type = "public"
 
+# The shortest allowed value for token validity is 2m
 authorize_token_valid = "5m"
 access_token_valid = "5m"
 refresh_token_valid = "8h"
 
 # session_valid defines maximum session validity time from logon.
 # if session_valid is defined, "refresh" request to /token returns also refesh
-# tokens until session_valid is reached.
+# tokens until session_valid is reached. The shortest allowed value is 2m.
 session_valid = "8h"
 
 signing_method = "Ed25519"
