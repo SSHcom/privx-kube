@@ -550,6 +550,9 @@ status_expunction_delay = 24
 # 0 disables the check.
 db_certificate_check_interval = 1
 
+# Max threshold for component's status before marked as error if no data received, in seconds
+status_max_threshold = 300
+
 [MONITOR-SERVICE.db]
 # Maximum amount of time a connection may be reused (in seconds)
 # 0 = connections are reused forever
@@ -679,6 +682,10 @@ enable_wallpaper = false
 
 # Enable font smoothing on target hosts.
 enable_font_smoothing = true
+
+# Delay (seconds) for releasing the implicit secret checkout after login to RDP target.
+# Default: 30, min: 0, Max: 300
+implicit_secret_checkout_release_delay_sec = 30
 
 [RDP-PROXY.certificates]
 # Replace the stored certificate if received target certificate is differ from stored certificate.
@@ -1570,6 +1577,12 @@ skip_event_ids = ""
 # silently accepted. Trust anchor certificates are configured as one or multiple
 # concatenated PEM certificates.
 winrm_host_certificate_trust_anchors = ""
+
+[SECRETS-MANAGER.targetdomains]
+# Maximum number of new target domain accounts scanned at a time that can be auto onboarded
+auto_onboarding_limit = 10
+# Interval for deleting target domain accounts with the "removed" status (minutes)
+account_removal_housekeeping_interval = 2880
 
 [SECRETS-MANAGER.logging]
 # Log level set in the database.

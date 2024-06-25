@@ -65,10 +65,15 @@ spec:
             {{- end }}
           image: "{{ $job.image.repository | default "public.ecr.aws/sshprivx" }}/{{ $job.image.name }}:{{ $job.image.tag | default "latest" }}"
           imagePullPolicy: {{ $job.image.pullPolicy }}
-          {{- with $job.environment }}
           env:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
+            {{- range $env := $job.environment}}
+            - name: {{ $env.name }}
+              {{- if $env.valueFromTemplate }}
+              value: {{ tpl $env.valueFromTemplate $globalContext | toString }}
+              {{- else }}
+              value: "{{ $env.value }}"
+              {{- end}}
+            {{- end}}
           {{- if $job.useGlobalPodSecurityContext }}
             {{- range $env := $job.environment }}
               {{- if eq $env.name "PRIVX_USER" }}

@@ -1,52 +1,91 @@
 migration:
   enabled: true
-  from: 33
-  to: 34
+  from: 34
+  to: 35
 
   configs:
     new:
       name: new
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/34/configs/new/*"
+      files: "migrations/35/configs/new/*"
     common:
       name: common
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/34/configs/common/*"
+      files: "migrations/35/configs/common/*"
     syslog:
       name: syslog
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/34/configs/syslog/*"
+      files: "migrations/35/configs/syslog/*"
     nginx:
       name: nginx
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/34/configs/nginx/*"
+      files: "migrations/35/configs/nginx/*"
     rdpmitm:
       name: rdpmitm
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/34/configs/rdpmitm/*"
+      files: "migrations/35/configs/rdpmitm/*"
     db-cert:
       name: db-cert
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/34/configs/database/certificate/*"
+      files: "migrations/35/configs/database/certificate/*"
     upgrade-scripts:
       name: upgrade-scripts
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/34/configs/scripts/*"
+      files: "migrations/35/configs/scripts/*"
 # global value to define the PrivX images' repository
 privxRepository: &privxRepo public.ecr.aws/sshprivx
 
 # global value to define the PrivX images' version tag
-privxVersion: &privxTag "34.1"
+privxVersion: &privxTag "35.0"
 
 # ==========Upgrader===============
 jobs:
+  db-checker:
+    name: db-checker
+    hook: pre-upgrade
+    weight: "-6"
+    hookDeletePolicy: before-hook-creation
+    image:
+      repository: *privxRepo
+      name: upgrader
+      pullPolicy: IfNotPresent
+      tag: *privxTag
+    imagePullSecrets:
+      - name: docker-pull-secret
+    environment:
+      - name: UPGRADER_CMD
+        value: check-db-version
+      - name: "SKIP_DB_VERSION_CHECK"
+        valueFromTemplate: "{{ .Values.db.skipVersionCheck | quote}}"
+    useGlobalPodSecurityContext: true
+    securityContext: {}
+    resources: {}
+    volumes:
+      enabled: true
+      volumeMounts:
+        - mountPath: /opt/privx/keyvault
+          name: privx-config
+          subPath: keyvault
+        - mountPath: /opt/privx/etc
+          name: privx-config
+          subPath: privxetc
+      claims:
+        - name: privx-config
+          claimName: privx-claim
+    serviceAccount:
+      create: false
+      annotations: {}
+      name: db-checker
+    rbac:
+      create: false
+
   upgrader:
     name: upgrader
     hook: pre-upgrade
@@ -57,7 +96,6 @@ jobs:
       name: upgrader
       pullPolicy: IfNotPresent
       tag: *privxTag
-
     imagePullSecrets:
       - name: docker-pull-secret
     environment:

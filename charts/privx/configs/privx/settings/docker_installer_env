@@ -18,6 +18,7 @@ export  PRIVX_POSTGRES_PORT="{{ required "A valid db.port value is required" .Va
 # Variables to decide whether to create the database and its user or not
 export DB_EXTERNAL_CREATE_PSQL_DATABASE="{{ .Values.db.admin.createDB }}"
 export DB_EXTERNAL_CREATE_PSQL_USER="{{ .Values.db.admin.createDBUser }}"
+export PRIVX_SKIP_DB_VERSION_CHECK="{{ .Values.db.skipVersionCheck }}"
 
 # PostgreSQL admin username/password is required only when the db and/or its user are to be created
 {{- if or .Values.db.admin.createDB .Values.db.admin.createDBUser }}

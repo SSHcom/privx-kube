@@ -405,3 +405,16 @@ data_version = "9"
 
 [34.0.shared-config.notificationCache]
 type = "db"
+
+################################# PrivX 35.0 #################################
+[35.0.monitor-service.db]
+data_version = "13"
+
+[35.0.secrets-manager.db]
+data_version = "3"
+
+[35.0.host-store.db]
+data_version = "21"
+
+[35.0.vault.db]
+data_version = "4"
