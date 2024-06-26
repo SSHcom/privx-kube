@@ -16,7 +16,7 @@ encryption_algorithm = "AES256withGCM"
 [db]
 # DB data version number
 # Do not modify
-data_version = "3"
+data_version = "4"
 
 [tls]
 # Microservice https server settings

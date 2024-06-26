@@ -291,11 +291,11 @@ insecure = false
 
 # trust_anchors_file, if set to file name, use only certificates on
 # the file as certificate path validation trust anchors. If set, but
-# not readable, fail startup, if unset or set to an empty string, use
-# system speficied trust anchors.
+# not readable, fail startup. If unset or set to an empty string, use
+# system specified trust anchors.
 trust_anchors_file = "/etc/nginx/ssl/privx-ca.crt"
 
-# append_to_system_trust_anchors, if set to true would append the certficates
+# append_to_system_trust_anchors, if set to true would append the certificates
 # defined in trust_anchors_file to the system trust certificates.
 append_to_system_trust_anchors = true
 

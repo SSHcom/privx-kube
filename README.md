@@ -1,9 +1,10 @@
-# **BREAKING CHANGES IN PRIVX HELM CHART 31.0.0**
+# **BREAKING CHANGES IN PRIVX 35.0**
 
-- default value for db.sslmode is changed from `require` to `verify-full`. This
-also adds an addition variable `db.sslDBcertificate` for possibly setting
-the database server/CA certificate. For more information, please check the extra
-documentation [here](db-certificate.md).
+- PrivX requires PostgreSQL server version to >= 11.X. Before installing/upgrading
+to PrivX 35.0, please make sure that a supported PostgreSQL server version is
+used. For more information and supported helm variables, please check
+[here](docs/breaking-35-0-0.md).
+
 # privx-kube
 
 privx-kube is a means to deploy [PrivX](https://www.ssh.com/products/privx/) in
@@ -235,4 +236,4 @@ helm install \
 ```
 
 # PrivX Version Upgrade
-For upgrading privx to the current version, follow the instructions [here](charts/privx/migrations/34/README.md)
+For upgrading privx to the current version, follow the instructions [here](charts/privx/migrations/35/README.md)

@@ -20,6 +20,10 @@ db:
     password:
   # database name (required)
   name:
+  # PrivX will not work if PostgreSQL version < 11.X. By setting skipVersionCheck
+  # to true, user confirms that the PostgreSQL server version >= 11.X.
+  # Acceptable values are true or false (case sensitive).
+  skipVersionCheck: false
   # database ssl mode (verify-full by default. Complete list of options can be checked from the postgresql version used)
   sslmode: verify-full
   # To add multiline DB certificate for sslmode verify-full/verify-ca, use the following example format:
