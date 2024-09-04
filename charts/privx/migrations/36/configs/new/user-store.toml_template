@@ -9,7 +9,7 @@ keyvault_secret = "@USERSTORE_SECRET@"
 [db]
 # DB data version number
 # Do not modify
-data_version = "12"
+data_version = "13"
 
 [tls]
 # Microservice https server settings

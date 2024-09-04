@@ -1,52 +1,53 @@
 migration:
   enabled: true
-  from: 34
-  to: 35
+  from: 35
+  to: 36
 
   configs:
     new:
       name: new
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/35/configs/new/*"
+      files: "migrations/36/configs/new/*"
     common:
       name: common
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/35/configs/common/*"
+      files: "migrations/36/configs/common/*"
     syslog:
       name: syslog
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/35/configs/syslog/*"
+      files: "migrations/36/configs/syslog/*"
     nginx:
       name: nginx
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/35/configs/nginx/*"
+      files: "migrations/36/configs/nginx/*"
     rdpmitm:
       name: rdpmitm
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/35/configs/rdpmitm/*"
+      files: "migrations/36/configs/rdpmitm/*"
     db-cert:
       name: db-cert
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/35/configs/database/certificate/*"
+      files: "migrations/36/configs/database/certificate/*"
     upgrade-scripts:
       name: upgrade-scripts
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/35/configs/scripts/*"
+      files: "migrations/36/configs/scripts/*"
 # global value to define the PrivX images' repository
 privxRepository: &privxRepo public.ecr.aws/sshprivx
 
 # global value to define the PrivX images' version tag
-privxVersion: &privxTag "35.2"
+privxVersion: &privxTag "36.0"
 
-# ==========Upgrader===============
+
 jobs:
+# ==========Database Version Checker===============
   db-checker:
     name: db-checker
     hook: pre-upgrade
@@ -62,7 +63,7 @@ jobs:
     environment:
       - name: UPGRADER_CMD
         value: check-db-version
-      - name: "SKIP_DB_VERSION_CHECK"
+      - name: "PRIVX_SKIP_DB_VERSION_CHECK"
         valueFromTemplate: "{{ .Values.db.skipVersionCheck | quote}}"
     useGlobalPodSecurityContext: true
     securityContext: {}
@@ -86,6 +87,8 @@ jobs:
     rbac:
       create: false
 
+
+# ==========Upgrader===============
   upgrader:
     name: upgrader
     hook: pre-upgrade
@@ -96,6 +99,7 @@ jobs:
       name: upgrader
       pullPolicy: IfNotPresent
       tag: *privxTag
+
     imagePullSecrets:
       - name: docker-pull-secret
     environment:

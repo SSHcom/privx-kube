@@ -418,3 +418,13 @@ data_version = "21"
 
 [35.0.vault.db]
 data_version = "4"
+
+################################# PrivX 36.0 #################################
+[36.0.workflow-engine.db]
+data_version = "10"
+
+[36.0.user-store.db]
+data_version = "13"
+
+[36.0.secrets-manager.db]
+data_version = "4"

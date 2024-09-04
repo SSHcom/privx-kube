@@ -60,6 +60,17 @@ slot = ""
 # pkcs11 pin
 pin = ""
 
+# ciphertext block size
+#   If non-zero, plaintexts that are larger than the block size will be split
+#   into discrete blocks of the given size. This should be used if the provider
+#   has a limit on the size of the input buffer.
+#
+#   The value has to be 0 or a multiple of 16 between 512 and 2147483648.
+#
+#   For Amazon CloudHSM, this should be set to 16160.
+#   https://docs.aws.amazon.com/cloudhsm/latest/userguide/ki-pkcs11-sdk.html#ki-pkcs11-8
+ciphertext_block_size = 0
+
 # pkcs11 features: comma separated list of following keywords:
 #   aes-gcm-zero-iv       Supply zero IV for aes gcm encrypt
 #   aes-gcm-padding       Pad aes-gcm input to aes blocksize
