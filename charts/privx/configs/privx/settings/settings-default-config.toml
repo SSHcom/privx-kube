@@ -230,7 +230,7 @@ default_user_filter = "(|(objectClass=user)(objectClass=person)(objectClass=inet
 # Tells which attributes to fetch from LDAP for caching. Leaving this empty will fetch all attributes for LDAP objects.
 # Filtering out unused attributes will make the memory consumption smaller and improve query times.
 # i.e. attributes = "objectClass cn dn distinguishedName whenCreated whenChanged name userPrincipalName givenName company departmentNumber mail email mobile sAMAccountName uid memberOf entryDN displayName userAccountControl groupType servicePrincipalName objectCategory objectGUID objectSID sn"
-attributes = "objectClass cn dn distinguishedName whenCreated whenChanged name userPrincipalName givenName company departmentNumber mail email mobile sAMAccountName uid memberOf entryDN displayName userAccountControl groupType servicePrincipalName objectCategory objectGUID objectSID sn"
+attributes = "objectClass cn dn distinguishedName whenCreated whenChanged name userPrincipalName givenName company departmentNumber mail email mobile sAMAccountName uid memberOf entryDN displayName userAccountControl groupType servicePrincipalName objectCategory objectGUID objectSID sn onPremisesSecurityIdentifier"
 
 # Automatically append this filter to AD requests when fetching users or mapping roles
 # Can be used to filter out disabled users and such.
