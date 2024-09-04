@@ -62,7 +62,7 @@ jobs:
     environment:
       - name: UPGRADER_CMD
         value: check-db-version
-      - name: "SKIP_DB_VERSION_CHECK"
+      - name: "PRIVX_SKIP_DB_VERSION_CHECK"
         valueFromTemplate: "{{ .Values.db.skipVersionCheck | quote}}"
     useGlobalPodSecurityContext: true
     securityContext: {}
