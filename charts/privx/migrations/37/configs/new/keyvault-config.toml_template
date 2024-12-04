@@ -78,4 +78,14 @@ ciphertext_block_size = 0
 #                         according to FIPS 140-2 level 3 requirements
 #   serialize-ops         Serialize all pkcs#11 operations
 #   disable-object-cache  Disable object handle caching
+#   sym-key-size-in-bits  Symmetric key sizes reported in bits rather than bytes
+#   ignore-key-size       Omit supported key size check
+#   key-id-in-label       Use CKA_LABEL attribute for the key ID
+#   aes-gcm-tag-prefix    Insert GCM tag before ciphertext during decryption
+#   private-key-specify-modulus-bits
+#                         Specify private key modulus size on key creation
+#   private-key-id-label  Specify ID in private key template on key creation
+#   skip-pub-key-deletion Omit public key deletion on key deletion
+#   exact-key-search-only Indicate that only key search by ID is supported
+#   explicit-no-export    Explicitly define keys as non-extractable on creation
 features = ""
