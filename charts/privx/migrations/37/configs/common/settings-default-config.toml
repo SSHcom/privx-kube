@@ -24,6 +24,13 @@ file_timestamp_obfuscation = true
 # 0 means no timeout, connections are kept open.
 timeout_when_no_connmgr = 5
 
+# Rate limit of verbose audit events
+[GLOBAL.audit_rate_limiting]
+# Time interval to ignore new events for verbose audit events (seconds).
+# Values: 0 <= interval (sec) <= 86400 sec = 24 hours
+# Default: 0. No events are omitted.
+interval = 0
+
 [GLOBAL.ldapconnections]
 # Should we use system cert pool with TLS
 # i.e. enable_ldap_system_roots_cert_pool = true
@@ -1505,6 +1512,18 @@ log_level = "DEFAULT"
 # If trace_level = -1, the environment value will be used.
 # Values: -1 <= trace_level <= 10
 trace_level = -1
+
+[AUTHORIZER.ca_settings]
+# Add windows security ID (SID) as an extension the to the X.509 certificates
+# authorizer issues for authenticating RDP target connections.
+#
+# This setting is required for ensuring consistent behavior during upgrade to
+# PrivX 36. This setting is likely to be removed in the future when the windows
+# AD starts requiring the SID extension.
+#
+# Changes to this setting via the settings UI take effect immediately without
+# requiring authorizer restart.
+rdp_x509_include_sid = false
 
 ##########################################################################################
 
