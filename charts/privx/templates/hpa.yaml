@@ -1,7 +1,13 @@
 {{- $globalContext := . }}
 {{- range $service := .Values.ms}}
 {{- if $service.autoscaling.enabled }}
+{{- if $globalContext.Capabilities.APIVersions.Has "autoscaling/v2" }}
+apiVersion: autoscaling/v2
+{{- else if $globalContext.Capabilities.APIVersions.Has "autoscaling/v2beta2" }}
+apiVersion: autoscaling/v2beta2
+{{- else }} # no support for autoscaling/v1. 
 apiVersion: autoscaling/v2beta1
+{{- end }}
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ include "privx.fullname" $globalContext }}-{{ $service.name }}
@@ -19,14 +25,30 @@ spec:
     - type: Resource
       resource:
         name: cpu
+        {{- if $globalContext.Capabilities.APIVersions.Has "autoscaling/v2" }}       
+        target:
+          type: Utilization
+          averageUtilization: {{ $service.autoscaling.targetCPUUtilizationPercentage }}
+        {{- else if $globalContext.Capabilities.APIVersions.Has "autoscaling/v2beta2" }}
         targetAverageUtilization: {{ $service.autoscaling.targetCPUUtilizationPercentage }}
-    {{- end }}
+        {{- else }}
+        targetAverageUtilization: {{ $service.autoscaling.targetCPUUtilizationPercentage }}
+        {{- end }}        
+    {{- end }}   
     {{- if $service.autoscaling.targetMemoryUtilizationPercentage }}
     - type: Resource
       resource:
         name: memory
+        {{- if $globalContext.Capabilities.APIVersions.Has "autoscaling/v2" }}       
+        target:
+          type: Utilization
+          averageUtilization: {{ $service.autoscaling.targetMemoryUtilizationPercentage }}
+        {{- else if $globalContext.Capabilities.APIVersions.Has "autoscaling/v2beta2" }}
         targetAverageUtilization: {{ $service.autoscaling.targetMemoryUtilizationPercentage }}
-    {{- end }}
+        {{- else }}
+        targetAverageUtilization: {{ $service.autoscaling.targetMemoryUtilizationPercentage }}
+        {{- end }}        
+    {{- end }}   
 {{- end }}
 ---
 {{- end }}
