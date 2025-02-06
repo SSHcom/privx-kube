@@ -97,6 +97,11 @@ helm upgrade --history-max 0 \
     -f charts/privx/migrations/36/restore.yaml \
     privx -n privx charts/privx/
 ```
+Also replace the environment variable `PREVIOUS_VERSION` in [restore.yaml](../restore.yaml) with the correct PrivX version to rollback to.
+
+Take the value from the name of your backup folder.
+
+If your backup folder was named `privx-backup-PPPPP_YYYY-MM-DD-hhmm_35.X.X` then your `PREVIOUS_VERSION` will be `35.X.X`.
 
 5. Rollback to the original PrivX revision by running the following command:
 
