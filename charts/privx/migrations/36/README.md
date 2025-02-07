@@ -89,6 +89,7 @@ copied from the logs of the backup job by running the following command:
 ```
 kubectl logs -n privx <name-of-the-backup-pod>
 ```
+
 Also replace the environment variable `PREVIOUS_VERSION` in [restore.yaml](../restore.yaml) with the correct PrivX version to rollback to.
 
 Take the value from the name of your backup folder.
