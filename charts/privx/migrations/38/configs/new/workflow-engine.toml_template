@@ -14,7 +14,7 @@ smtp_settings = "smtp-settings-template.tmpl"
 [db]
 # DB data version number
 # Do not modify
-data_version = "10"
+data_version = "11"
 
 [tls]
 # Microservice https server settings

@@ -7,6 +7,9 @@ listen_port = 8981
 keyvault_id = "@EXTENDER_SERVICE_ID@"
 keyvault_secret = "@EXTENDER_SERVICE_SECRET@"
 
+# DB data version number
+# Do not modify
+data_version = "2"
 
 [tls]
 # Microservice https server settings
