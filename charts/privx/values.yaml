@@ -98,7 +98,7 @@ privx:
 privxRepository: &privxRepo public.ecr.aws/sshprivx
 
 # global value to define the PrivX images' version tag
-privxVersion: &privxTag "37.0"
+privxVersion: &privxTag "38.0"
 
 # When enabled migration will do the backup + upgrade (while using the correct override values)
 migration:
@@ -2885,6 +2885,7 @@ ms:
         className: ""
         annotations:
           nginx.ingress.kubernetes.io/proxy-ssl-name: "extender-service"
+          nginx.ingress.kubernetes.io/proxy-body-size: "10m"
         hosts:
           - host: localhost
             paths:

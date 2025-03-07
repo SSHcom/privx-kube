@@ -680,10 +680,6 @@ connectivity_test_timeout = 30
 # Disable windows smart card login failure workaround.
 smartcard_status_workaround_disabled = true
 
-# Timeout interval (seconds) for connection message reply.
-# Default: 5 seconds.
-connection_message_timeout_sec = 5
-
 # Enable wallpaper on target hosts. Disabled by default for performance reasons.
 enable_wallpaper = false
 
@@ -783,10 +779,6 @@ allow_role_ip_restrictions = true
 # Reauthorization interval in seconds
 reauthorization_interval_sec = 300
 
-# Timeout interval (seconds) for connection message reply.
-# Default: 5 seconds.
-connection_message_timeout_sec = 5
-
 [RDP-MITM.certificates]
 # Replace the stored certificate if received target certificate is differ from stored certificate.
 update_automatically = true
@@ -864,10 +856,6 @@ allow_connect_to_local_addresses = false
 
 # Target blacklist: a comma separated list of IP addresses or subnets (CIDR) of prohibited SSH targets
 target_blacklist = ""
-
-# Timeout interval (seconds) for connection message reply.
-# Default: 5 seconds.
-connection_message_timeout_sec = 5
 
 [SSH-PROXY.db]
 # Maximum amount of time a connection may be reused (in seconds)
@@ -955,10 +943,6 @@ allow_role_ip_restrictions = true
 
 # Exec connection idle timeout in seconds
 exec_connection_idle_timeout_sec = 30
-
-# Timeout interval (seconds) for connection message reply.
-# Default: 5 seconds.
-connection_message_timeout_sec = 5
 
 [SSH-MITM.db]
 # Maximum amount of time a connection may be reused (in seconds)
@@ -1082,10 +1066,6 @@ housekeeping_interval_sec = 60
 
 # Maximum number of retries for PrivX router session removal
 router_session_removal_max_retries = 5
-
-# Timeout interval (seconds) for connection message reply.
-# Default: 5 seconds.
-connection_message_timeout_sec = 5
 
 # Interval for metadata updates to connection manager, in seconds.
 metadata_update_interval_sec = 120
@@ -1312,6 +1292,14 @@ webauthn_enabled = false
 
 # Enable or disable Single Sign On
 sso_enabled = false
+
+[AUTH.session_inactivity]
+# Duration of user inactivity after which their session becomes invalid.
+# A value of 0 disables session inactivity invalidation. Minimum valid value
+# is 60 and maximum value is the validity duration of the refresh token in
+# seconds.
+# Default: 0
+inactivity_limit_sec = 0
 
 [AUTH.logging]
 # Log level set in the database.

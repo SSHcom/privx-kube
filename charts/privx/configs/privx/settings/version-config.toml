@@ -444,3 +444,13 @@ data_version = "5"
 
 [37.0.settings.db]
 data_version = "6"
+
+################################# PrivX 38.0 #################################
+[38.0.workflow-engine.db]
+data_version = "11"
+
+[38.0.network-access-manager.db]
+data_version = "4"
+
+[38.0.extender-service.db]
+data_version = "2"
