@@ -90,6 +90,12 @@ copied from the logs of the backup job by running the following command:
 kubectl logs -n privx <name-of-the-backup-pod>
 ```
 
+Also replace the environment variable `PREVIOUS_VERSION` in [restore.yaml](../restore.yaml) with the correct PrivX version to rollback to.
+
+Take the value from the name of your backup folder.
+
+If your backup folder was named `privx-backup-PPPPP_YYYY-MM-DD-hhmm_35.X.X` then your `PREVIOUS_VERSION` will be `35.X.X`.
+
 4. Restore PrivX settings using the following command:
 ```
 helm upgrade --history-max 0 \
