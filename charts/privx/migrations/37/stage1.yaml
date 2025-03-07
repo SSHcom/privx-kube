@@ -10,7 +10,7 @@ shutdown: true
 privxRepository: &privxRepo public.ecr.aws/sshprivx
 
 # global value to define the PrivX images' version tag
-privxVersion: &privxTag "37.0"
+privxVersion: &privxTag "37.1"
 
 # ========== Privx settings backup ===============
 jobs:
@@ -31,7 +31,7 @@ jobs:
       - name: UPGRADER_CMD
         value: backup
       - name: PRIVX_VERSION
-        value: 36.2.0
+        value: 36.X.X
     useGlobalPodSecurityContext: true
     securityContext: {}
     resources: {}
