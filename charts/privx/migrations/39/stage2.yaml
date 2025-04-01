@@ -40,8 +40,48 @@ privxRepository: &privxRepo public.ecr.aws/sshprivx
 # global value to define the PrivX images' version tag
 privxVersion: &privxTag "39.0"
 
-# ==========Upgrader===============
 jobs:
+# ==========Database Version Checker===============
+  db-checker:
+    name: db-checker
+    hook: pre-upgrade
+    weight: "-6"
+    hookDeletePolicy: before-hook-creation
+    image:
+      repository: *privxRepo
+      name: upgrader
+      pullPolicy: IfNotPresent
+      tag: *privxTag
+    imagePullSecrets:
+      - name: docker-pull-secret
+    environment:
+      - name: UPGRADER_CMD
+        value: check-db-version
+      - name: "PRIVX_SKIP_DB_VERSION_CHECK"
+        valueFromTemplate: "{{ .Values.db.skipVersionCheck | quote}}"
+    useGlobalPodSecurityContext: true
+    securityContext: {}
+    resources: {}
+    volumes:
+      enabled: true
+      volumeMounts:
+        - mountPath: /opt/privx/keyvault
+          name: privx-config
+          subPath: keyvault
+        - mountPath: /opt/privx/etc
+          name: privx-config
+          subPath: privxetc
+      claims:
+        - name: privx-config
+          claimName: privx-claim
+    serviceAccount:
+      create: false
+      annotations: {}
+      name: db-checker
+    rbac:
+      create: false
+
+# ==========Upgrader===============
   upgrader:
     name: upgrader
     hook: pre-upgrade
