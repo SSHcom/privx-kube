@@ -23,8 +23,8 @@ For a list of Kubernetes resources that are deployed, please check
 
 ## Prequisites
 
-- Kubernetes >= 1.20
-- Kubectl >= 1.20
+- Kubernetes >= 1.19
+- Kubectl >= 1.19
 - Helm >= 3.6.3
 - Volume/Storage requirements as described below
 
@@ -70,25 +70,60 @@ settings (e.g Load balancer settings). But the main requirement after installing
 the ingress controller is that it should be accessible for the clients that
 would end up using PrivX.
 
-The installation of the Ingress Controller is tested to work on Kubernetes Server
-v1.24. Please be advised that new releases of the Kubernetes Server or Ingress
-Controller may cause some of these instructions to fail. Always consult the
-upstream Ingress Controller [repo](https://github.com/bitnami/charts/tree/master/bitnami/nginx-ingress-controller#upgrading)
-to make sure that the values are correct.
+The installation instructions are split in to two sections depending on the
+version of Kubernetes in use =1.19 or >1.19. This is because of the backward
+incompatible changes done by the developers of the ingress controller helm chart.
+To install the ingress controller chart, do the following:
 
-An Example installation instruction (Please update to a more secure version if available):
+
+##### Kubernetes =1.19:
+```
+helm repo add bitnami-full-index https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
+helm install \
+    -n ingress --create-namespace \
+    -f values-overrides/ingress.yaml \
+    --version 7.6.6 \
+    ingress bitnami-full-index/nginx-ingress-controller
+```
+
+##### Kubernetes >1.19:
 ```
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm install \
     -n ingress --create-namespace \
     -f values-overrides/ingress.yaml \
-    --version 11.6.12 \
+    --version 9.3.0 \
     ingress bitnami/nginx-ingress-controller
 ```
 
 Up to date instructions on new releases and any breaking changes can be found
 in the original
 [repo](https://github.com/bitnami/charts/tree/master/bitnami/nginx-ingress-controller#upgrading).
+
+#### Restricted access Ingress Controller
+
+If the ingress controller is deployed in a more secure fashion, then the
+following command can be used:
+
+**NOTE: The pre-requisite for using the command is to have a volume claim named
+`ingress-claim`**
+
+```
+helm upgrade --install \
+    -n ingress --create-namespace \
+    -f values-overrides/ingress.yaml \
+    -f values-overrides/ingress-secure.yaml \
+    ingress charts/nginx-ingress-controller/
+```
+
+The command above uses an extra override file called
+[ingress-secure.yaml](values-overrides/ingress-secure.yaml).
+
+The file restricts privilege escalation, writing to container
+filesystem and drops all file capabilities including the `NET_BIND_SERVICE`
+that is needed by the ingress controller. The last setting is dropped with the
+help of a wrapper container around the Bitnami Ingress Controller Docker container
+by dropping the file capability `cap_net_bind_service`.
 
 ### Working Postgres Database
 
@@ -201,4 +236,4 @@ helm install \
 ```
 
 # PrivX Version Upgrade
-For upgrading privx to the current version, follow the instructions [here](charts/privx/migrations/38/README.md)
+For upgrading privx to the current version, follow the instructions [here](charts/privx/migrations/39/README.md)

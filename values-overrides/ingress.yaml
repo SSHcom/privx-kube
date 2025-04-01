@@ -5,7 +5,7 @@ tcp:
   2222: "privx/ssh-mitm:2222"
   3389: "privx/rdp-mitm:3389"
   1080: "privx/ssh-mitm:1080"
-  8444: "privx/nginx:8444"
+  8443: "privx/nginx:8443"
 
 addHeaders:
   Cache-Control: "private, no-cache, must-revalidate"
