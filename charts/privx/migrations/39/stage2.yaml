@@ -24,6 +24,11 @@ migration:
       hook: pre-upgrade
       weight: "-5"
       files: "migrations/39/configs/nginx/*"
+    rdpmitm:
+      name: rdpmitm
+      hook: pre-upgrade
+      weight: "-5"
+      files: "migrations/39/configs/rdpmitm/*"
     db-cert:
       name: db-cert
       hook: pre-upgrade
@@ -132,6 +137,9 @@ jobs:
         - name: privx-nginx-config
           configMap:
             name: nginx-config
+        - name: privx-rdpmitm-config
+          configMap:
+            name: rdpmitm-config
         - name: privx-database-certificate
           configMap:
             name: db-cert-config
@@ -155,6 +163,8 @@ jobs:
             cp -f /common-config-mount/* /opt/privx/etc/;
             echo copying nginx configs;
             cp -f /upgraded-nginx-config/* /etc/nginx/privx/;
+            echo copying rdpmitm configs;
+            cp -f /upgraded-rdpmitm-config/* /opt/privx/etc/rdpmitm/;
             echo copying the database certificate;
             cp /certificate-mount/server.crt /opt/privx/etc/privx-db-trust-anchor.pem;
             echo setting sslrootcert if needed;
@@ -172,6 +182,8 @@ jobs:
             subPath: privxetc
           - name: privx-nginx-config
             mountPath: /upgraded-nginx-config
+          - name: privx-rdpmitm-config
+            mountPath: /upgraded-rdpmitm-config
           - name: privx-config
             mountPath: /etc/nginx/privx
             subPath: nginxprivx
