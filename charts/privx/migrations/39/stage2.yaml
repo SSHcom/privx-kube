@@ -1,50 +1,49 @@
 migration:
   enabled: true
-  from: 37
-  to: 38
+  from: 38
+  to: 39
 
   configs:
     new:
       name: new
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/38/configs/new/*"
+      files: "migrations/39/configs/new/*"
     common:
       name: common
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/38/configs/common/*"
+      files: "migrations/39/configs/common/*"
     syslog:
       name: syslog
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/38/configs/syslog/*"
+      files: "migrations/39/configs/syslog/*"
     nginx:
       name: nginx
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/38/configs/nginx/*"
+      files: "migrations/39/configs/nginx/*"
     rdpmitm:
       name: rdpmitm
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/38/configs/rdpmitm/*"
+      files: "migrations/39/configs/rdpmitm/*"
     db-cert:
       name: db-cert
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/38/configs/database/certificate/*"
+      files: "migrations/39/configs/database/certificate/*"
     upgrade-scripts:
       name: upgrade-scripts
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/38/configs/scripts/*"
+      files: "migrations/39/configs/scripts/*"
 # global value to define the PrivX images' repository
 privxRepository: &privxRepo public.ecr.aws/sshprivx
 
 # global value to define the PrivX images' version tag
-privxVersion: &privxTag "38.0"
-
+privxVersion: &privxTag "39.0"
 
 jobs:
 # ==========Database Version Checker===============
@@ -86,7 +85,6 @@ jobs:
       name: db-checker
     rbac:
       create: false
-
 
 # ==========Upgrader===============
   upgrader:

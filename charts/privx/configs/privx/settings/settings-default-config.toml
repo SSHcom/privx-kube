@@ -835,10 +835,6 @@ reauthorization_interval_sec = 300
 # Enable to allow remote PrivX Extender client connections for tunneling SSH traffic inside VPC networks.
 extender_enabled = true
 
-# SSH forwarder toggle
-# Enable to allow forwarding of SSH connections from the PrivX agent
-forwarder_enabled = false
-
 # Web socket keepalive interval in seconds
 ws_keepalive_interval_sec = 30
 
