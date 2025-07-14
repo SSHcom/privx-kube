@@ -103,6 +103,33 @@ macs = [
 
 ]
 
+# Hostkey algorithm override patterns
+#
+# Default algorithms:
+#   "rsa-sha2-256-cert-v01@openssh.com"
+#   "rsa-sha2-512-cert-v01@openssh.com"
+#   "ssh-rsa-cert-v01@openssh.com"
+#   "ssh-dss-cert-v01@openssh.com"
+#   "ecdsa-sha2-nistp256-cert-v01@openssh.com"
+#   "ecdsa-sha2-nistp384-cert-v01@openssh.com"
+#   "ecdsa-sha2-nistp521-cert-v01@openssh.com"
+#   "ssh-ed25519-cert-v01@openssh.com"
+#   "ecdsa-sha2-nistp256"
+#   "ecdsa-sha2-nistp384"
+#   "ecdsa-sha2-nistp521"
+#   "rsa-sha2-256"
+#   "rsa-sha2-512"
+#   "ssh-rsa"
+#   "ssh-dss"
+#   "ssh-ed25519"
+#
+# If hostkey list contains the keyword "nosort", then the hostkey algorithms are
+# used in their configured preference order. Otherwise the algorithms matching
+# the hostkeys stored to host object are moved to head of the list.
+hostkeys = [
+
+]
+
 # Rekey threshold in bytes
 #
 # Override pattern format:
