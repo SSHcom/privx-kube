@@ -38,7 +38,8 @@ export  PRIVX_DATABASE_PASSWORD="{{ required "A valid db.user.password value is 
 # Database-connection SSL mode
 export  PRIVX_DATABASE_SSLMODE="{{ .Values.db.sslmode | default "require" }}"
 # Database additional params
-export PRIVX_DATABASE_ADDITIONAL_PARAMS=$(grep -E "^[^#]*additional_params" /opt/privx/etc/shared-config.toml | awk -F "=" '{for (i=2; i<=NF; i++) printf("%s%s", $i, (i<NF) ? "=" : "");}')
+# (reads the value of additional_params and trims leading/trailing whitespace)
+export PRIVX_DATABASE_ADDITIONAL_PARAMS="$(grep -E '^\s*additional_params' /opt/privx/etc/shared-config.toml | sed -r 's/^\s*additional_params\s*=\s*"(.*)".*/\1/g ; s/^\s*//g ; s/\s*$//g')"
 # Notification backend, "db"
 export  PRIVX_NOTIFICATION_BACKEND="db"
 
@@ -46,3 +47,10 @@ export  PRIVX_NOTIFICATION_BACKEND="db"
 export PRIVX_SUPERUSER="{{ required "A valid privx.admin.username value is required" .Values.privx.admin.username }}"
 export PRIVX_SUPERUSER_PASSWORD="{{ required "A valid privx.admin.password value is required" .Values.privx.admin.password }}"
 export PRIVX_SUPERUSER_EMAIL="{{ required "A valid privx.admin.email value is required" .Values.privx.admin.email }}"
+
+# Default CA key type and size
+export PRIVX_DEFAULT_KEY_TYPE="{{ required "Default CA key type is required" .Values.privx.ca.keyType }}"
+export PRIVX_DEFAULT_KEY_SIZE="{{ required "Default CA key size is required" .Values.privx.ca.keySize }}"
+
+# Misc. crypto options
+export PRIVX_PASSWORD_HASH="{{ required "Default password hash method required" .Values.privx.crypto.passwordHash }}"

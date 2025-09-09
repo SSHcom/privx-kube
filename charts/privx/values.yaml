@@ -13,9 +13,9 @@ ingress:
       nginx.ingress.kubernetes.io/proxy-ssl-secret: "privx/proxy-ca-secret"
       nginx.ingress.kubernetes.io/proxy-ssl-verify: "on"
       nginx.ingress.kubernetes.io/proxy-ssl-server-name: "on"
-      nginx.ingress.kubernetes.io/ssl-ciphers: "AESGCM+EECDH:AESGCM+EDH:AES+EECDH:AES+EDH:AES128-GCM-SHA256:AES128-SHA256:AES128-SHA:-DSS:-EDH"
+      nginx.ingress.kubernetes.io/ssl-ciphers: "AESGCM+EECDH:AESGCM+EDH:AES+EECDH:AES128-GCM-SHA256:-DSS:-EDH:-SHA1:-SHA256:-SHA384"
       nginx.ingress.kubernetes.io/ssl-prefer-server-ciphers: "true"
-      nginx.ingress.kubernetes.io/proxy-ssl-protocols: "TLSv1.2"
+      nginx.ingress.kubernetes.io/proxy-ssl-protocols: "TLSv1.2 TLSv1.3"
       nginx.ingress.kubernetes.io/proxy-body-size: 1m
       nginx.ingress.kubernetes.io/affinity: "cookie"
       nginx.ingress.kubernetes.io/affinity-mode: "persistent"
@@ -54,6 +54,24 @@ privx:
     password:
     #admin email for PrivX UI login (required)
     email:
+  ca:
+    # This specifies how CA keys are created during installation.
+    # Keys issued from CA keys will inherit the same key type.
+    # CA key type (RSA or ECDSA)
+    keyType: RSA
+    # key size corresponding to key type above (RSA:4096, ECDSA:384)
+    keySize: 4096
+  crypto:
+    # Password hash generation parameters.
+    # Parameters are expected to contain the generation method followed by optional
+    # cost / iterations separated with a slash '/'.
+    #
+    # Valid generation methods and respective costs:
+    #   "bcrypt", cost: default 11, min 11, max 16
+    #   "pbkdf2", iterations: default 300000, min 300000, max 1000000
+    #
+    # Examples: "bcrypt", "bcrypt/12", "pbkdf2", "pbkdf2/380000"
+    passwordHash: bcrypt
   # audit.priority is used to set the priority level for audit events in PrivX
   # Here are the priority levels used in PrivX and their corresponding numeric
   # values:
@@ -94,11 +112,17 @@ privx:
       sensitive:
         to:
 
-# global value to define the PrivX images' repository
-privxRepository: &privxRepo public.ecr.aws/sshprivx
+# Global value to define the PrivX images' repository.
+# Individual microservices/jobs can override this.
+privxRepository: public.ecr.aws/sshprivx
 
-# global value to define the PrivX images' version tag
-privxVersion: &privxTag "39.0"
+# Global value to define the PrivX images' version tag.
+# Individual microservices/jobs can override this.
+privxVersion: "41.0"
+
+# Global value to define the default image pull policy.
+# Individual microservices/jobs can override this.
+pullPolicy: IfNotPresent
 
 # When enabled migration will do the backup + upgrade (while using the correct override values)
 migration:
@@ -118,6 +142,27 @@ securityContext:
   runAsNonRoot: true
   runAsUser: 5111
   allowPrivilegeEscalation: false
+
+# This liveness probe is used by pods that have useCommonLivenessConfig set to true
+livenessProbe:
+  # If startupProbe is disabled, initialDelaySeconds is critical to avoid restarts.
+  # If startupProbe is enabled, this delay is unnecessary but adds a safety buffer.
+  initialDelaySeconds:  120
+  failureThreshold: 1
+  periodSeconds: 10
+
+# This startup probe is used by pods that have useCommonStartupConfig set to true
+startupProbe:
+  initialDelaySeconds: 60
+  failureThreshold: 10
+  periodSeconds: 10
+
+# This readiness probe is used by pods that have useCommonReadinessConfig set to true
+# readinessProbe is functionally active, but note that the /status endpoint does not
+# verify full service readiness, it only confirms the container is up.
+readinessProbe:
+  failureThreshold: 1
+  periodSeconds: 10
 #==============Config values (TOMLS, RDPMITM and NGINX configs)
 configs:
   nginx:
@@ -163,10 +208,10 @@ jobs:
     weight: "-1"
     hookDeletePolicy: before-hook-creation
     image:
-      repository: *privxRepo
       name: installer
-      pullPolicy: IfNotPresent
-      tag: *privxTag
+      repository: ~
+      tag: ~
+      pullPolicy: ~
     imagePullSecrets:
       - name: docker-pull-secret
     useGlobalPodSecurityContext: true
@@ -236,12 +281,13 @@ jobs:
     initContainers:
       - name: config-copier
         image: "bash:5.2"
+        imagePullPolicy: IfNotPresent
         command: [ "bash", "-c" ]
         args:
           - mkdir -p /opt/privx/etc/new;
             mkdir -p /opt/privx/etc/rdpmitm;
             mkdir -p /opt/privx/etc/templates;
-            mkdir -p /opt/privx/etc/locales/workflowengine;
+            mkdir -p /opt/privx/etc/locales/workflow-engine;
             echo copying the database certificate;
             cp /certificate-mount/server.crt /opt/privx/etc/privx-db-trust-anchor.pem;
             echo copying template tomls;
@@ -306,10 +352,10 @@ jobs:
     weight: "-1"
     hookDeletePolicy: before-hook-creation
     image:
-      repository: *privxRepo
       name: installer
-      pullPolicy: IfNotPresent
-      tag: *privxTag
+      repository: ~
+      tag: ~
+      pullPolicy: ~
     imagePullSecrets:
       - name: docker-pull-secret
     useGlobalPodSecurityContext: true
@@ -355,10 +401,10 @@ jobs:
     weight: "-1"
     hookDeletePolicy: before-hook-creation,hook-succeeded
     image:
-      repository: *privxRepo
       name: secrets-generator
-      pullPolicy: IfNotPresent
-      tag: *privxTag
+      repository: ~
+      tag: ~
+      pullPolicy: ~
     imagePullSecrets:
       - name: docker-pull-secret
     useGlobalPodSecurityContext: true
@@ -371,8 +417,8 @@ jobs:
       #   cpu: 100m
       #   memory: 128Mi
     args:
-      - --keys=ca.crt
-      - --files=/etc/nginx/ssl/privx-ca.crt
+      - --keys=ca.crt tls.crt
+      - --files=/etc/nginx/ssl/privx-ca.crt /etc/nginx/ssl/privx-ca.crt
       - --secret_name=proxy-ca-secret
       - --namespace=privx
       - --secret_type=Opaque
@@ -435,10 +481,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: *privxRepo
       name: rdp-proxy
-      pullPolicy: IfNotPresent
-      tag: *privxTag
+      repository: ~
+      tag: ~
+      pullPolicy: ~
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -480,9 +526,9 @@ ms:
           nginx.ingress.kubernetes.io/proxy-ssl-verify: "on"
           nginx.ingress.kubernetes.io/proxy-ssl-name: "rdp-proxy"
           nginx.ingress.kubernetes.io/proxy-ssl-server-name: "on"
-          nginx.ingress.kubernetes.io/ssl-ciphers: "AESGCM+EECDH:AESGCM+EDH:AES+EECDH:AES+EDH:AES128-GCM-SHA256:AES128-SHA256:AES128-SHA:-DSS:-EDH"
+          nginx.ingress.kubernetes.io/ssl-ciphers: "AESGCM+EECDH:AESGCM+EDH:AES+EECDH:AES128-GCM-SHA256:-DSS:-EDH:-SHA1:-SHA256:-SHA384"
           nginx.ingress.kubernetes.io/ssl-prefer-server-ciphers: "true"
-          nginx.ingress.kubernetes.io/proxy-ssl-protocols: "TLSv1.2"
+          nginx.ingress.kubernetes.io/proxy-ssl-protocols: "TLSv1.2 TLSv1.3"
           nginx.ingress.kubernetes.io/proxy-body-size: 0m
           nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
           nginx.ingress.kubernetes.io/affinity: "cookie"
@@ -497,6 +543,19 @@ ms:
           - secretName: privx-tls
             hosts:
               - localhost
+
+    livenessProbe:
+      enabled: false
+      useCommonLivenessConfig: true
+      config: {}
+    startupProbe:
+      enabled: false
+      useCommonStartupConfig: true
+      config: {}
+    readinessProbe:
+      enabled: false
+      useCommonReadinessConfig: true
+      config: {}
 
     resources: {}
       # We usually recommend not to specify default resources and to leave this as a conscious
@@ -565,10 +624,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: *privxRepo
       name: ssh-proxy
-      pullPolicy: IfNotPresent
-      tag: *privxTag
+      repository: ~
+      tag: ~
+      pullPolicy: ~
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -606,9 +665,9 @@ ms:
           nginx.ingress.kubernetes.io/proxy-ssl-verify: "on"
           nginx.ingress.kubernetes.io/proxy-ssl-name: "ssh-proxy"
           nginx.ingress.kubernetes.io/proxy-ssl-server-name: "on"
-          nginx.ingress.kubernetes.io/ssl-ciphers: "AESGCM+EECDH:AESGCM+EDH:AES+EECDH:AES+EDH:AES128-GCM-SHA256:AES128-SHA256:AES128-SHA:-DSS:-EDH"
+          nginx.ingress.kubernetes.io/ssl-ciphers: "AESGCM+EECDH:AESGCM+EDH:AES+EECDH:AES128-GCM-SHA256:-DSS:-EDH:-SHA1:-SHA256:-SHA384"
           nginx.ingress.kubernetes.io/ssl-prefer-server-ciphers: "true"
-          nginx.ingress.kubernetes.io/proxy-ssl-protocols: "TLSv1.2"
+          nginx.ingress.kubernetes.io/proxy-ssl-protocols: "TLSv1.2 TLSv1.3"
           nginx.ingress.kubernetes.io/proxy-body-size: 0m
           nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
           nginx.ingress.kubernetes.io/affinity: "cookie"
@@ -623,6 +682,19 @@ ms:
           - secretName: privx-tls
             hosts:
               - localhost
+
+    livenessProbe:
+      enabled: false
+      useCommonLivenessConfig: true
+      config: {}
+    startupProbe:
+      enabled: false
+      useCommonStartupConfig: true
+      config: {}
+    readinessProbe:
+      enabled: false
+      useCommonReadinessConfig: true
+      config: {}
 
     resources: {}
       # We usually recommend not to specify default resources and to leave this as a conscious
@@ -686,11 +758,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: *privxRepo
       name: auth
-      pullPolicy: IfNotPresent
-      # Overrides the image tag whose default is the chart appVersion.
-      tag: *privxTag
+      repository: ~
+      tag: ~
+      pullPolicy: ~
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -731,7 +802,7 @@ ms:
           nginx.ingress.kubernetes.io/proxy-ssl-name: "auth"
           nginx.ingress.kubernetes.io/proxy-buffering: "on"
           nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
-          nginx.ingress.kubernetes.io/proxy-busy-buffer-size: "16k"
+          nginx.ingress.kubernetes.io/proxy-busy-buffers-size: "16k"
         hosts:
           - host: localhost
             paths:
@@ -741,6 +812,19 @@ ms:
           - secretName: privx-tls
             hosts:
               - localhost
+
+    livenessProbe:
+      enabled: false
+      useCommonLivenessConfig: true
+      config: {}
+    startupProbe:
+      enabled: false
+      useCommonStartupConfig: true
+      config: {}
+    readinessProbe:
+      enabled: false
+      useCommonReadinessConfig: true
+      config: {}
 
     resources: {}
       # We usually recommend not to specify default resources and to leave this as a conscious
@@ -799,10 +883,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: *privxRepo
       name: keyvault
-      pullPolicy: IfNotPresent
-      tag: *privxTag
+      repository: ~
+      tag: ~
+      pullPolicy: ~
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -845,6 +929,19 @@ ms:
           - secretName: privx-tls
             hosts:
               - localhost
+
+    livenessProbe:
+      enabled: false
+      useCommonLivenessConfig: true
+      config: {}
+    startupProbe:
+      enabled: false
+      useCommonStartupConfig: true
+      config: {}
+    readinessProbe:
+      enabled: false
+      useCommonReadinessConfig: true
+      config: {}
 
     resources: {}
       # We usually recommend not to specify default resources and to leave this as a conscious
@@ -902,10 +999,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: *privxRepo
       name: authorizer
-      pullPolicy: IfNotPresent
-      tag: *privxTag
+      repository: ~
+      tag: ~
+      pullPolicy: ~
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -959,9 +1056,9 @@ ms:
           nginx.ingress.kubernetes.io/proxy-ssl-secret: "privx/proxy-ca-secret"
           nginx.ingress.kubernetes.io/proxy-ssl-verify: "on"
           nginx.ingress.kubernetes.io/proxy-ssl-server-name: "on"
-          nginx.ingress.kubernetes.io/ssl-ciphers: "AESGCM+EECDH:AESGCM+EDH:AES+EECDH:AES+EDH:AES128-GCM-SHA256:AES128-SHA256:AES128-SHA:-DSS:-EDH"
+          nginx.ingress.kubernetes.io/ssl-ciphers: "AESGCM+EECDH:AESGCM+EDH:AES+EECDH:AES128-GCM-SHA256:-DSS:-EDH:-SHA1:-SHA256:-SHA384"
           nginx.ingress.kubernetes.io/ssl-prefer-server-ciphers: "true"
-          nginx.ingress.kubernetes.io/proxy-ssl-protocols: "TLSv1.2"
+          nginx.ingress.kubernetes.io/proxy-ssl-protocols: "TLSv1.2 TLSv1.3"
           nginx.ingress.kubernetes.io/proxy-body-size: 1m
           nginx.ingress.kubernetes.io/proxy-ssl-name: "authorizer"
         hosts:
@@ -973,6 +1070,19 @@ ms:
                 pathType: Prefix
               - path: /authorizer/api/v1/icap/cas
                 pathType: Prefix
+
+    livenessProbe:
+      enabled: false
+      useCommonLivenessConfig: true
+      config: {}
+    startupProbe:
+      enabled: false
+      useCommonStartupConfig: true
+      config: {}
+    readinessProbe:
+      enabled: false
+      useCommonReadinessConfig: true
+      config: {}
 
     resources: {}
       # We usually recommend not to specify default resources and to leave this as a conscious
@@ -1030,10 +1140,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: *privxRepo
       name: connection-manager
-      pullPolicy: IfNotPresent
-      tag: *privxTag
+      repository: ~
+      tag: ~
+      pullPolicy: ~
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1095,6 +1205,19 @@ ms:
             hosts:
               - localhost
 
+    livenessProbe:
+      enabled: false
+      useCommonLivenessConfig: true
+      config: {}
+    startupProbe:
+      enabled: false
+      useCommonStartupConfig: true
+      config: {}
+    readinessProbe:
+      enabled: false
+      useCommonReadinessConfig: true
+      config: {}
+
     resources: {}
       # We usually recommend not to specify default resources and to leave this as a conscious
       # choice for the user. This also increases chances charts run on environments with little
@@ -1154,10 +1277,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: *privxRepo
       name: host-store
-      pullPolicy: IfNotPresent
-      tag: *privxTag
+      repository: ~
+      tag: ~
+      pullPolicy: ~
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1200,6 +1323,19 @@ ms:
           - secretName: privx-tls
             hosts:
               - localhost
+
+    livenessProbe:
+      enabled: false
+      useCommonLivenessConfig: true
+      config: {}
+    startupProbe:
+      enabled: false
+      useCommonStartupConfig: true
+      config: {}
+    readinessProbe:
+      enabled: false
+      useCommonReadinessConfig: true
+      config: {}
 
     resources: {}
       # We usually recommend not to specify default resources and to leave this as a conscious
@@ -1257,10 +1393,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: *privxRepo
       name: license-manager
-      pullPolicy: IfNotPresent
-      tag: *privxTag
+      repository: ~
+      tag: ~
+      pullPolicy: ~
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1310,6 +1446,19 @@ ms:
           - secretName: privx-tls
             hosts:
               - localhost
+
+    livenessProbe:
+      enabled: false
+      useCommonLivenessConfig: true
+      config: {}
+    startupProbe:
+      enabled: false
+      useCommonStartupConfig: true
+      config: {}
+    readinessProbe:
+      enabled: false
+      useCommonReadinessConfig: true
+      config: {}
 
     resources: {}
       # We usually recommend not to specify default resources and to leave this as a conscious
@@ -1367,11 +1516,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: *privxRepo
       name: monitor-service
-      pullPolicy: IfNotPresent
-      tag: *privxTag
-
+      repository: ~
+      tag: ~
+      pullPolicy: ~
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1437,6 +1585,19 @@ ms:
             hosts:
               - localhost
 
+    livenessProbe:
+      enabled: false
+      useCommonLivenessConfig: true
+      config: {}
+    startupProbe:
+      enabled: false
+      useCommonStartupConfig: true
+      config: {}
+    readinessProbe:
+      enabled: false
+      useCommonReadinessConfig: true
+      config: {}
+
     resources: {}
       # We usually recommend not to specify default resources and to leave this as a conscious
       # choice for the user. This also increases chances charts run on environments with little
@@ -1493,11 +1654,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: *privxRepo
       name: rdp-mitm
-      pullPolicy: IfNotPresent
-      tag: *privxTag
-
+      repository: ~
+      tag: ~
+      pullPolicy: ~
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1508,7 +1668,6 @@ ms:
     # privxRepo/initContainerName:privxVersion
     initContainers:
       - name: rdp-mitm-conf
-        imagePullPolicy: IfNotPresent
         command: [ "/bin/sh", "-c" ]
         env:
         - name: KEY_PASS
@@ -1571,6 +1730,19 @@ ms:
           - secretName: privx-tls
             hosts:
               - localhost
+
+    livenessProbe:
+      enabled: false
+      useCommonLivenessConfig: true
+      config: {}
+    startupProbe:
+      enabled: false
+      useCommonStartupConfig: true
+      config: {}
+    readinessProbe:
+      enabled: false
+      useCommonReadinessConfig: true
+      config: {}
 
     resources: {}
       # We usually recommend not to specify default resources and to leave this as a conscious
@@ -1642,11 +1814,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: *privxRepo
       name: ssh-mitm
-      pullPolicy: IfNotPresent
-      tag: *privxTag
-
+      repository: ~
+      tag: ~
+      pullPolicy: ~
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1695,6 +1866,19 @@ ms:
           - secretName: privx-tls
             hosts:
               - localhost
+
+    livenessProbe:
+      enabled: false
+      useCommonLivenessConfig: true
+      config: {}
+    startupProbe:
+      enabled: false
+      useCommonStartupConfig: true
+      config: {}
+    readinessProbe:
+      enabled: false
+      useCommonReadinessConfig: true
+      config: {}
 
     resources: {}
       # We usually recommend not to specify default resources and to leave this as a conscious
@@ -1758,11 +1942,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: *privxRepo
       name: trail-index
-      pullPolicy: IfNotPresent
-      tag: *privxTag
-
+      repository: ~
+      tag: ~
+      pullPolicy: ~
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1805,6 +1988,19 @@ ms:
           - secretName: privx-tls
             hosts:
               - localhost
+
+    livenessProbe:
+      enabled: false
+      useCommonLivenessConfig: true
+      config: {}
+    startupProbe:
+      enabled: false
+      useCommonStartupConfig: true
+      config: {}
+    readinessProbe:
+      enabled: false
+      useCommonReadinessConfig: true
+      config: {}
 
     resources: {}
       # We usually recommend not to specify default resources and to leave this as a conscious
@@ -1865,11 +2061,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: *privxRepo
       name: role-store
-      pullPolicy: IfNotPresent
-      tag: *privxTag
-
+      repository: ~
+      tag: ~
+      pullPolicy: ~
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -1914,6 +2109,19 @@ ms:
           - secretName: privx-tls
             hosts:
               - localhost
+
+    livenessProbe:
+      enabled: false
+      useCommonLivenessConfig: true
+      config: {}
+    startupProbe:
+      enabled: false
+      useCommonStartupConfig: true
+      config: {}
+    readinessProbe:
+      enabled: false
+      useCommonReadinessConfig: true
+      config: {}
 
     resources: {}
       # We usually recommend not to specify default resources and to leave this as a conscious
@@ -1971,11 +2179,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: *privxRepo
       name: settings
-      pullPolicy: IfNotPresent
-      tag: *privxTag
-
+      repository: ~
+      tag: ~
+      pullPolicy: ~
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2018,6 +2225,19 @@ ms:
           - secretName: privx-tls
             hosts:
               - localhost
+
+    livenessProbe:
+      enabled: false
+      useCommonLivenessConfig: true
+      config: {}
+    startupProbe:
+      enabled: false
+      useCommonStartupConfig: true
+      config: {}
+    readinessProbe:
+      enabled: false
+      useCommonReadinessConfig: true
+      config: {}
 
     resources: {}
       # We usually recommend not to specify default resources and to leave this as a conscious
@@ -2075,11 +2295,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: *privxRepo
       name: user-store
-      pullPolicy: IfNotPresent
-      tag: *privxTag
-
+      repository: ~
+      tag: ~
+      pullPolicy: ~
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2122,6 +2341,19 @@ ms:
           - secretName: privx-tls
             hosts:
               - localhost
+
+    livenessProbe:
+      enabled: false
+      useCommonLivenessConfig: true
+      config: {}
+    startupProbe:
+      enabled: false
+      useCommonStartupConfig: true
+      config: {}
+    readinessProbe:
+      enabled: false
+      useCommonReadinessConfig: true
+      config: {}
 
     resources: {}
       # We usually recommend not to specify default resources and to leave this as a conscious
@@ -2179,10 +2411,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: *privxRepo
       name: vault
-      pullPolicy: IfNotPresent
-      tag: *privxTag
+      repository: ~
+      tag: ~
+      pullPolicy: ~
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2226,6 +2458,19 @@ ms:
           - secretName: privx-tls
             hosts:
               - localhost
+
+    livenessProbe:
+      enabled: false
+      useCommonLivenessConfig: true
+      config: {}
+    startupProbe:
+      enabled: false
+      useCommonStartupConfig: true
+      config: {}
+    readinessProbe:
+      enabled: false
+      useCommonReadinessConfig: true
+      config: {}
 
     resources: {}
       # We usually recommend not to specify default resources and to leave this as a conscious
@@ -2283,11 +2528,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: *privxRepo
       name: workflow-engine
-      pullPolicy: IfNotPresent
-      tag: *privxTag
-
+      repository: ~
+      tag: ~
+      pullPolicy: ~
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2298,13 +2542,14 @@ ms:
     # privxRepo/initContainerName:privxVersion
     initContainers:
       - name: workflow-engine-conf
-        imagePullPolicy: IfNotPresent
         command: [ "/bin/sh", "-c" ]
         args:
           - echo copying templates;
             cp -rf templates/* /opt/privx/etc/templates/;
+            echo creating workflow engine locales directory;
+            mkdir -p /opt/privx/etc/locales/workflow-engine;
             echo copying locales;
-            cp -rf locales/* /opt/privx/etc/locales/workflowengine;
+            cp -rf locales/* /opt/privx/etc/locales/workflow-engine;
         volumeMounts:
         - mountPath: /opt/privx/etc
           name: privx-config
@@ -2354,6 +2599,19 @@ ms:
           - secretName: privx-tls
             hosts:
               - localhost
+
+    livenessProbe:
+      enabled: false
+      useCommonLivenessConfig: true
+      config: {}
+    startupProbe:
+      enabled: false
+      useCommonStartupConfig: true
+      config: {}
+    readinessProbe:
+      enabled: false
+      useCommonReadinessConfig: true
+      config: {}
 
     resources: {}
       # We usually recommend not to specify default resources and to leave this as a conscious
@@ -2411,11 +2669,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: *privxRepo
       name: nginx
-      pullPolicy: IfNotPresent
-      tag: *privxTag
-
+      repository: ~
+      tag: ~
+      pullPolicy: ~
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2435,6 +2692,10 @@ ms:
     podAnnotations: {}
     useGlobalPodSecurityContext: true
     securityContext: {}
+
+    livenessProbe: {}
+    startupProbe: {}
+    readinessProbe: {}
 
     service:
       enabled: true
@@ -2460,12 +2721,12 @@ ms:
           nginx.ingress.kubernetes.io/proxy-ssl-verify: "on"
           nginx.ingress.kubernetes.io/proxy-ssl-name: "nginx"
           nginx.ingress.kubernetes.io/proxy-ssl-server-name: "on"
-          nginx.ingress.kubernetes.io/ssl-ciphers: "AESGCM+EECDH:AESGCM+EDH:AES+EECDH:AES+EDH:AES128-GCM-SHA256:AES128-SHA256:AES128-SHA:-DSS:-EDH"
+          nginx.ingress.kubernetes.io/ssl-ciphers: "AESGCM+EECDH:AESGCM+EDH:AES+EECDH:AES128-GCM-SHA256:-DSS:-EDH:-SHA1:-SHA256:-SHA384"
           nginx.ingress.kubernetes.io/ssl-prefer-server-ciphers: "true"
-          nginx.ingress.kubernetes.io/proxy-ssl-protocols: "TLSv1.2"
+          nginx.ingress.kubernetes.io/proxy-ssl-protocols: "TLSv1.2 TLSv1.3"
           nginx.ingress.kubernetes.io/proxy-buffering: "on"
           nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
-          nginx.ingress.kubernetes.io/proxy-busy-buffer-size: "16k"
+          nginx.ingress.kubernetes.io/proxy-busy-buffers-size: "16k"
         hosts:
           - host: localhost
             paths:
@@ -2557,11 +2818,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: *privxRepo
       name: installer
-      pullPolicy: IfNotPresent
-      tag: *privxTag
-
+      repository: ~
+      tag: ~
+      pullPolicy: ~
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2588,6 +2848,10 @@ ms:
       enabled: false
 
     ingress: {}
+  
+    livenessProbe: {}
+    startupProbe: {}
+    readinessProbe: {}
 
     resources: {}
 
@@ -2636,11 +2900,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: *privxRepo
       name: network-access-manager
-      pullPolicy: IfNotPresent
-      tag: *privxTag
-
+      repository: ~
+      tag: ~
+      pullPolicy: ~
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2683,6 +2946,19 @@ ms:
           - secretName: privx-tls
             hosts:
               - localhost
+
+    livenessProbe:
+      enabled: false
+      useCommonLivenessConfig: true
+      config: {}
+    startupProbe:
+      enabled: false
+      useCommonStartupConfig: true
+      config: {}
+    readinessProbe:
+      enabled: false
+      useCommonReadinessConfig: true
+      config: {}
 
     resources: {}
       # We usually recommend not to specify default resources and to leave this as a conscious
@@ -2740,11 +3016,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: *privxRepo
       name: secrets-manager
-      pullPolicy: IfNotPresent
-      tag: *privxTag
-
+      repository: ~
+      tag: ~
+      pullPolicy: ~
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2787,6 +3062,19 @@ ms:
           - secretName: privx-tls
             hosts:
               - localhost
+
+    livenessProbe:
+      enabled: false
+      useCommonLivenessConfig: true
+      config: {}
+    startupProbe:
+      enabled: false
+      useCommonStartupConfig: true
+      config: {}
+    readinessProbe:
+      enabled: false
+      useCommonReadinessConfig: true
+      config: {}
 
     resources: {}
       # We usually recommend not to specify default resources and to leave this as a conscious
@@ -2847,11 +3135,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: *privxRepo
       name: extender-service
-      pullPolicy: IfNotPresent
-      tag: *privxTag
-
+      repository: ~
+      tag: ~
+      pullPolicy: ~
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -2895,6 +3182,19 @@ ms:
           - secretName: privx-tls
             hosts:
               - localhost
+
+    livenessProbe:
+      enabled: false
+      useCommonLivenessConfig: true
+      config: {}
+    startupProbe:
+      enabled: false
+      useCommonStartupConfig: true
+      config: {}
+    readinessProbe:
+      enabled: false
+      useCommonReadinessConfig: true
+      config: {}
 
     resources: {}
       # We usually recommend not to specify default resources and to leave this as a conscious
@@ -2955,10 +3255,10 @@ ms:
     hookDeletePolicy: before-hook-creation
 
     image:
-      repository: *privxRepo
       name: syslog-service
-      pullPolicy: IfNotPresent
-      tag: *privxTag
+      repository: ~
+      tag: ~
+      pullPolicy: ~
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -3042,11 +3342,10 @@ ms:
     replicaCount: 1
 
     image:
-      repository: *privxRepo
       name: db-proxy
-      pullPolicy: IfNotPresent
-      tag: *privxTag
-
+      repository: ~
+      tag: ~
+      pullPolicy: ~
 
     imagePullSecrets:
       - name: docker-pull-secret
@@ -3089,6 +3388,19 @@ ms:
           - secretName: privx-tls
             hosts:
               - localhost
+
+    livenessProbe:
+      enabled: false
+      useCommonLivenessConfig: true
+      config: {}
+    startupProbe:
+      enabled: false
+      useCommonStartupConfig: true
+      config: {}
+    readinessProbe:
+      enabled: false
+      useCommonReadinessConfig: true
+      config: {}
 
     resources: {}
       # We usually recommend not to specify default resources and to leave this as a conscious

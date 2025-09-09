@@ -1,10 +1,16 @@
-# **BREAKING CHANGES IN PRIVX 35.0**
+# **Breaking Changes**:
+- Bitnami Ingress Controller support is moved to a 
+[paid tier](https://github.com/bitnami/charts/tree/7210c0ac599773072b7234235d4fd17dffb55772?tab=readme-ov-file#%EF%B8%8F-important-notice-upcoming-changes-to-the-bitnami-catalog). If you 
+are relying on the free version, please move to the [Nginx Ingress
+Controller](https://github.com/kubernetes/ingress-nginx/tree/main/charts/ingress-nginx)
+or any other solution of your choice. The requirements
+from PrivX point of view are listed in the [Ingress Controller](#ingress-controller) section.
 
-- PrivX requires PostgreSQL server version to >= 11.X. Before installing/upgrading
-to PrivX 35.0, please make sure that a supported PostgreSQL server version is
-used. For more information and supported helm variables, please check
-[here](docs/breaking-35-0-0.md).
-
+- PrivX will require Kubernetes minimum version 1.23 starting 
+with release v42. In PrivX v41, Kubernetes >= 1.20 is still supported
+but if this is a fresh installation of PrivX, then please consider
+using the latest supported version of Kubernetes.
+ 
 # privx-kube
 
 privx-kube is a means to deploy [PrivX](https://www.ssh.com/products/privx/) in
@@ -23,9 +29,9 @@ For a list of Kubernetes resources that are deployed, please check
 
 ## Prequisites
 
-- Kubernetes >= 1.20
-- Kubectl >= 1.20
-- Helm >= 3.6.3
+- Kubernetes >= 1.23
+- Kubectl >= 1.23
+- Helm >= 3.6.X
 - Volume/Storage requirements as described below
 
 ### Volume Requirements
@@ -53,7 +59,7 @@ for PrivX to work.
 ### Ingress Controller
 
 As in any kubernetes cluster, a gateway or ingress is required to reach the
-application. PrivX uses [Bitnami Nginx Ingress Controller](https://github.com/bitnami/charts/tree/master/bitnami/nginx-ingress-controller)
+application. PrivX uses [Nginx Ingress Controller](https://github.com/kubernetes/ingress-nginx)
 as the ingress controller.
 
 **NOTE: Please keep [this](docs/ingress.md) information in mind if an Ingress
@@ -61,8 +67,8 @@ Controller or a similar component other than the one mentioned above is used.**
 
 The purpose of the ingress controller is to setup ingress to the PrivX
 microservices in a dynamic way.
-privx-kube provides an override file [ingress.yaml](values-overrides/ingress.yaml) with
-extra settings for deploying the Bitnami nginx ingress controller. The purpose
+_privx-kube_ provides an override file [ingress.yaml](values-overrides/ingress.yaml) with
+extra settings for deploying the nginx ingress controller. The purpose
 of the file is to provide settings that are crucial to the workings of PrivX.
 
 Depending on the type of Kubernetes cluster, this file might require further
@@ -73,22 +79,20 @@ would end up using PrivX.
 The installation of the Ingress Controller is tested to work on Kubernetes Server
 v1.24. Please be advised that new releases of the Kubernetes Server or Ingress
 Controller may cause some of these instructions to fail. Always consult the
-upstream Ingress Controller [repo](https://github.com/bitnami/charts/tree/master/bitnami/nginx-ingress-controller#upgrading)
+upstream Ingress Controller [repo](https://github.com/kubernetes/ingress-nginx/tree/main/charts/ingress-nginx#upgrading-chart)
 to make sure that the values are correct.
 
 An Example installation instruction (Please update to a more secure version if available):
 ```
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm install \
-    -n ingress --create-namespace \
-    -f values-overrides/ingress.yaml \
-    --version 11.6.12 \
-    ingress bitnami/nginx-ingress-controller
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+helm install [RELEASE_NAME] ingress-nginx/ingress-nginx -n ingress --create-namespace
 ```
 
 Up to date instructions on new releases and any breaking changes can be found
 in the original
-[repo](https://github.com/bitnami/charts/tree/master/bitnami/nginx-ingress-controller#upgrading).
+[repo](https://github.com/kubernetes/ingress-nginx/tree/main/charts/ingress-nginx).
+
 
 ### Working Postgres Database
 
@@ -201,4 +205,4 @@ helm install \
 ```
 
 # PrivX Version Upgrade
-For upgrading privx to the current version, follow the instructions [here](charts/privx/migrations/39/README.md)
+For upgrading privx to the current version, follow the instructions [here](charts/privx/migrations/41/README.md)
