@@ -24,7 +24,10 @@ spec:
             {{- toYaml . | nindent 10 }}
           {{- end }}
           {{- if not $initContainer.image }}
-          image: "{{ $globalContext.Values.privxRepository | default "public.ecr.aws/sshprivx" }}/{{ $initContainer.name }}:{{ $globalContext.Values.privxVersion | default "latest" }}"
+          image: "{{ coalesce $globalContext.Values.privxRepository "public.ecr.aws/sshprivx" }}/{{ $initContainer.name }}:{{ coalesce $globalContext.Values.privxVersion "latest" }}"
+          {{- end }}
+          {{- if not $initContainer.imagePullPolicy }}
+          imagePullPolicy: {{ coalesce $globalContext.Values.pullPolicy "IfNotPresent" }}
           {{- end }}
           {{- $containerName := $initContainer.name }}
           {{- range $icEnv := $job.initContainersEnvironment }}
@@ -63,8 +66,8 @@ spec:
             {{- else }}
               {{- toYaml $job.securityContext | nindent 12 }}
             {{- end }}
-          image: "{{ $job.image.repository | default "public.ecr.aws/sshprivx" }}/{{ $job.image.name }}:{{ $job.image.tag | default "latest" }}"
-          imagePullPolicy: {{ $job.image.pullPolicy }}
+          image: "{{ coalesce $job.image.repository $globalContext.Values.privxRepository "public.ecr.aws/sshprivx" }}/{{ $job.image.name }}:{{ coalesce $job.image.tag $globalContext.Values.privxVersion "latest" }}"
+          imagePullPolicy: {{ coalesce $job.image.pullPolicy $globalContext.Values.pullPolicy "IfNotPresent" }}
           env:
             {{- range $env := $job.environment}}
             - name: {{ $env.name }}

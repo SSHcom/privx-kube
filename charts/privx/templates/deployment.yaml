@@ -2,6 +2,10 @@
 {{- range $service := .Values.ms}}
 {{- if and (eq $service.name "syslog-service") (not ($globalContext.Values.privx.syslog.enabled)) }}
 {{- else }}
+{{- $path := (printf "%s" $service.image.name) }}
+{{- if eq $service.image.name "user-store" }}
+  {{- $path = "local-user-store" }}
+{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -44,7 +48,10 @@ spec:
         - securityContext: {}
           {{- end }}
           {{- if not $initContainer.image }}
-          image: "{{ $globalContext.Values.privxRepository | default "public.ecr.aws/sshprivx"}}/{{ $initContainer.name }}:{{ $globalContext.Values.privxVersion | default "latest" }}"
+          image: "{{ coalesce $globalContext.Values.privxRepository "public.ecr.aws/sshprivx" }}/{{ $initContainer.name }}:{{ coalesce $globalContext.Values.privxVersion "latest" }}"
+          {{- end }}
+          {{- if not $initContainer.imagePullPolicy }}
+          imagePullPolicy: {{ coalesce $globalContext.Values.pullPolicy "IfNotPresent" }}
           {{- end }}
           {{- with $initContainer }}
             {{- toYaml . | nindent 10 }}
@@ -70,8 +77,8 @@ spec:
             {{- else }}
               {{- toYaml $service.securityContext | nindent 12 }}
             {{- end }}
-          image: "{{ $service.image.repository | default "public.ecr.aws/sshprivx" }}/{{ $service.image.name }}:{{ $service.image.tag | default "latest" }}"
-          imagePullPolicy: {{ $service.image.pullPolicy }}
+          image: "{{ coalesce $service.image.repository $globalContext.Values.privxRepository "public.ecr.aws/sshprivx" }}/{{ $service.image.name }}:{{ coalesce $service.image.tag $globalContext.Values.privxVersion "latest" }}"
+          imagePullPolicy: {{ coalesce $service.image.pullPolicy $globalContext.Values.pullPolicy "IfNotPresent" }}
           env:
             - name: IS_DOCKER_ENV
               value: "yes"
@@ -114,6 +121,42 @@ spec:
             {{- end }}
           resources:
             {{- toYaml $service.resources | nindent 12 }}
+          {{- if and $service.livenessProbe (hasKey $service.livenessProbe "enabled") $service.livenessProbe.enabled }}
+          livenessProbe:
+            {{- if and $service.livenessProbe.useCommonLivenessConfig }}
+            httpGet:
+             path: /{{ $path }}/api/v1/status
+             port: {{ $service.service.port }}
+             scheme: HTTPS
+            {{- toYaml $globalContext.Values.livenessProbe | nindent 12 }}
+            {{- else }}
+            {{- toYaml $service.livenessProbe.config | nindent 12 }}
+            {{- end }}
+          {{- end }}
+          {{- if and $service.startupProbe (hasKey $service.startupProbe "enabled") $service.startupProbe.enabled }}
+          startupProbe:
+            {{- if and $service.startupProbe.useCommonStartupConfig }}
+            httpGet:
+             path: /{{ $path }}/api/v1/status
+             port: {{ $service.service.port }}
+             scheme: HTTPS
+            {{- toYaml $globalContext.Values.startupProbe | nindent 12 }}
+            {{- else }}
+            {{- toYaml $service.startupProbe.config | nindent 12 }}
+            {{- end }}
+          {{- end }}
+          {{- if and $service.readinessProbe (hasKey $service.readinessProbe "enabled") $service.readinessProbe.enabled }}
+          readinessProbe:
+            {{- if and $service.readinessProbe.useCommonReadinessConfig }}
+            httpGet:
+             path: /{{ $path }}/api/v1/status
+             port: {{ $service.service.port }}
+             scheme: HTTPS
+            {{- toYaml $globalContext.Values.readinessProbe | nindent 12 }}
+            {{- else }}
+            {{- toYaml $service.readinessProbe.config | nindent 12 }}
+            {{- end }}
+          {{- end }}
           {{- if $service.volumes.enabled }}
           volumeMounts:
             {{- range $service.volumes.volumeMounts }}
