@@ -1,16 +1,26 @@
 # **Breaking Changes**:
-- Bitnami Ingress Controller support is moved to a 
-[paid tier](https://github.com/bitnami/charts/tree/7210c0ac599773072b7234235d4fd17dffb55772?tab=readme-ov-file#%EF%B8%8F-important-notice-upcoming-changes-to-the-bitnami-catalog). If you 
-are relying on the free version, please move to the [Nginx Ingress
-Controller](https://github.com/kubernetes/ingress-nginx/tree/main/charts/ingress-nginx)
-or any other solution of your choice. The requirements
-from PrivX point of view are listed in the [Ingress Controller](#ingress-controller) section.
 
-- PrivX will require Kubernetes minimum version 1.23 starting 
-with release v42. In PrivX v41, Kubernetes >= 1.20 is still supported
-but if this is a fresh installation of PrivX, then please consider
-using the latest supported version of Kubernetes.
- 
+This list of breaking changes is for PrivX 42. For breaking changes
+in previous releases, please check the specific release branch for
+correct information.
+
+- NGINX Ingress Controller is going to be 
+[retired](https://www.kubernetes.dev/blog/2025/11/12/ingress-nginx-retirement/)
+in Spring 2026. Depending on various factors until then, we might
+have to either move directly to using the new Gateway API or
+look for another Ingress Controller alternative. The criteria for the
+change would be to cover all the use cases that PrivX depends on.
+More information would follow in the coming releases.
+
+- PrivX now requires Kubernetes Server version 1.23 or newer. Please
+upgrade your cluster before upgrading to PrivX v42 in case an older
+cluster version is still in use.
+
+- PrivX uses Ephemeral and Generic Ephemeral volumes for mounting
+some of the directories to the PrivX pods starting v42. The latter
+volume type in some cases might need to explicitly set `Values.ephemeralStorageClassName`
+if the default StorageClass doesn't support Generic Ephemeral volumes. 
+
 # privx-kube
 
 privx-kube is a means to deploy [PrivX](https://www.ssh.com/products/privx/) in
@@ -205,4 +215,4 @@ helm install \
 ```
 
 # PrivX Version Upgrade
-For upgrading privx to the current version, follow the instructions [here](charts/privx/migrations/41/README.md)
+For upgrading privx to the current version, follow the instructions [here](charts/privx/migrations/42/README.md)

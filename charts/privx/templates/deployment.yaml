@@ -1,3 +1,4 @@
+{{- include "check.kubeVersion" . }}
 {{- $globalContext := . }}
 {{- range $service := .Values.ms}}
 {{- if and (eq $service.name "syslog-service") (not ($globalContext.Values.privx.syslog.enabled)) }}
@@ -171,6 +172,13 @@ spec:
         - name: {{ .name }}
           persistentVolumeClaim:
             claimName: {{ .claimName }}
+        {{- end }}
+        {{- range $service.volumes.ephemeral }}
+        - name: {{ .name }}
+          {{- toYaml .spec | nindent 10 }}
+          {{- if and $globalContext.Values.ephemeralStorageClassName (eq .name "privx-ephemeral")}}
+          {{- printf "storageClassName: %s" $globalContext.Values.ephemeralStorageClassName | nindent 16 }}
+          {{- end }}
         {{- end }}
         {{- range $service.volumes.secrets }}
         - name: {{ .name }}

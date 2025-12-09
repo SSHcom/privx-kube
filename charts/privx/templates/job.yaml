@@ -1,3 +1,4 @@
+{{- include "check.kubeVersion" . }}
 {{- $globalContext := . }}
 {{- range $job := .Values.jobs}}
 apiVersion: batch/v1

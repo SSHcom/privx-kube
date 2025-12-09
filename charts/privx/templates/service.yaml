@@ -1,3 +1,4 @@
+{{- include "check.kubeVersion" . }}
 {{- $globalContext := . }}
 {{- range $service := .Values.ms}}
 {{- if and (eq $service.name "syslog-service") (not ($globalContext.Values.privx.syslog.enabled)) }}

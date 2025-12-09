@@ -1,0 +1,42 @@
+servicename = "api-proxy"
+
+# Default port for api proxy
+listen_port = 8984
+
+# api-proxy keyvault credentials.
+keyvault_id = "@APIPROXY_ID@"
+keyvault_secret = "@APIPROXY_SECRET@"
+
+# Api-proxy http connect proxy listen addresses
+# By default listen on IPv4/IPv6 port 20080 When changing the listen port,
+# please make sure to also update the firewalld configuration.
+listen_addresses = [
+    ":20080",
+]
+
+# Parse proxy protocol header from incoming connections to any port listed in
+# listen_addresses.
+#
+# When this setting is true, then the existence of a proxy protocol header is
+# checked in all incoming TCP connections. If a proxy protocol header exists,
+# then the address from proxy protocol header is used as the connection's client
+# IP address. Otherwise the connection is accepted and the connection's source
+# address is used as the client IP address.
+use_proxy_protocol = false
+
+# Optional list of source addresses from which proxy protocol header can be
+# sent. Addresses are defined either as CIDR or as IP address.
+#
+# If the list is not empty, then incoming TCP connections are allowed only from
+# the specified source addresses and the connections are expected to contain a
+# proxy protocol header. Any connections originating outside of the specified
+# source addresses and connections not containing a proxy protocol header are
+# rejected.
+proxy_protocol_trusted_source_addresses = [
+]
+
+[tls]
+# Microservice https server settings
+enable_https_server = true
+certificate = "/opt/privx/cert/api-proxy.crt"
+private_key = "/opt/privx/cert/api-proxy.key"

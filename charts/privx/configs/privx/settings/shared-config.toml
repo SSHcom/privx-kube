@@ -75,6 +75,11 @@ health_check_only_hosts_with_tag = ""
 # If set to false, we use round-robin for load balancing instead. If only one extender/carrier can be resolved for the connection, this setting has no effect.
 prefer_extender_or_carrier_with_least_connections = true
 
+# SSH listen port for extender-service. Used by extender-v2 in normal mode to
+# connect to PrivX.
+# Note that you may have to open the port on the firewall if changed.
+extender_service_ssh_listen_port = 2322
+
 ###############################################################################
 # Backend services
 
@@ -150,6 +155,10 @@ extenderservice_connect_api_address = "{{ .Values.ms.extenderservice.name }}:{{ 
 # Database Proxy
 dbproxy_address = "https://{{ .Values.ms.dbproxy.name }}:{{ .Values.ms.dbproxy.service.port }}/db-proxy/api/v1"
 dbproxy_connect_api_address = "{{ .Values.ms.dbproxy.name }}:{{ .Values.ms.dbproxy.service.port }}"
+
+# Api-Proxy
+apiproxy_address = "https://{{ .Values.ms.apiproxy.name }}:{{ .Values.ms.apiproxy.service.port }}/api-proxy/api/v1"
+
 ###############################################################################
 
 ###  Audit event logging. ###  

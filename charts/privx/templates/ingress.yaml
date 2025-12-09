@@ -1,3 +1,4 @@
+{{- include "check.kubeVersion" . }}
 {{- $globalContext := . }}
 {{- range $service := .Values.ms}}
 {{- range $ingress := $service.ingress}}
