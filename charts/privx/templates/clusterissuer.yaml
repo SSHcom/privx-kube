@@ -1,3 +1,4 @@
+{{- include "check.kubeVersion" . }}
 {{- if .Values.cert.selfsigned }}
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer

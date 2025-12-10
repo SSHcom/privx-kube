@@ -1,3 +1,7 @@
+# minimum required version of kubernetes
+# A different patch version is ignored
+minKubeVersion: "1.23"
+
 # Default values for privx.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
@@ -118,11 +122,16 @@ privxRepository: public.ecr.aws/sshprivx
 
 # Global value to define the PrivX images' version tag.
 # Individual microservices/jobs can override this.
-privxVersion: "41.0"
+privxVersion: "42.0"
 
 # Global value to define the default image pull policy.
 # Individual microservices/jobs can override this.
 pullPolicy: IfNotPresent
+
+# Specifiy the storageClassName for the "privx-ephemeral" volume claim
+# that is used in rdp-proxy, rdp-mitm, ssh-proxy and ssh-mitm.
+# If not defined, Kubernetes will default to using the default storageClass.
+ephemeralStorageClassName: ""
 
 # When enabled migration will do the backup + upgrade (while using the correct override values)
 migration:
@@ -165,7 +174,7 @@ readinessProbe:
   periodSeconds: 10
 #==============Config values (TOMLS, RDPMITM and NGINX configs)
 configs:
-  nginx:
+  nginx: # This is not deleted after installation as it is needed by the nginx deployment
     name: nginx
     hook: pre-install
     weight: "-2"
@@ -175,17 +184,20 @@ configs:
     hook: pre-install
     weight: "-2"
     files: "configs/rdpmitm/*"
+    hookDeletePolicy: hook-succeeded
   settings:
     name: settings
     hook: pre-install
     weight: "-2"
     files: "configs/privx/settings/*"
+    hookDeletePolicy: hook-succeeded
   templates:
     name: templates
     hook: pre-install
     weight: "-2"
     files: "configs/privx/templates/*"
-  syslog:
+    hookDeletePolicy: hook-succeeded
+  syslog: # This is not deleted after installation as it is needed by the syslog-service
     name: syslog
     hook: pre-install
     weight: "-2"
@@ -195,11 +207,13 @@ configs:
     hook: pre-install
     weight: "-2"
     files: "configs/database/certificate/*"
+    hookDeletePolicy: hook-succeeded
   install-scripts:
     name: install-scripts
     hook: pre-install
     weight: "-5"
     files: "configs/scripts/*"
+    hookDeletePolicy: hook-succeeded
 jobs:
 # ==========Full Installer Job===============
   installer:
@@ -591,13 +605,13 @@ ms:
       enabled: true
       volumeMounts:
         - mountPath: /tmp
-          name: privx-config
+          name: privx-ephemeral
           subPath: rdpproxytmp
         - mountPath: /home/privx
           name: privx-config
           subPath: rdpproxyhome
         - mountPath: /opt/privx/cert
-          name: privx-config
+          name: privx-cert
           subPath: privxcert
         - mountPath: /opt/privx/keyvault
           name: privx-config
@@ -617,7 +631,22 @@ ms:
       claims:
         - name: privx-config
           claimName: privx-claim
+      ephemeral:
+        - name: privx-ephemeral
+          spec:
+            ephemeral:
+              volumeClaimTemplate:
+                spec:
+                  accessModes: [ "ReadWriteOnce" ]
+                  resources:
+                    requests:
+                      storage: 1Mi
 
+        - name: privx-cert
+          spec:
+            emptyDir:
+              medium: Memory
+              sizeLimit: 10Ki
   # ==========ssh-proxy values===============
   sshproxy:
     name: ssh-proxy
@@ -731,10 +760,10 @@ ms:
       enabled: true
       volumeMounts:
         - mountPath: /tmp
-          name: privx-config
+          name: privx-ephemeral
           subPath: privxsshproxyshareddrive
         - mountPath: /opt/privx/cert
-          name: privx-config
+          name: privx-cert
           subPath: privxcert
         - mountPath: /opt/privx/keyvault
           name: privx-config
@@ -751,7 +780,22 @@ ms:
       claims:
         - name: privx-config
           claimName: privx-claim
+      ephemeral:
+        - name: privx-ephemeral
+          spec:
+            ephemeral:
+              volumeClaimTemplate:
+                spec:
+                  accessModes: [ "ReadWriteOnce" ]
+                  resources:
+                    requests:
+                      storage: 1Mi
 
+        - name: privx-cert
+          spec:
+            emptyDir:
+              medium: Memory
+              sizeLimit: 10Ki
   #==========auth values===============
   auth:
     name: auth
@@ -861,7 +905,7 @@ ms:
       enabled: true
       volumeMounts:
         - mountPath: /opt/privx/cert
-          name: privx-config
+          name: privx-cert
           subPath: privxcert
         - mountPath: /opt/privx/keyvault
           name: privx-config
@@ -875,7 +919,12 @@ ms:
       claims:
         - name: privx-config
           claimName: privx-claim
-
+      ephemeral:
+        - name: privx-cert
+          spec:
+            emptyDir:
+              medium: Memory
+              sizeLimit: 10Ki
 
   #==========keyvault values===============
   keyvault:
@@ -978,7 +1027,7 @@ ms:
       enabled: true
       volumeMounts:
         - mountPath: /opt/privx/cert
-          name: privx-config
+          name: privx-cert
           subPath: privxcert
         - mountPath: /opt/privx/keyvault
           name: privx-config
@@ -992,7 +1041,12 @@ ms:
       claims:
         - name: privx-config
           claimName: privx-claim
-
+      ephemeral:
+        - name: privx-cert
+          spec:
+            emptyDir:
+              medium: Memory
+              sizeLimit: 10Ki
   #==========authorizer values===============
   authorizer:
     name: authorizer
@@ -1119,7 +1173,7 @@ ms:
       enabled: true
       volumeMounts:
         - mountPath: /opt/privx/cert
-          name: privx-config
+          name: privx-cert
           subPath: privxcert
         - mountPath: /opt/privx/keyvault
           name: privx-config
@@ -1133,6 +1187,12 @@ ms:
       claims:
         - name: privx-config
           claimName: privx-claim
+      ephemeral:
+        - name: privx-cert
+          spec:
+            emptyDir:
+              medium: Memory
+              sizeLimit: 10Ki
 
   #==========connection-manager values===============
   connectionmanager:
@@ -1253,7 +1313,7 @@ ms:
       enabled: true
       volumeMounts:
         - mountPath: /opt/privx/cert
-          name: privx-config
+          name: privx-cert
           subPath: privxcert
         - mountPath: /opt/privx/keyvault
           name: privx-config
@@ -1270,6 +1330,12 @@ ms:
       claims:
         - name: privx-config
           claimName: privx-claim
+      ephemeral:
+        - name: privx-cert
+          spec:
+            emptyDir:
+              medium: Memory
+              sizeLimit: 10Ki
 
   #==========host-store values===============
   hoststore:
@@ -1372,7 +1438,7 @@ ms:
       enabled: true
       volumeMounts:
         - mountPath: /opt/privx/cert
-          name: privx-config
+          name: privx-cert
           subPath: privxcert
         - mountPath: /opt/privx/keyvault
           name: privx-config
@@ -1386,6 +1452,12 @@ ms:
       claims:
         - name: privx-config
           claimName: privx-claim
+      ephemeral:
+        - name: privx-cert
+          spec:
+            emptyDir:
+              medium: Memory
+              sizeLimit: 10Ki
 
   #==========license-manager values===============
   licensemanager:
@@ -1495,7 +1567,7 @@ ms:
       enabled: true
       volumeMounts:
         - mountPath: /opt/privx/cert
-          name: privx-config
+          name: privx-cert
           subPath: privxcert
         - mountPath: /opt/privx/keyvault
           name: privx-config
@@ -1509,6 +1581,12 @@ ms:
       claims:
         - name: privx-config
           claimName: privx-claim
+      ephemeral:
+        - name: privx-cert
+          spec:
+            emptyDir:
+              medium: Memory
+              sizeLimit: 10Ki
 
   #==========monitor-service values===============
   monitorservice:
@@ -1633,7 +1711,7 @@ ms:
       enabled: true
       volumeMounts:
         - mountPath: /opt/privx/cert
-          name: privx-config
+          name: privx-cert
           subPath: privxcert
         - mountPath: /opt/privx/keyvault
           name: privx-config
@@ -1647,6 +1725,12 @@ ms:
       claims:
         - name: privx-config
           claimName: privx-claim
+      ephemeral:
+        - name: privx-cert
+          spec:
+            emptyDir:
+              medium: Memory
+              sizeLimit: 10Ki
 
   #==========rdp-mitm values===============
   rdpmitm:
@@ -1779,13 +1863,13 @@ ms:
       enabled: true
       volumeMounts:
         - mountPath: /tmp
-          name: privx-config
+          name: privx-ephemeral
           subPath: privxrdpmitmtmp
         - mountPath: /var/run
-          name: privx-config
+          name: privx-ephemeral
           subPath: privxredemption
         - mountPath: /opt/privx/cert
-          name: privx-config
+          name: privx-cert
           subPath: privxcert
         - mountPath: /opt/privx/keyvault
           name: privx-config
@@ -1807,6 +1891,21 @@ ms:
       secrets:
         - name: privx-tls-vol
           secretName: privx-tls
+      ephemeral:
+        - name: privx-ephemeral
+          spec:
+            ephemeral:
+              volumeClaimTemplate:
+                spec:
+                  accessModes: [ "ReadWriteOnce" ]
+                  resources:
+                    requests:
+                      storage: 1Mi
+        - name: privx-cert
+          spec:
+            emptyDir:
+              medium: Memory
+              sizeLimit: 10Ki
 
   #==========ssh-mitm values===============
   sshmitm:
@@ -1915,10 +2014,10 @@ ms:
       enabled: true
       volumeMounts:
         - mountPath: /tmp
-          name: privx-config
+          name: privx-ephemeral
           subPath: privxsshmitmshareddrive
         - mountPath: /opt/privx/cert
-          name: privx-config
+          name: privx-cert
           subPath: privxcert
         - mountPath: /opt/privx/keyvault
           name: privx-config
@@ -1935,6 +2034,21 @@ ms:
       claims:
         - name: privx-config
           claimName: privx-claim
+      ephemeral:
+        - name: privx-ephemeral
+          spec:
+            ephemeral:
+              volumeClaimTemplate:
+                spec:
+                  accessModes: [ "ReadWriteOnce" ]
+                  resources:
+                    requests:
+                      storage: 1Mi
+        - name: privx-cert
+          spec:
+            emptyDir:
+              medium: Memory
+              sizeLimit: 10Ki
 
   #==========trail-index values===============
   trailindex:
@@ -2037,7 +2151,7 @@ ms:
       enabled: true
       volumeMounts:
         - mountPath: /opt/privx/cert
-          name: privx-config
+          name: privx-cert
           subPath: privxcert
         - mountPath: /opt/privx/keyvault
           name: privx-config
@@ -2054,6 +2168,12 @@ ms:
       claims:
         - name: privx-config
           claimName: privx-claim
+      ephemeral:
+        - name: privx-cert
+          spec:
+            emptyDir:
+              medium: Memory
+              sizeLimit: 10Ki
 
   #==========role-store values===============
   rolestore:
@@ -2158,7 +2278,7 @@ ms:
       enabled: true
       volumeMounts:
         - mountPath: /opt/privx/cert
-          name: privx-config
+          name: privx-cert
           subPath: privxcert
         - mountPath: /opt/privx/keyvault
           name: privx-config
@@ -2172,6 +2292,12 @@ ms:
       claims:
         - name: privx-config
           claimName: privx-claim
+      ephemeral:
+        - name: privx-cert
+          spec:
+            emptyDir:
+              medium: Memory
+              sizeLimit: 10Ki
 
   #==========settings values===============
   settings:
@@ -2274,7 +2400,7 @@ ms:
       enabled: true
       volumeMounts:
         - mountPath: /opt/privx/cert
-          name: privx-config
+          name: privx-cert
           subPath: privxcert
         - mountPath: /opt/privx/keyvault
           name: privx-config
@@ -2288,6 +2414,12 @@ ms:
       claims:
         - name: privx-config
           claimName: privx-claim
+      ephemeral:
+        - name: privx-cert
+          spec:
+            emptyDir:
+              medium: Memory
+              sizeLimit: 10Ki
 
   #==========user-store values===============
   userstore:
@@ -2390,7 +2522,7 @@ ms:
       enabled: true
       volumeMounts:
         - mountPath: /opt/privx/cert
-          name: privx-config
+          name: privx-cert
           subPath: privxcert
         - mountPath: /opt/privx/keyvault
           name: privx-config
@@ -2404,6 +2536,12 @@ ms:
       claims:
         - name: privx-config
           claimName: privx-claim
+      ephemeral:
+        - name: privx-cert
+          spec:
+            emptyDir:
+              medium: Memory
+              sizeLimit: 10Ki
 
   #==========vault values===============
   vault:
@@ -2507,7 +2645,7 @@ ms:
       enabled: true
       volumeMounts:
         - mountPath: /opt/privx/cert
-          name: privx-config
+          name: privx-cert
           subPath: privxcert
         - mountPath: /opt/privx/keyvault
           name: privx-config
@@ -2521,6 +2659,12 @@ ms:
       claims:
         - name: privx-config
           claimName: privx-claim
+      ephemeral:
+        - name: privx-cert
+          spec:
+            emptyDir:
+              medium: Memory
+              sizeLimit: 10Ki
 
   #==========workflow-engine values===============
   workflowengine:
@@ -2648,7 +2792,7 @@ ms:
       enabled: true
       volumeMounts:
         - mountPath: /opt/privx/cert
-          name: privx-config
+          name: privx-cert
           subPath: privxcert
         - mountPath: /opt/privx/keyvault
           name: privx-config
@@ -2662,6 +2806,12 @@ ms:
       claims:
         - name: privx-config
           claimName: privx-claim
+      ephemeral:
+        - name: privx-cert
+          spec:
+            emptyDir:
+              medium: Memory
+              sizeLimit: 10Ki
 
   #==========nginx values===============
   nginx:
@@ -2848,7 +2998,7 @@ ms:
       enabled: false
 
     ingress: {}
-  
+
     livenessProbe: {}
     startupProbe: {}
     readinessProbe: {}
@@ -2995,7 +3145,7 @@ ms:
       enabled: true
       volumeMounts:
         - mountPath: /opt/privx/cert
-          name: privx-config
+          name: privx-cert
           subPath: privxcert
         - mountPath: /opt/privx/keyvault
           name: privx-config
@@ -3009,6 +3159,12 @@ ms:
       claims:
         - name: privx-config
           claimName: privx-claim
+      ephemeral:
+        - name: privx-cert
+          spec:
+            emptyDir:
+              medium: Memory
+              sizeLimit: 10Ki
 
   #==========secrets-manager values===============
   secretsmanager:
@@ -3111,7 +3267,7 @@ ms:
       enabled: true
       volumeMounts:
         - mountPath: /opt/privx/cert
-          name: privx-config
+          name: privx-cert
           subPath: privxcert
         - mountPath: /opt/privx/keyvault
           name: privx-config
@@ -3128,6 +3284,12 @@ ms:
       claims:
         - name: privx-config
           claimName: privx-claim
+      ephemeral:
+        - name: privx-cert
+          spec:
+            emptyDir:
+              medium: Memory
+              sizeLimit: 10Ki
 
   #==========extender-service values===============
   extenderservice:
@@ -3163,6 +3325,10 @@ ms:
       enabled: true
       type: ClusterIP
       port: 8981
+      internal:
+        - name: extenderservice
+          port: 2322
+          protocol: TCP
 
     ingress:
       https:
@@ -3231,7 +3397,7 @@ ms:
       enabled: true
       volumeMounts:
         - mountPath: /opt/privx/cert
-          name: privx-config
+          name: privx-cert
           subPath: privxcert
         - mountPath: /opt/privx/keyvault
           name: privx-config
@@ -3245,6 +3411,12 @@ ms:
       claims:
         - name: privx-config
           claimName: privx-claim
+      ephemeral:
+        - name: privx-cert
+          spec:
+            emptyDir:
+              medium: Memory
+              sizeLimit: 10Ki
 
   #==========syslog (optional for auditing)===============
   syslogservice:
@@ -3437,7 +3609,7 @@ ms:
       enabled: true
       volumeMounts:
         - mountPath: /opt/privx/cert
-          name: privx-config
+          name: privx-cert
           subPath: privxcert
         - mountPath: /opt/privx/keyvault
           name: privx-config
@@ -3454,3 +3626,137 @@ ms:
       claims:
         - name: privx-config
           claimName: privx-claim
+      ephemeral:
+        - name: privx-cert
+          spec:
+            emptyDir:
+              medium: Memory
+              sizeLimit: 10Ki
+
+  #==========api-proxy values===============
+  apiproxy:
+    name: api-proxy
+    replicaCount: 1
+
+    image:
+      name: api-proxy
+      repository: ~
+      tag: ~
+      pullPolicy: Always
+
+    imagePullSecrets:
+      - name: docker-pull-secret
+    nameOverride: ""
+    fullnameOverride: ""
+
+    initContainers: []
+    serviceAccount:
+      # Specifies whether a service account should be created
+      create: true
+      # Annotations to add to the service account
+      annotations: {}
+      # The name of the service account to use.
+      # If not set and create is true, a name is generated using the fullname template
+      name: api-proxy
+
+    podAnnotations: {}
+    useGlobalPodSecurityContext: true
+    securityContext: {}
+
+    service:
+      enabled: true
+      type: ClusterIP
+      port: 8984
+      internal:
+        - name: apiproxyport
+          port: 20080
+          protocol: TCP
+    ingress:
+      https:
+        name: https
+        useCommonHost: true
+        useCommonAnnotations: true
+        className: ""
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-ssl-name: "api-proxy"
+        hosts:
+          - host: localhost
+            paths:
+              - path: /api-proxy
+                pathType: Prefix
+        tls:
+          - secretName: privx-tls
+            hosts:
+              - localhost
+
+    livenessProbe:
+      enabled: false
+      useCommonLivenessConfig: true
+      config: {}
+    startupProbe:
+      enabled: false
+      useCommonStartupConfig: true
+      config: {}
+    readinessProbe:
+      enabled: false
+      useCommonReadinessConfig: true
+      config: {}
+
+    resources: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious
+      # choice for the user. This also increases chances charts run on environments with little
+      # resources, such as Minikube. If you do want to specify resources, uncomment the following
+      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+
+    rbac:
+      create: false
+
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 100
+      targetCPUUtilizationPercentage: 80
+      # targetMemoryUtilizationPercentage: 80
+
+    nodeSelector: {}
+
+    tolerations: []
+
+    affinity: {}
+    level:
+      log: DEBUG
+      trace: 3
+
+    volumes:
+      enabled: true
+      volumeMounts:
+        - mountPath: /opt/privx/cert
+          name: privx-cert
+          subPath: privxcert
+        - mountPath: /opt/privx/keyvault
+          name: privx-config
+          subPath: keyvault
+        - mountPath: /opt/privx/etc
+          name: privx-config
+          subPath: privxetc
+        - mountPath: /etc/nginx/ssl
+          name: privx-config
+          subPath: nginxssl
+        - mountPath: /var/privx/audit
+          name: privx-config
+          subPath: privxaudit
+      claims:
+        - name: privx-config
+          claimName: privx-claim
+      ephemeral:
+        - name: privx-cert
+          spec:
+            emptyDir:
+              medium: Memory
+              sizeLimit: 10Ki

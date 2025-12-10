@@ -1,3 +1,4 @@
+{{- include "check.kubeVersion" . }}
 {{- $globalContext := . }}
 {{- $configs := .Values.configs }}
 {{- if .Values.migration.enabled }}
@@ -13,7 +14,8 @@ metadata:
   name: {{ $config.name }}-config
   annotations:
     "helm.sh/hook": "{{ $config.hook }}"
-    "helm.sh/hook-weight": "{{ $config.weight }}"
+    "helm.sh/hook-weight": "{{ $config.weight | default "0" }}"
+    "helm.sh/hook-delete-policy": "{{ $config.hookDeletePolicy | default "before-hook-creation" }}"
 data:
 {{ range $path, $d :=  $globalContext.Files.Glob  $files }}
   {{ base ($path | toString) }}: |+

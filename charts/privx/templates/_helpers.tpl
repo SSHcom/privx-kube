@@ -100,3 +100,30 @@ index.
 {{-   end }}
 {{-   $hostnames }}
 {{- end }}
+
+{{- define "check.kubeVersion" -}}
+{{- /*
+semver is not capable to parse weird versioning used in different
+clusters. Hence we only take the Major and Minor version of the
+the current cluster kubernetes version and ignore the patch version
+as no API changes are allowed in patch versions anyway.
+*/ -}}
+
+{{- $major := int .Capabilities.KubeVersion.Major }}
+{{- $minorRaw := .Capabilities.KubeVersion.Minor }}
+{{- $minorClean := (trimSuffix "+" $minorRaw) | int }}
+
+{{- /*
+A deliberately chosen high patch number so semverCompare can ignore
+it in realistic situations.
+*/ -}}
+
+{{- $patch :=  1000 }}
+
+{{- $current := (printf "%d.%d.%d" $major $minorClean $patch) }}
+
+{{- if semverCompare (printf "<%s" .Values.minKubeVersion) $current }}
+
+{{- fail (printf "Kubernetes %s or higher is required, but found: %s. Please upgrade your Kubernetes cluster before installing/upgrading PrivX." .Values.minKubeVersion .Capabilities.KubeVersion.Version) }}
+{{- end }}
+{{- end }}

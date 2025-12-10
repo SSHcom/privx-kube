@@ -1,25 +1,24 @@
 migration:
   enabled: true
   from: 41
-  to: 39
+  to: 42
 
-# Keep all the microservices shutdown so that the previous version can be roll
-# backed using helm rollback.
+# Before anything else, PrivX is shutdown
 shutdown: true
 
 # Global value to define the PrivX images' repository
 privxRepository: public.ecr.aws/sshprivx
 
 # Global value to define the PrivX images' version tag
-privxVersion: "41.0"
+privxVersion: "42.0"
 
 # Global value to define the default image pull policy
 pullPolicy: IfNotPresent
 
-# ========== Privx settings restore ===============
+# ========== Privx settings backup ===============
 jobs:
-  restore:
-    name: restore
+  backup:
+    name: backup
     hook: post-upgrade
     weight: "-5"
     hookDeletePolicy: before-hook-creation
@@ -33,11 +32,9 @@ jobs:
       - name: docker-pull-secret
     environment:
       - name: UPGRADER_CMD
-        value: restore
-      - name: PREVIOUS_VERSION
-        value: 39.X.X
-      - name: BACKUP_DIR
-        value: <generated-backup-folder-placeholder>
+        value: backup
+      - name: PRIVX_VERSION
+        value: 41.X.X
     useGlobalPodSecurityContext: true
     securityContext: {}
     resources: {}
