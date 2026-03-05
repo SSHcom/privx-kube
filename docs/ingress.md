@@ -8,6 +8,11 @@ features to work correctly:
 - 2222 (Needed by SSH Bastion for SSH native connections)
 - 3389 (Needed by RDP Bastion for RDP native connections)
 - 8444 (Needed by Authorizer for client certification authentication endpoints)
+- 2322 (Needed by the Extender Service)
+- 20080 (Needed by API Proxy for REST based connections)
+
+**NOTE**: These are default ports and any changes to the ports should reflect
+in all the places (including in the Helm charts and any override files)
 
 # Information on Sticky Sessions
 
