@@ -1,7 +1,7 @@
 migration:
   enabled: true
-  from: 42
-  to: 41
+  from: 43
+  to: 42
 
 # Keep all the microservices shutdown so that the previous version can be roll
 # backed using helm rollback.
@@ -11,7 +11,7 @@ shutdown: true
 privxRepository: public.ecr.aws/sshprivx
 
 # Global value to define the PrivX images' version tag
-privxVersion: "42.2"
+privxVersion: "43.0"
 
 # Global value to define the default image pull policy
 pullPolicy: IfNotPresent
@@ -35,7 +35,7 @@ jobs:
       - name: UPGRADER_CMD
         value: restore
       - name: PREVIOUS_VERSION
-        value: 41.X.X
+        value: 42.X.X
       - name: BACKUP_DIR
         value: <generated-backup-folder-placeholder>
     useGlobalPodSecurityContext: true

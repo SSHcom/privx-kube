@@ -72,6 +72,12 @@ pin = ""
 #   https://docs.aws.amazon.com/cloudhsm/latest/userguide/ki-pkcs11-sdk.html#ki-pkcs11-8
 ciphertext_block_size = 0
 
+# session cache lifetime
+#   Determines cached PKCS#11 session lifetime. If empty, session caching is
+#   disabled. Accepts duration strings such as "5m", "1h" or "1h59m55s" with
+#   hours, minutes and/or seconds.
+session_cache_lifetime = ""
+
 # pkcs11 features: comma separated list of following keywords:
 #   aes-gcm-zero-iv       Supply zero IV for aes gcm encrypt
 #   aes-gcm-padding       Pad aes-gcm input to aes blocksize

@@ -122,7 +122,7 @@ privxRepository: public.ecr.aws/sshprivx
 
 # Global value to define the PrivX images' version tag.
 # Individual microservices/jobs can override this.
-privxVersion: "42.2"
+privxVersion: "43.0"
 
 # Global value to define the default image pull policy.
 # Individual microservices/jobs can override this.
@@ -462,6 +462,7 @@ jobs:
 
 # ==========Ingress CA cert values===============
 cert:
+  clusterIssuerName: selfsigned
   name: ca-cert
   secretName: privx-ca-secret
   duration: 24h
