@@ -1,50 +1,50 @@
 migration:
   enabled: true
-  from: 41
-  to: 42
+  from: 42
+  to: 43
 
   configs:
     new:
       name: new
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/42/configs/new/*"
+      files: "migrations/43/configs/new/*"
       hookDeletePolicy: before-hook-creation,hook-succeeded
     common:
       name: common
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/42/configs/common/*"
+      files: "migrations/43/configs/common/*"
       hookDeletePolicy: before-hook-creation,hook-succeeded
     syslog: # This is not deleted after upgrade as the syslog-service deployment depends on it
       name: syslog
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/42/configs/syslog/*"
+      files: "migrations/43/configs/syslog/*"
       hookDeletePolicy: before-hook-creation
     nginx: # This is not deleted after upgrade as the nginx deployment depends on it
       name: nginx
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/42/configs/nginx/*"
+      files: "migrations/43/configs/nginx/*"
       hookDeletePolicy: before-hook-creation
     rdpmitm:
       name: rdpmitm
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/42/configs/rdpmitm/*"
+      files: "migrations/43/configs/rdpmitm/*"
       hookDeletePolicy: before-hook-creation,hook-succeeded
     db-cert:
       name: db-cert
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/42/configs/database/certificate/*"
+      files: "migrations/43/configs/database/certificate/*"
       hookDeletePolicy: before-hook-creation,hook-succeeded
     upgrade-scripts:
       name: upgrade-scripts
       hook: pre-upgrade
       weight: "-5"
-      files: "migrations/42/configs/scripts/*"
+      files: "migrations/43/configs/scripts/*"
       hookDeletePolicy: before-hook-creation,hook-succeeded
     settings: # This is added so any install time configmaps are deleted
       name: settings
@@ -69,7 +69,7 @@ migration:
 privxRepository: public.ecr.aws/sshprivx
 
 # Global value to define the PrivX images' version tag
-privxVersion: "42.2"
+privxVersion: "43.0"
 
 # Global value to define the default image pull policy
 pullPolicy: IfNotPresent

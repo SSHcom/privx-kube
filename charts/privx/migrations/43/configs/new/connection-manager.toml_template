@@ -12,3 +12,9 @@ keyvault_secret = "@CONNECTIONMANAGER_SECRET@"
 enable_https_server = true
 certificate = "/opt/privx/cert/connection-manager.crt"
 private_key = "/opt/privx/cert/connection-manager.key"
+
+[ueba]
+# UEBA server and trainer image versions
+version_dev = "1.2"
+version_live = "1.2"
+

@@ -178,7 +178,8 @@ rekey_threshold = [
 #   "*:version"
 #
 # Valid values: 3, 4, 5, 6
-# Default value: 6
+# If no explicit version is configured for a target then PrivX will select
+# the highest version (currently version 6).
 #
 # Example:
 #    sftp_protocol_version = [

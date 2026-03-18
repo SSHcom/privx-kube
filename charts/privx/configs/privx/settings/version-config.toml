@@ -458,3 +458,9 @@ data_version = "2"
 ################################# PrivX 39.0 #################################
 [39.0.workflow-engine.db]
 data_version = "12"
+
+################################# PrivX 43.0 #################################
+
+[43.0.connection-manager.ueba]
+version_dev = "1.2"
+version_live = "1.2"

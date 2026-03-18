@@ -3,7 +3,7 @@
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
-  name: selfsigned
+  name: {{ default "selfsigned" .Values.cert.clusterIssuerName }}
 spec:
   selfSigned: {}
 {{- end }}

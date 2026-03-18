@@ -24,7 +24,7 @@ spec:
     - {{ .host }}
     {{- end }}
   issuerRef:
-    name: selfsigned
+    name: {{ default "selfsigned" .Values.cert.clusterIssuerName }}
     kind: ClusterIssuer
     group: cert-manager.io
 {{- end }}

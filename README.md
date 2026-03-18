@@ -1,7 +1,7 @@
 # **Breaking Changes**:
 
-This list of breaking changes is for PrivX 42. For breaking changes
-in previous releases, please check the specific release branch for
+This list of breaking changes is for PrivX 43. For breaking changes
+in the previous releases, please check the specific release branch for
 correct information.
 
 - NGINX Ingress Controller is going to be 
@@ -10,16 +10,10 @@ in Spring 2026. Depending on various factors until then, we might
 have to either move directly to using the new Gateway API or
 look for another Ingress Controller alternative. The criteria for the
 change would be to cover all the use cases that PrivX depends on.
-More information would follow in the coming releases.
 
-- PrivX now requires Kubernetes Server version 1.23 or newer. Please
-upgrade your cluster before upgrading to PrivX v42 in case an older
-cluster version is still in use.
-
-- PrivX uses Ephemeral and Generic Ephemeral volumes for mounting
-some of the directories to the PrivX pods starting v42. The latter
-volume type in some cases might need to explicitly set `Values.ephemeralStorageClassName`
-if the default StorageClass doesn't support Generic Ephemeral volumes. 
+The candidate of choice for Ingress Controller in PrivX v44 is HAProxy based
+Ingress Controller. The plans are still subject to change in case a better
+alternative appears.
 
 # privx-kube
 
@@ -215,4 +209,4 @@ helm install \
 ```
 
 # PrivX Version Upgrade
-For upgrading privx to the current version, follow the instructions [here](charts/privx/migrations/42/README.md)
+For upgrading privx to the current version, follow the instructions [here](charts/privx/migrations/43/README.md)
