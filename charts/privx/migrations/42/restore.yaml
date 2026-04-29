@@ -11,7 +11,7 @@ shutdown: true
 privxRepository: public.ecr.aws/sshprivx
 
 # Global value to define the PrivX images' version tag
-privxVersion: "42.2"
+privxVersion: "42.3"
 
 # Global value to define the default image pull policy
 pullPolicy: IfNotPresent
