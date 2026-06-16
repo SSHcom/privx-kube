@@ -78,7 +78,7 @@ spec:
               value: "{{ $env.value }}"
               {{- end}}
             {{- end}}
-          {{- if $job.useGlobalPodSecurityContext }}
+          {{- if not $job.useGlobalPodSecurityContext }}
             {{- range $env := $job.environment }}
               {{- if eq $env.name "PRIVX_USER" }}
             - name: "{{ $env.name }}"

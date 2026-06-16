@@ -9,22 +9,18 @@ fullnameOverride: ""
 nameOverride: ""
 ingress:
   common:
-    className: "nginx"
+    className: "haproxy"
     hosts:
       - host: localhost
     annotations:
-      nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-      nginx.ingress.kubernetes.io/proxy-ssl-secret: "privx/proxy-ca-secret"
-      nginx.ingress.kubernetes.io/proxy-ssl-verify: "on"
-      nginx.ingress.kubernetes.io/proxy-ssl-server-name: "on"
-      nginx.ingress.kubernetes.io/ssl-ciphers: "AESGCM+EECDH:AESGCM+EDH:AES+EECDH:AES128-GCM-SHA256:-DSS:-EDH:-SHA1:-SHA256:-SHA384"
-      nginx.ingress.kubernetes.io/ssl-prefer-server-ciphers: "true"
-      nginx.ingress.kubernetes.io/proxy-ssl-protocols: "TLSv1.2 TLSv1.3"
-      nginx.ingress.kubernetes.io/proxy-body-size: 1m
-      nginx.ingress.kubernetes.io/affinity: "cookie"
-      nginx.ingress.kubernetes.io/affinity-mode: "persistent"
-      nginx.ingress.kubernetes.io/session-cookie-change-on-failure: "true"
-
+      haproxy.org/check-interval: "1m"
+      haproxy.org/server-ssl: "true"
+      haproxy.org/server-ca: "privx/proxy-ca-secret"
+      haproxy.org/global-config-snippet: |
+        ssl-default-bind-ciphers ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256
+        ssl-default-bind-options ssl-min-ver TLSv1.2 no-tls-tickets
+      haproxy.org/frontend-config-snippet: |
+        http-request deny deny_status 413 if { req.body_size gt 10485760 }
 db:
   # database address (required)
   address:
@@ -122,7 +118,7 @@ privxRepository: public.ecr.aws/sshprivx
 
 # Global value to define the PrivX images' version tag.
 # Individual microservices/jobs can override this.
-privxVersion: "43.1"
+privxVersion: "44.0"
 
 # Global value to define the default image pull policy.
 # Individual microservices/jobs can override this.
@@ -156,7 +152,7 @@ securityContext:
 livenessProbe:
   # If startupProbe is disabled, initialDelaySeconds is critical to avoid restarts.
   # If startupProbe is enabled, this delay is unnecessary but adds a safety buffer.
-  initialDelaySeconds:  120
+  initialDelaySeconds: 120
   failureThreshold: 1
   periodSeconds: 10
 
@@ -215,7 +211,7 @@ configs:
     files: "configs/scripts/*"
     hookDeletePolicy: hook-succeeded
 jobs:
-# ==========Full Installer Job===============
+  # ==========Full Installer Job===============
   installer:
     name: installer
     hook: pre-install
@@ -296,7 +292,7 @@ jobs:
       - name: config-copier
         image: "bash:5.2"
         imagePullPolicy: IfNotPresent
-        command: [ "bash", "-c" ]
+        command: ["bash", "-c"]
         args:
           - mkdir -p /opt/privx/etc/new;
             mkdir -p /opt/privx/etc/rdpmitm;
@@ -359,7 +355,7 @@ jobs:
     rbac:
       create: false
 
-# ==========Internal Cert Updater Job===============
+  # ==========Internal Cert Updater Job===============
   internal-cert-updater:
     name: internal-cert-updater
     hook: pre-install
@@ -408,7 +404,7 @@ jobs:
     rbac:
       create: false
 
-# ==========Job for creating TLS secret between ingress and pod===============
+  # ==========Job for creating TLS secret between ingress and pod===============
   proxy-ca-secret-generator:
     name: proxy-ca-secret-generator
     hook: post-install
@@ -536,19 +532,17 @@ ms:
         useCommonAnnotations: false
         className: ""
         annotations:
-          nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-          nginx.ingress.kubernetes.io/proxy-ssl-secret: "privx/proxy-ca-secret"
-          nginx.ingress.kubernetes.io/proxy-ssl-verify: "on"
-          nginx.ingress.kubernetes.io/proxy-ssl-name: "rdp-proxy"
-          nginx.ingress.kubernetes.io/proxy-ssl-server-name: "on"
-          nginx.ingress.kubernetes.io/ssl-ciphers: "AESGCM+EECDH:AESGCM+EDH:AES+EECDH:AES128-GCM-SHA256:-DSS:-EDH:-SHA1:-SHA256:-SHA384"
-          nginx.ingress.kubernetes.io/ssl-prefer-server-ciphers: "true"
-          nginx.ingress.kubernetes.io/proxy-ssl-protocols: "TLSv1.2 TLSv1.3"
-          nginx.ingress.kubernetes.io/proxy-body-size: 0m
-          nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
-          nginx.ingress.kubernetes.io/affinity: "cookie"
-          nginx.ingress.kubernetes.io/affinity-mode: "persistent"
-          nginx.ingress.kubernetes.io/session-cookie-change-on-failure: "true"
+          haproxy.org/check-interval: "1m"
+          haproxy.org/server-ssl: "true"
+          haproxy.org/server-ca: "privx/proxy-ca-secret"
+          haproxy.org/cookie-persistence: "privx-rdp-proxy-session"
+          haproxy.org/global-config-snippet: |
+            ssl-default-bind-ciphers ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256
+            ssl-default-bind-options ssl-min-ver TLSv1.2 no-tls-tickets
+          haproxy.org/backend-config-snippet: |
+            default-server sni str(rdp-proxy) verifyhost rdp-proxy
+          haproxy.org/frontend-config-snippet: |
+            http-request deny deny_status 413 if { req.body_size gt 10485760 }
         hosts:
           - host: localhost
             paths:
@@ -638,7 +632,7 @@ ms:
             ephemeral:
               volumeClaimTemplate:
                 spec:
-                  accessModes: [ "ReadWriteOnce" ]
+                  accessModes: ["ReadWriteOnce"]
                   resources:
                     requests:
                       storage: 1Mi
@@ -690,19 +684,17 @@ ms:
         useCommonAnnotations: false
         className: ""
         annotations:
-          nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-          nginx.ingress.kubernetes.io/proxy-ssl-secret: "privx/proxy-ca-secret"
-          nginx.ingress.kubernetes.io/proxy-ssl-verify: "on"
-          nginx.ingress.kubernetes.io/proxy-ssl-name: "ssh-proxy"
-          nginx.ingress.kubernetes.io/proxy-ssl-server-name: "on"
-          nginx.ingress.kubernetes.io/ssl-ciphers: "AESGCM+EECDH:AESGCM+EDH:AES+EECDH:AES128-GCM-SHA256:-DSS:-EDH:-SHA1:-SHA256:-SHA384"
-          nginx.ingress.kubernetes.io/ssl-prefer-server-ciphers: "true"
-          nginx.ingress.kubernetes.io/proxy-ssl-protocols: "TLSv1.2 TLSv1.3"
-          nginx.ingress.kubernetes.io/proxy-body-size: 0m
-          nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
-          nginx.ingress.kubernetes.io/affinity: "cookie"
-          nginx.ingress.kubernetes.io/affinity-mode: "persistent"
-          nginx.ingress.kubernetes.io/session-cookie-change-on-failure: "true"
+          haproxy.org/check-interval: "1m"
+          haproxy.org/server-ssl: "true"
+          haproxy.org/server-ca: "privx/proxy-ca-secret"
+          haproxy.org/cookie-persistence: "privx-ssh-proxy-session"
+          haproxy.org/global-config-snippet: |
+            ssl-default-bind-ciphers ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256
+            ssl-default-bind-options ssl-min-ver TLSv1.2 no-tls-tickets
+          haproxy.org/backend-config-snippet: |
+            default-server sni str(ssh-proxy) verifyhost ssh-proxy
+          haproxy.org/frontend-config-snippet: |
+            http-request deny deny_status 413 if { req.body_size gt 10485760 }
         hosts:
           - host: localhost
             paths:
@@ -787,7 +779,7 @@ ms:
             ephemeral:
               volumeClaimTemplate:
                 spec:
-                  accessModes: [ "ReadWriteOnce" ]
+                  accessModes: ["ReadWriteOnce"]
                   resources:
                     requests:
                       storage: 1Mi
@@ -844,10 +836,10 @@ ms:
         useCommonAnnotations: true
         className: ""
         annotations:
-          nginx.ingress.kubernetes.io/proxy-ssl-name: "auth"
-          nginx.ingress.kubernetes.io/proxy-buffering: "on"
-          nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
-          nginx.ingress.kubernetes.io/proxy-busy-buffers-size: "16k"
+          haproxy.org/cookie-persistence: "privx-auth-session"
+          haproxy.org/backend-config-snippet: |
+            default-server sni str(auth) verifyhost auth
+            http-request deny deny_status 413 if { req.body_size gt 1048576 }
         hosts:
           - host: localhost
             paths:
@@ -969,7 +961,9 @@ ms:
         useCommonAnnotations: true
         className: ""
         annotations:
-          nginx.ingress.kubernetes.io/proxy-ssl-name: "keyvault"
+          haproxy.org/cookie-persistence: "privx-keyvault-session"
+          haproxy.org/backend-config-snippet: |
+            default-server sni str(keyvault) verifyhost keyvault
         hosts:
           - host: localhost
             paths:
@@ -1090,7 +1084,9 @@ ms:
         useCommonAnnotations: true
         className: ""
         annotations:
-          nginx.ingress.kubernetes.io/proxy-ssl-name: "authorizer"
+          haproxy.org/cookie-persistence: "privx-authorizer-session"
+          haproxy.org/backend-config-snippet: |
+            default-server sni str(authorizer) verifyhost authorizer
         hosts:
           - host: localhost
             paths:
@@ -1106,16 +1102,17 @@ ms:
         useCommonAnnotations: false
         className: ""
         annotations:
-          nginx.ingress.kubernetes.io/ssl-redirect: "false"
-          nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-          nginx.ingress.kubernetes.io/proxy-ssl-secret: "privx/proxy-ca-secret"
-          nginx.ingress.kubernetes.io/proxy-ssl-verify: "on"
-          nginx.ingress.kubernetes.io/proxy-ssl-server-name: "on"
-          nginx.ingress.kubernetes.io/ssl-ciphers: "AESGCM+EECDH:AESGCM+EDH:AES+EECDH:AES128-GCM-SHA256:-DSS:-EDH:-SHA1:-SHA256:-SHA384"
-          nginx.ingress.kubernetes.io/ssl-prefer-server-ciphers: "true"
-          nginx.ingress.kubernetes.io/proxy-ssl-protocols: "TLSv1.2 TLSv1.3"
-          nginx.ingress.kubernetes.io/proxy-body-size: 1m
-          nginx.ingress.kubernetes.io/proxy-ssl-name: "authorizer"
+          haproxy.org/check-interval: "1m"
+          haproxy.org/server-ssl: "true"
+          haproxy.org/server-ca: "privx/proxy-ca-secret"
+          haproxy.org/cookie-persistence: "privx-authorizer-session"
+          haproxy.org/global-config-snippet: |
+            ssl-default-bind-ciphers ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256
+            ssl-default-bind-options ssl-min-ver TLSv1.2 no-tls-tickets
+          haproxy.org/frontend-config-snippet: |
+            http-request deny deny_status 413 if { req.body_size gt 1048576 }
+          haproxy.org/backend-config-snippet: |
+            default-server sni str(authorizer) verifyhost authorizer
         hosts:
           - host: localhost
             paths:
@@ -1237,7 +1234,9 @@ ms:
         useCommonAnnotations: true
         className: ""
         annotations:
-          nginx.ingress.kubernetes.io/proxy-ssl-name: "connection-manager"
+          haproxy.org/cookie-persistence: "privx-connection-manager-session"
+          haproxy.org/backend-config-snippet: |
+            default-server sni str(connection-manager) verifyhost connection-manager
         hosts:
           - host: localhost
             paths:
@@ -1254,8 +1253,9 @@ ms:
         useCommonAnnotations: true
         className: ""
         annotations:
-          nginx.ingress.kubernetes.io/proxy-ssl-name: "connection-manager"
-          nginx.ingress.kubernetes.io/proxy-read-timeout: "120"
+          haproxy.org/cookie-persistence: "privx-connection-manager-session"
+          haproxy.org/backend-config-snippet: |
+            default-server sni str(connection-manager) verifyhost connection-manager
         hosts:
           - host: localhost
             paths:
@@ -1380,7 +1380,9 @@ ms:
         useCommonAnnotations: true
         className: ""
         annotations:
-          nginx.ingress.kubernetes.io/proxy-ssl-name: "host-store"
+          haproxy.org/cookie-persistence: "privx-host-store-session"
+          haproxy.org/backend-config-snippet: |
+            default-server sni str(host-store) verifyhost host-store
         hosts:
           - host: localhost
             paths:
@@ -1477,6 +1479,8 @@ ms:
     fullnameOverride: ""
 
     initContainers: []
+    # If either dev.enabled or prod.enabled is true, license-manager uses that
+    # code and all deployments inherit the matching LICBE_PROFILE by default.
     licenseCode:
       dev:
         enabled: false
@@ -1509,7 +1513,9 @@ ms:
         useCommonAnnotations: true
         className: ""
         annotations:
-          nginx.ingress.kubernetes.io/proxy-ssl-name: "license-manager"
+          haproxy.org/cookie-persistence: "privx-license-manager-session"
+          haproxy.org/backend-config-snippet: |
+            default-server sni str(license-manager) verifyhost license-manager
         hosts:
           - host: localhost
             paths:
@@ -1635,7 +1641,9 @@ ms:
         useCommonAnnotations: true
         className: ""
         annotations:
-          nginx.ingress.kubernetes.io/proxy-ssl-name: "monitor-service"
+          haproxy.org/cookie-persistence: "privx-monitor-service-session"
+          haproxy.org/backend-config-snippet: |
+            default-server sni str(monitor-service) verifyhost monitor-service
         hosts:
           - host: localhost
             paths:
@@ -1652,8 +1660,9 @@ ms:
         useCommonAnnotations: true
         className: ""
         annotations:
-          nginx.ingress.kubernetes.io/proxy-ssl-name: "monitor-service"
-          nginx.ingress.kubernetes.io/proxy-read-timeout: "120"
+          haproxy.org/cookie-persistence: "privx-monitor-service-session"
+          haproxy.org/backend-config-snippet: |
+            default-server sni str(monitor-service) verifyhost monitor-service
         hosts:
           - host: localhost
             paths:
@@ -1753,21 +1762,21 @@ ms:
     # privxRepo/initContainerName:privxVersion
     initContainers:
       - name: rdp-mitm-conf
-        command: [ "/bin/sh", "-c" ]
+        command: ["/bin/sh", "-c"]
         env:
-        - name: KEY_PASS
-          value: inquisition
+          - name: KEY_PASS
+            value: inquisition
         args:
           - echo copying rdpmitm static resources;
             cp -rf rdpmitm/* /opt/privx/etc/rdpmitm/;
             echo generating redemption certs;
             ./rdpmitm/scripts/redemption_cert.sh;
         volumeMounts:
-        - mountPath: /opt/privx/etc
-          name: privx-config
-          subPath: privxetc
-        - mountPath: /etc/nginx/tls
-          name: privx-tls-vol
+          - mountPath: /opt/privx/etc
+            name: privx-config
+            subPath: privxetc
+          - mountPath: /etc/nginx/tls
+            name: privx-tls-vol
         resources: {}
           # limits:
           #   cpu: 100m
@@ -1805,7 +1814,9 @@ ms:
         useCommonAnnotations: true
         className: ""
         annotations:
-          nginx.ingress.kubernetes.io/proxy-ssl-name: "rdp-mitm"
+          haproxy.org/cookie-persistence: "privx-rdp-mitm-session"
+          haproxy.org/backend-config-snippet: |
+            default-server sni str(rdp-mitm) verifyhost rdp-mitm
         hosts:
           - host: localhost
             paths:
@@ -1898,7 +1909,7 @@ ms:
             ephemeral:
               volumeClaimTemplate:
                 spec:
-                  accessModes: [ "ReadWriteOnce" ]
+                  accessModes: ["ReadWriteOnce"]
                   resources:
                     requests:
                       storage: 1Mi
@@ -1956,7 +1967,9 @@ ms:
         useCommonAnnotations: true
         className: ""
         annotations:
-          nginx.ingress.kubernetes.io/proxy-ssl-name: "ssh-mitm"
+          haproxy.org/cookie-persistence: "privx-ssh-mitm-session"
+          haproxy.org/backend-config-snippet: |
+            default-server sni str(ssh-mitm) verifyhost ssh-mitm
         hosts:
           - host: localhost
             paths:
@@ -2041,7 +2054,7 @@ ms:
             ephemeral:
               volumeClaimTemplate:
                 spec:
-                  accessModes: [ "ReadWriteOnce" ]
+                  accessModes: ["ReadWriteOnce"]
                   resources:
                     requests:
                       storage: 1Mi
@@ -2093,7 +2106,9 @@ ms:
         useCommonAnnotations: true
         className: ""
         annotations:
-          nginx.ingress.kubernetes.io/proxy-ssl-name: "trail-index"
+          haproxy.org/cookie-persistence: "privx-trail-index-session"
+          haproxy.org/backend-config-snippet: |
+            default-server sni str(trail-index) verifyhost trail-index
         hosts:
           - host: localhost
             paths:
@@ -2218,7 +2233,9 @@ ms:
         useCommonAnnotations: true
         className: ""
         annotations:
-          nginx.ingress.kubernetes.io/proxy-ssl-name: "role-store"
+          haproxy.org/cookie-persistence: "privx-role-store-session"
+          haproxy.org/backend-config-snippet: |
+            default-server sni str(role-store) verifyhost role-store
         hosts:
           - host: localhost
             paths:
@@ -2342,7 +2359,9 @@ ms:
         useCommonAnnotations: true
         className: ""
         annotations:
-          nginx.ingress.kubernetes.io/proxy-ssl-name: "settings"
+          haproxy.org/cookie-persistence: "privx-settings-session"
+          haproxy.org/backend-config-snippet: |
+            default-server sni str(settings) verifyhost settings
         hosts:
           - host: localhost
             paths:
@@ -2464,7 +2483,9 @@ ms:
         useCommonAnnotations: true
         className: ""
         annotations:
-          nginx.ingress.kubernetes.io/proxy-ssl-name: "user-store"
+          haproxy.org/cookie-persistence: "privx-user-store-session"
+          haproxy.org/backend-config-snippet: |
+            default-server sni str(user-store) verifyhost user-store
         hosts:
           - host: localhost
             paths:
@@ -2587,7 +2608,9 @@ ms:
         useCommonAnnotations: true
         className: ""
         annotations:
-          nginx.ingress.kubernetes.io/proxy-ssl-name: "vault"
+          haproxy.org/cookie-persistence: "privx-vault-session"
+          haproxy.org/backend-config-snippet: |
+            default-server sni str(vault) verifyhost vault
         hosts:
           - host: localhost
             paths:
@@ -2687,7 +2710,7 @@ ms:
     # privxRepo/initContainerName:privxVersion
     initContainers:
       - name: workflow-engine-conf
-        command: [ "/bin/sh", "-c" ]
+        command: ["/bin/sh", "-c"]
         args:
           - echo copying templates;
             cp -rf templates/* /opt/privx/etc/templates/;
@@ -2696,9 +2719,9 @@ ms:
             echo copying locales;
             cp -rf locales/* /opt/privx/etc/locales/workflow-engine;
         volumeMounts:
-        - mountPath: /opt/privx/etc
-          name: privx-config
-          subPath: privxetc
+          - mountPath: /opt/privx/etc
+            name: privx-config
+            subPath: privxetc
         resources: {}
           # limits:
           #   cpu: 100m
@@ -2734,7 +2757,9 @@ ms:
         useCommonAnnotations: true
         className: ""
         annotations:
-          nginx.ingress.kubernetes.io/proxy-ssl-name: "workflow-engine"
+          haproxy.org/cookie-persistence: "privx-workflow-engine-session"
+          haproxy.org/backend-config-snippet: |
+            default-server sni str(workflow-engine) verifyhost workflow-engine
         hosts:
           - host: localhost
             paths:
@@ -2867,17 +2892,19 @@ ms:
         useCommonHost: true
         className: ""
         annotations:
-          nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-          nginx.ingress.kubernetes.io/proxy-ssl-secret: "privx/proxy-ca-secret"
-          nginx.ingress.kubernetes.io/proxy-ssl-verify: "on"
-          nginx.ingress.kubernetes.io/proxy-ssl-name: "nginx"
-          nginx.ingress.kubernetes.io/proxy-ssl-server-name: "on"
-          nginx.ingress.kubernetes.io/ssl-ciphers: "AESGCM+EECDH:AESGCM+EDH:AES+EECDH:AES128-GCM-SHA256:-DSS:-EDH:-SHA1:-SHA256:-SHA384"
-          nginx.ingress.kubernetes.io/ssl-prefer-server-ciphers: "true"
-          nginx.ingress.kubernetes.io/proxy-ssl-protocols: "TLSv1.2 TLSv1.3"
-          nginx.ingress.kubernetes.io/proxy-buffering: "on"
-          nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
-          nginx.ingress.kubernetes.io/proxy-busy-buffers-size: "16k"
+          haproxy.org/ssl-redirect-port: "443"
+          haproxy.org/check-interval: "1m"
+          haproxy.org/server-ssl: "true"
+          haproxy.org/server-ca: "privx/proxy-ca-secret"
+          haproxy.org/cookie-persistence: "privx-nginx-session"
+          haproxy.org/global-config-snippet: |
+            ssl-default-bind-ciphers ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256
+            ssl-default-bind-options ssl-min-ver TLSv1.2 no-tls-tickets
+          haproxy.org/frontend-config-snippet: |
+            http-request deny deny_status 413 if { req.body_size gt 10485760 }
+          haproxy.org/backend-config-snippet: |
+            default-server sni str(nginx) verifyhost nginx
+            http-request deny deny_status 413 if { req.body_size gt 1048576 }
         hosts:
           - host: localhost
             paths:
@@ -3044,7 +3071,6 @@ ms:
         - name: privx-ca-vol
           secretName: privx-ca-secret
 
-
   #==========network-access-manager values===============
   networkaccessmanager:
     name: network-access-manager
@@ -3087,7 +3113,9 @@ ms:
         useCommonAnnotations: true
         className: ""
         annotations:
-          nginx.ingress.kubernetes.io/proxy-ssl-name: "network-access-manager"
+          haproxy.org/cookie-persistence: "privx-network-access-manager-session"
+          haproxy.org/backend-config-snippet: |
+            default-server sni str(network-access-manager) verifyhost network-access-manager
         hosts:
           - host: localhost
             paths:
@@ -3209,7 +3237,9 @@ ms:
         useCommonAnnotations: true
         className: ""
         annotations:
-          nginx.ingress.kubernetes.io/proxy-ssl-name: "secrets-manager"
+          haproxy.org/cookie-persistence: "privx-secrets-manager-session"
+          haproxy.org/backend-config-snippet: |
+            default-server sni str(secrets-manager) verifyhost secrets-manager
         hosts:
           - host: localhost
             paths:
@@ -3338,8 +3368,11 @@ ms:
         useCommonAnnotations: true
         className: ""
         annotations:
-          nginx.ingress.kubernetes.io/proxy-ssl-name: "extender-service"
-          nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+          haproxy.org/cookie-persistence: "privx-extender-service-session"
+          haproxy.org/backend-config-snippet: |
+            default-server sni str(extender-service) verifyhost extender-service
+            # keep req.body_size in sync with MAX_RPM_SIZE
+            http-request deny deny_status 413 if { req.body_size gt 20971520 }
         hosts:
           - host: localhost
             paths:
@@ -3551,7 +3584,9 @@ ms:
         useCommonAnnotations: true
         className: ""
         annotations:
-          nginx.ingress.kubernetes.io/proxy-ssl-name: "db-proxy"
+          haproxy.org/cookie-persistence: "privx-db-proxy-session"
+          haproxy.org/backend-config-snippet: |
+            default-server sni str(db-proxy) verifyhost db-proxy
         hosts:
           - host: localhost
             paths:
@@ -3679,7 +3714,9 @@ ms:
         useCommonAnnotations: true
         className: ""
         annotations:
-          nginx.ingress.kubernetes.io/proxy-ssl-name: "api-proxy"
+          haproxy.org/cookie-persistence: "privx-api-proxy-session"
+          haproxy.org/backend-config-snippet: |
+            default-server sni str(api-proxy) verifyhost api-proxy
         hosts:
           - host: localhost
             paths:

@@ -127,3 +127,17 @@ it in realistic situations.
 {{- fail (printf "Kubernetes %s or higher is required, but found: %s. Please upgrade your Kubernetes cluster before installing/upgrading PrivX." .Values.minKubeVersion .Capabilities.KubeVersion.Version) }}
 {{- end }}
 {{- end }}
+
+{{- define "privx.licenseProfileFromCode" -}}
+{{- $licenseCode := . -}}
+{{- if and $licenseCode $licenseCode.dev.enabled -}}
+dev
+{{- else if and $licenseCode $licenseCode.prod.enabled -}}
+prod
+{{- end -}}
+{{- end }}
+
+{{- define "privx.globalLicenseCodeProfile" -}}
+{{- $globalContext := . -}}
+{{- include "privx.licenseProfileFromCode" $globalContext.Values.ms.licensemanager.licenseCode | trim -}}
+{{- end }}

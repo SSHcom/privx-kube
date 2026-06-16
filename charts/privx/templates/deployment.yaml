@@ -4,6 +4,7 @@
 {{- if and (eq $service.name "syslog-service") (not ($globalContext.Values.privx.syslog.enabled)) }}
 {{- else }}
 {{- $path := (printf "%s" $service.image.name) }}
+{{- $licenseProfile := include "privx.globalLicenseCodeProfile" $globalContext | trim }}
 {{- if eq $service.image.name "user-store" }}
   {{- $path = "local-user-store" }}
 {{- end }}
@@ -95,16 +96,16 @@ spec:
               value: "{{ $globalContext.Values.privx.audit.priority | default "6" }}"
             {{- if $service.licenseCode }}
             {{- if $service.licenseCode.dev.enabled }}
-            - name: LICBE_PROFILE
-              value: dev
             - name: PRIVX_LICENSE_CODE
               value: {{ $service.licenseCode.dev.value }}
             {{- else if $service.licenseCode.prod.enabled }}
-            - name: LICBE_PROFILE
-              value: prod
             - name: PRIVX_LICENSE_CODE
               value: {{ $service.licenseCode.prod.value }}
             {{- end }}
+            {{- end }}
+            {{- if $licenseProfile }}
+            - name: LICBE_PROFILE
+              value: {{ $licenseProfile | quote }}
             {{- end }}
             {{- with $service.environment }}
               {{- toYaml . | nindent 12 }}

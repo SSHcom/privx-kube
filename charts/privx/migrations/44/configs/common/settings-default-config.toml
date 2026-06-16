@@ -158,6 +158,18 @@ icap_service_name = ""
 # ICAP client binary path
 icap_client_binary_path = "/opt/privx/bin/c-icap-client"
 
+# Use a TLS connection to the ICAP server
+icap_tls_enabled = false
+
+# Skip TLS certificate verification for the ICAP server
+icap_skip_tls_verification = false
+
+# Trust anchor certificates for ICAP server certificate validation. If the
+# ICAP server certificate is valid and signed by one of the trust anchors, the
+# server certificate is accepted as trusted. Trust anchor certificates are
+# configured as one or multiple concatenated PEM certificates.
+icap_certificate_trust_anchors = ""
+
 [GLOBAL.live_monitoring]
 # Disable live monitoring for services
 enable_live_ssh = true
@@ -314,7 +326,15 @@ blacklisted_host_tag_prefixes = [
 [ROLE-STORE.housekeeping]
 # Unused SCIM role housekeeping interval in minutes
 scim_role_housekeeping_interval = 720
+
+# Inactive users housekeeping interval in hours
+inactive_users_housekeeping_interval = 12
+
+# Inactive user threshold in minutes
 users_active_interval = 15780000
+
+# Ephemeral user purge housekeeping interval in minutes
+ephemeral_users_housekeeping_interval = 60
 
 # Amazon Web Services settings
 [ROLE-STORE.aws]

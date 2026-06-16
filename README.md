@@ -1,19 +1,21 @@
-# **Breaking Changes**:
+# **Breaking Changes in PrivX 44.X**
 
-This list of breaking changes is for PrivX 43. For breaking changes
-in the previous releases, please check the specific release branch for
-correct information.
+- PrivX Kubernetes ingress defaults were changed from the NGINX Ingress
+Controller to the HAProxy Ingress Controller. Before upgrading to PrivX 44.0,
+make sure your cluster has a compatible HAProxy ingress controller installed
+and that the external traffic currently handled by NGINX can be migrated to it.
 
-- NGINX Ingress Controller is going to be 
-[retired](https://www.kubernetes.dev/blog/2025/11/12/ingress-nginx-retirement/)
-in Spring 2026. Depending on various factors until then, we might
-have to either move directly to using the new Gateway API or
-look for another Ingress Controller alternative. The criteria for the
-change would be to cover all the use cases that PrivX depends on.
+- The default Helm value `ingress.common.className` was changed from `nginx`
+to `haproxy`, and the chart annotations were changed from
+`nginx.ingress.kubernetes.io/*` to `haproxy.org/*`. If you use custom
+`values.yaml` overrides, custom ingress classes, or controller-specific
+annotations, you must update them before the upgrade. Otherwise the upgraded
+release may attach to the wrong ingress controller or the ingress resources may
+stop working.
 
-The candidate of choice for Ingress Controller in PrivX v44 is HAProxy based
-Ingress Controller. The plans are still subject to change in case a better
-alternative appears.
+- Plan the migration so that all required exposed PrivX ports are available
+through the HAProxy ingress controller after the upgrade. For port details and
+general ingress requirements, see [ingress.md](docs/ingress.md).
 
 # privx-kube
 
@@ -209,4 +211,4 @@ helm install \
 ```
 
 # PrivX Version Upgrade
-For upgrading privx to the current version, follow the instructions [here](charts/privx/migrations/43/README.md)
+For upgrading privx to the current version, follow the instructions [here](charts/privx/migrations/44/README.md)
