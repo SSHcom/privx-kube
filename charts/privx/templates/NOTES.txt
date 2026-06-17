@@ -1,0 +1,11 @@
+{{- $licenseProfile := include "privx.globalLicenseCodeProfile" . | trim -}}
+{{- if not $licenseProfile }}
+WARNING:
+  Neither `ms.licensemanager.licenseCode.dev.enabled` nor
+  `ms.licensemanager.licenseCode.prod.enabled` is enabled.
+
+  `LICBE_PROFILE` will not be exported to PrivX microservice deployments.
+
+  If this release should use the development or production license backend,
+  enable the matching `ms.licensemanager.licenseCode` profile.
+{{- end }}
