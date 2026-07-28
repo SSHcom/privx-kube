@@ -28,12 +28,12 @@ versions of PrivX on Kubernetes.
 
 For more information on PrivX, please find the documentation
 [here](https://privx.docs.ssh.com/). An architecture diagram for PrivX on
-Kubernetes can be found [here](https://privx.docs.ssh.com/docs/privx-on-kubernetes#architecture-diagram-for-privx-on-kubernetes).
+Kubernetes can be found [here](https://privx.docs.ssh.com/docs/knowledge-base/privx-on-kubernetes#architecture-diagram-for-privx-on-kubernetes).
 
 For a list of Kubernetes resources that are deployed, please check
 [here](docs/resources.md).
 
-## Prequisites
+## Prerequisites
 
 - Kubernetes >= 1.23
 - Kubectl >= 1.23
@@ -65,39 +65,20 @@ for PrivX to work.
 ### Ingress Controller
 
 As in any kubernetes cluster, a gateway or ingress is required to reach the
-application. PrivX uses [Nginx Ingress Controller](https://github.com/kubernetes/ingress-nginx)
-as the ingress controller.
+application. PrivX uses the HAProxy Ingress Controller as the ingress controller.
 
 **NOTE: Please keep [this](docs/ingress.md) information in mind if an Ingress
 Controller or a similar component other than the one mentioned above is used.**
 
 The purpose of the ingress controller is to setup ingress to the PrivX
-microservices in a dynamic way.
-_privx-kube_ provides an override file [ingress.yaml](values-overrides/ingress.yaml) with
-extra settings for deploying the nginx ingress controller. The purpose
-of the file is to provide settings that are crucial to the workings of PrivX.
+microservices in a dynamic way. _privx-kube_ provides an override file
+[ingress.yaml](values-overrides/ingress.yaml) with the TCP port mappings and
+headers PrivX requires.
 
 Depending on the type of Kubernetes cluster, this file might require further
-settings (e.g Load balancer settings). But the main requirement after installing
+settings (for example, load balancer settings). But the main requirement after installing
 the ingress controller is that it should be accessible for the clients that
 would end up using PrivX.
-
-The installation of the Ingress Controller is tested to work on Kubernetes Server
-v1.24. Please be advised that new releases of the Kubernetes Server or Ingress
-Controller may cause some of these instructions to fail. Always consult the
-upstream Ingress Controller [repo](https://github.com/kubernetes/ingress-nginx/tree/main/charts/ingress-nginx#upgrading-chart)
-to make sure that the values are correct.
-
-An Example installation instruction (Please update to a more secure version if available):
-```
-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-helm repo update
-helm install [RELEASE_NAME] ingress-nginx/ingress-nginx -n ingress --create-namespace
-```
-
-Up to date instructions on new releases and any breaking changes can be found
-in the original
-[repo](https://github.com/kubernetes/ingress-nginx/tree/main/charts/ingress-nginx).
 
 
 ### Working Postgres Database
@@ -181,7 +162,7 @@ PrivX assumes that a volume claim named `privx-claim` be present with
 The value for `ms.licensemanager.licenseCode.prod.value` in the file
 [privx.yaml](values-overrides/privx.yaml) should be changed to a
 valid license value. **NOTE:** If offline licenses are used, then please wait
-for more instructions as support for that is still under work.
+for product-specific licensing guidance from SSH.
 
 ### PrivX Admin user
 The values for the following are **mandatory** and need to be set before
@@ -193,7 +174,7 @@ installing PrivX in the file [privx.yaml](values-overrides/privx.yaml).
 
 ### PrivX Container Custom User ID and Group ID
 
-By default, PrivX containers are runing under User ID (`uid`) and Group ID (`gid`) `5111`. To run containers under a custom `uid/gid`, customize the following values in `charts/privx/values.yaml`:
+By default, PrivX containers run under User ID (`uid`) and Group ID (`gid`) `5111`. To run containers under a custom `uid/gid`, customize the following values in `charts/privx/values.yaml`:
 
     - podSecurityContext.fsGroup (Custom gid)
     - podSecurityContext.runAsUser (Custom uid)
@@ -211,4 +192,5 @@ helm install \
 ```
 
 # PrivX Version Upgrade
-For upgrading privx to the current version, follow the instructions [here](charts/privx/migrations/44/README.md)
+For upgrading privx to the current version, follow the instructions [here](charts/privx/migrations/44/README.md). Review
+the release-specific breaking changes before starting the upgrade.
