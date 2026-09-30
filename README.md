@@ -1,21 +1,22 @@
-# **Breaking Changes in PrivX 44.X**
+# **Breaking Changes in PrivX 45.X**:
 
-- PrivX Kubernetes ingress defaults were changed from the NGINX Ingress
-Controller to the HAProxy Ingress Controller. Before upgrading to PrivX 44.0,
-make sure your cluster has a compatible HAProxy ingress controller installed
-and that the external traffic currently handled by NGINX can be migrated to it.
+The nginx port behavior has changed in PrivX 45 to fix client certificate authentication.
+Because of this, rollback to PrivX 44 or older may fail if the old `nginx-config`
+ConfigMap is not restored before `helm rollback`.
 
-- The default Helm value `ingress.common.className` was changed from `nginx`
-to `haproxy`, and the chart annotations were changed from
-`nginx.ingress.kubernetes.io/*` to `haproxy.org/*`. If you use custom
-`values.yaml` overrides, custom ingress classes, or controller-specific
-annotations, you must update them before the upgrade. Otherwise the upgraded
-release may attach to the wrong ingress controller or the ingress resources may
-stop working.
+Before starting the upgrade, back up the current `nginx-config`:
 
-- Plan the migration so that all required exposed PrivX ports are available
-through the HAProxy ingress controller after the upgrade. For port details and
-general ingress requirements, see [ingress.md](docs/ingress.md).
+```bash
+kubectl get configmap nginx-config -n privx -o yaml > nginx-config.backup.yaml
+```
+
+If you need to rollback, first run the `restore.yaml` step of the rollback
+procedure. After that, re-apply the backed up ConfigMap and only then run the
+`helm rollback` command:
+
+```bash
+kubectl apply -f nginx-config.backup.yaml
+```
 
 # privx-kube
 
@@ -192,5 +193,5 @@ helm install \
 ```
 
 # PrivX Version Upgrade
-For upgrading privx to the current version, follow the instructions [here](charts/privx/migrations/44/README.md). Review
+For upgrading privx to the current version, follow the instructions [here](charts/privx/migrations/45/README.md). Review
 the release-specific breaking changes before starting the upgrade.

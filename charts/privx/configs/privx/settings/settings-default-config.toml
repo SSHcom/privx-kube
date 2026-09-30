@@ -214,6 +214,14 @@ host_watermark = '''[]'''
 [GLOBAL.mobile_gw]
 use_static_ips = false
 
+# Interval for health check, in seconds.
+# 0 disables the check.
+health_check_interval = 0
+
+[GLOBAL.conn_common]
+
+# Connection justification prompt
+justification_prompt = "Please provide a short justification for the connection" 
 
 ##########################################################################################
 
@@ -724,11 +732,18 @@ smartcard_status_workaround_disabled = true
 # Enable wallpaper on target hosts. Disabled by default for performance reasons.
 enable_wallpaper = false
 
+# Enable RDPGFX for RDP desktop sessions. Improves rendering performance, but may increase the audit trail size and memory usage.
+enable_gfx = false
+
 # Enable font smoothing on target hosts.
 enable_font_smoothing = true
 
 # Enable touch screen support
 enable_touch = false
+
+# Session recording quality.
+# Values: full, medium, low
+recording_quality = "full"
 
 # Delay (seconds) for releasing the implicit secret checkout after login to RDP target.
 # Default: 30, min: 0, Max: 300
@@ -983,6 +998,12 @@ allow_role_ip_restrictions = true
 
 # Exec connection idle timeout in seconds
 exec_connection_idle_timeout_sec = 30
+
+# When true, close the channel if ICAP scanning of an intercepted SCP/SFTP file
+# transfer fails (e.g. the ICAP server is unreachable, or the scan directory
+# cannot be accessed). When false, the error is only logged and the channel is
+# left open so the file transfer session can continue.
+terminate_channel_on_icap_scan_error = false
 
 # List of allowed separators when using Bastion syntax. Repeat the separator to escape it. Using different unescaped separators in the same connection string is not allowed.
 # Allowed separators: % ^ + : / #
@@ -1302,6 +1323,17 @@ enabled = false
 # require manual intervention. Max allowed value is 48 (hours).
 # Use zero or -1 to disable auto steps retries.
 freshness_threshold = 24
+
+[WORKFLOW-ENGINE.mobile_approvals]
+# Maximum number of eligible approvers for which mobile notifications
+# are sent per request. If the approver count exceeds this threshold,
+# mobile notifications are suppressed for that request.
+# Allowed range: 1–25.
+notification_threshold = 10
+
+# Expiry time for mobile approval role-request transactions, in days.
+# Allowed range: 1 to 7 days. Default: 4 days.
+role_request_transaction_ttl_days = 4
 
 ##########################################################################################
 

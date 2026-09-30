@@ -38,7 +38,7 @@ frontend_address = "https://{{ index .Values.ingress.common.hosts 0 "host" }}/pr
 
 # Login page
 auth_ui_address = "/auth"
-auth_client_cert_ui_address = "https://localhost:8444/auth"
+auth_client_cert_ui_address = "https://{{ index .Values.ingress.common.hosts 0 "host" }}:{{- range .Values.ms.nginx.service.internal }}{{- if eq .name "client-cert" }}{{ .port }}{{- end }}{{- end }}/auth"
 
 # OIDC Identity Provider endpoint enabled
 oidc_provider_enabled = true
@@ -318,7 +318,10 @@ max_conns_per_host = 128
 
 [restapi]
 
-# client_cert_auth_required, caller must provide valid client certificate
+# Support client cert authentication in REST API (mTLS).
+# Specific REST API endpoints - used for enduser client certificate authentication - check explicitly
+# that requests arrive over a client certificate authentications mTLS connections. If mTLS support at
+# REST API level is disabled, then these specific REST API endpoints start rejecting the requests.
 client_cert_auth_required = true
 
 # client_trust_anchors_file, used to verify caller

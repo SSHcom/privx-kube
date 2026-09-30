@@ -40,8 +40,6 @@ export  PRIVX_DATABASE_SSLMODE="{{ .Values.db.sslmode | default "require" }}"
 # Database additional params
 # (reads the value of additional_params and trims leading/trailing whitespace)
 export PRIVX_DATABASE_ADDITIONAL_PARAMS="$(grep -E '^\s*additional_params' /opt/privx/etc/shared-config.toml | sed -r 's/^\s*additional_params\s*=\s*"(.*)".*/\1/g ; s/^\s*//g ; s/\s*$//g')"
-# Notification backend, "db"
-export  PRIVX_NOTIFICATION_BACKEND="db"
 
 # PrivX superuser
 export PRIVX_SUPERUSER="{{ required "A valid privx.admin.username value is required" .Values.privx.admin.username }}"
