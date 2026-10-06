@@ -19,8 +19,6 @@ ingress:
       haproxy.org/global-config-snippet: |
         ssl-default-bind-ciphers ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256
         ssl-default-bind-options ssl-min-ver TLSv1.2 no-tls-tickets
-      haproxy.org/frontend-config-snippet: |
-        http-request deny deny_status 413 if { req.body_size gt 10485760 }
 db:
   # database address (required)
   address:
@@ -118,7 +116,7 @@ privxRepository: public.ecr.aws/sshprivx
 
 # Global value to define the PrivX images' version tag.
 # Individual microservices/jobs can override this.
-privxVersion: "44.0"
+privxVersion: "45.0"
 
 # Global value to define the default image pull policy.
 # Individual microservices/jobs can override this.
@@ -541,8 +539,6 @@ ms:
             ssl-default-bind-options ssl-min-ver TLSv1.2 no-tls-tickets
           haproxy.org/backend-config-snippet: |
             default-server sni str(rdp-proxy) verifyhost rdp-proxy
-          haproxy.org/frontend-config-snippet: |
-            http-request deny deny_status 413 if { req.body_size gt 10485760 }
         hosts:
           - host: localhost
             paths:
@@ -693,8 +689,6 @@ ms:
             ssl-default-bind-options ssl-min-ver TLSv1.2 no-tls-tickets
           haproxy.org/backend-config-snippet: |
             default-server sni str(ssh-proxy) verifyhost ssh-proxy
-          haproxy.org/frontend-config-snippet: |
-            http-request deny deny_status 413 if { req.body_size gt 10485760 }
         hosts:
           - host: localhost
             paths:
@@ -964,6 +958,7 @@ ms:
           haproxy.org/cookie-persistence: "privx-keyvault-session"
           haproxy.org/backend-config-snippet: |
             default-server sni str(keyvault) verifyhost keyvault
+            http-request deny deny_status 413 if { req.body_size gt 1048576 }
         hosts:
           - host: localhost
             paths:
@@ -1087,6 +1082,7 @@ ms:
           haproxy.org/cookie-persistence: "privx-authorizer-session"
           haproxy.org/backend-config-snippet: |
             default-server sni str(authorizer) verifyhost authorizer
+            http-request deny deny_status 413 if { req.body_size gt 1048576 }
         hosts:
           - host: localhost
             paths:
@@ -1109,10 +1105,9 @@ ms:
           haproxy.org/global-config-snippet: |
             ssl-default-bind-ciphers ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256
             ssl-default-bind-options ssl-min-ver TLSv1.2 no-tls-tickets
-          haproxy.org/frontend-config-snippet: |
-            http-request deny deny_status 413 if { req.body_size gt 1048576 }
           haproxy.org/backend-config-snippet: |
             default-server sni str(authorizer) verifyhost authorizer
+            http-request deny deny_status 413 if { req.body_size gt 1048576 }
         hosts:
           - host: localhost
             paths:
@@ -1237,6 +1232,7 @@ ms:
           haproxy.org/cookie-persistence: "privx-connection-manager-session"
           haproxy.org/backend-config-snippet: |
             default-server sni str(connection-manager) verifyhost connection-manager
+            http-request deny deny_status 413 if { req.body_size gt 1048576 }
         hosts:
           - host: localhost
             paths:
@@ -1256,6 +1252,7 @@ ms:
           haproxy.org/cookie-persistence: "privx-connection-manager-session"
           haproxy.org/backend-config-snippet: |
             default-server sni str(connection-manager) verifyhost connection-manager
+            http-request deny deny_status 413 if { req.body_size gt 1048576 }
         hosts:
           - host: localhost
             paths:
@@ -1383,6 +1380,7 @@ ms:
           haproxy.org/cookie-persistence: "privx-host-store-session"
           haproxy.org/backend-config-snippet: |
             default-server sni str(host-store) verifyhost host-store
+            http-request deny deny_status 413 if { req.body_size gt 52428800 }
         hosts:
           - host: localhost
             paths:
@@ -1516,6 +1514,7 @@ ms:
           haproxy.org/cookie-persistence: "privx-license-manager-session"
           haproxy.org/backend-config-snippet: |
             default-server sni str(license-manager) verifyhost license-manager
+            http-request deny deny_status 413 if { req.body_size gt 1048576 }
         hosts:
           - host: localhost
             paths:
@@ -1644,6 +1643,7 @@ ms:
           haproxy.org/cookie-persistence: "privx-monitor-service-session"
           haproxy.org/backend-config-snippet: |
             default-server sni str(monitor-service) verifyhost monitor-service
+            http-request deny deny_status 413 if { req.body_size gt 1048576 }
         hosts:
           - host: localhost
             paths:
@@ -1663,6 +1663,7 @@ ms:
           haproxy.org/cookie-persistence: "privx-monitor-service-session"
           haproxy.org/backend-config-snippet: |
             default-server sni str(monitor-service) verifyhost monitor-service
+            http-request deny deny_status 413 if { req.body_size gt 1048576 }
         hosts:
           - host: localhost
             paths:
@@ -2109,6 +2110,7 @@ ms:
           haproxy.org/cookie-persistence: "privx-trail-index-session"
           haproxy.org/backend-config-snippet: |
             default-server sni str(trail-index) verifyhost trail-index
+            http-request deny deny_status 413 if { req.body_size gt 1048576 }
         hosts:
           - host: localhost
             paths:
@@ -2236,6 +2238,7 @@ ms:
           haproxy.org/cookie-persistence: "privx-role-store-session"
           haproxy.org/backend-config-snippet: |
             default-server sni str(role-store) verifyhost role-store
+            http-request deny deny_status 413 if { req.body_size gt 1048576 }
         hosts:
           - host: localhost
             paths:
@@ -2362,6 +2365,7 @@ ms:
           haproxy.org/cookie-persistence: "privx-settings-session"
           haproxy.org/backend-config-snippet: |
             default-server sni str(settings) verifyhost settings
+            http-request deny deny_status 413 if { req.body_size gt 1048576 }
         hosts:
           - host: localhost
             paths:
@@ -2486,6 +2490,7 @@ ms:
           haproxy.org/cookie-persistence: "privx-user-store-session"
           haproxy.org/backend-config-snippet: |
             default-server sni str(user-store) verifyhost user-store
+            http-request deny deny_status 413 if { req.body_size gt 1048576 }
         hosts:
           - host: localhost
             paths:
@@ -2611,6 +2616,7 @@ ms:
           haproxy.org/cookie-persistence: "privx-vault-session"
           haproxy.org/backend-config-snippet: |
             default-server sni str(vault) verifyhost vault
+            http-request deny deny_status 413 if { req.body_size gt 1048576 }
         hosts:
           - host: localhost
             paths:
@@ -2760,6 +2766,7 @@ ms:
           haproxy.org/cookie-persistence: "privx-workflow-engine-session"
           haproxy.org/backend-config-snippet: |
             default-server sni str(workflow-engine) verifyhost workflow-engine
+            http-request deny deny_status 413 if { req.body_size gt 1048576 }
         hosts:
           - host: localhost
             paths:
@@ -2876,13 +2883,13 @@ ms:
     service:
       enabled: true
       type: ClusterIP
-      port: 8444
+      port: 8443
       internal:
         - name: non-tls
           port: 80
           protocol: TCP
         - name: client-cert
-          port: 8443
+          port: 8444
           protocol: TCP
 
     ingress:
@@ -2900,8 +2907,6 @@ ms:
           haproxy.org/global-config-snippet: |
             ssl-default-bind-ciphers ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256
             ssl-default-bind-options ssl-min-ver TLSv1.2 no-tls-tickets
-          haproxy.org/frontend-config-snippet: |
-            http-request deny deny_status 413 if { req.body_size gt 10485760 }
           haproxy.org/backend-config-snippet: |
             default-server sni str(nginx) verifyhost nginx
             http-request deny deny_status 413 if { req.body_size gt 1048576 }
@@ -3116,6 +3121,7 @@ ms:
           haproxy.org/cookie-persistence: "privx-network-access-manager-session"
           haproxy.org/backend-config-snippet: |
             default-server sni str(network-access-manager) verifyhost network-access-manager
+            http-request deny deny_status 413 if { req.body_size gt 1048576 }
         hosts:
           - host: localhost
             paths:
@@ -3240,6 +3246,7 @@ ms:
           haproxy.org/cookie-persistence: "privx-secrets-manager-session"
           haproxy.org/backend-config-snippet: |
             default-server sni str(secrets-manager) verifyhost secrets-manager
+            http-request deny deny_status 413 if { req.body_size gt 1048576 }
         hosts:
           - host: localhost
             paths:
@@ -3587,6 +3594,7 @@ ms:
           haproxy.org/cookie-persistence: "privx-db-proxy-session"
           haproxy.org/backend-config-snippet: |
             default-server sni str(db-proxy) verifyhost db-proxy
+            http-request deny deny_status 413 if { req.body_size gt 1048576 }
         hosts:
           - host: localhost
             paths:
@@ -3717,6 +3725,7 @@ ms:
           haproxy.org/cookie-persistence: "privx-api-proxy-session"
           haproxy.org/backend-config-snippet: |
             default-server sni str(api-proxy) verifyhost api-proxy
+            http-request deny deny_status 413 if { req.body_size gt 1048576 }
         hosts:
           - host: localhost
             paths:

@@ -6,6 +6,9 @@ listen_port = 8880
 keyvault_id = "@SSHPROXY_ID@"
 keyvault_secret = "@SSHPROXY_SECRET@"
 
+# Directory for temporary ICAP scan files from SSH web UI file transfers.
+icap_scan_directory = "/tmp/ssh-proxy-drive/scan/"
+
 [tls]
 # Microservice https server settings
 enable_https_server = true

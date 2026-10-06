@@ -10,6 +10,9 @@ listen_port = 8095
 # Key name for host keys in keyvault
 hostkey_name = "/sshmitm/hostkey"
 
+# Directory for temporary ICAP scan files from SSH native client file transfers.
+icap_scan_directory = "/tmp/ssh-mitm-drive/scan/"
+
 # ssh-mitm listen addresses
 # By default listen on IPv4/IPv6 port 2222. When changing the listen port, please make sure to also
 # update the firewalld configuration.

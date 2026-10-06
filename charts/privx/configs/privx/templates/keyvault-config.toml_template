@@ -75,8 +75,14 @@ ciphertext_block_size = 0
 # session cache lifetime
 #   Determines cached PKCS#11 session lifetime. If empty, session caching is
 #   disabled. Accepts duration strings such as "5m", "1h" or "1h59m55s" with
-#   hours, minutes and/or seconds.
+#   hours, minutes and/or seconds. Also accepts the value "infinite" to disable
+#   session expiration altogether.
 session_cache_lifetime = ""
+
+# maximum cached sessions
+#   If session caching is enabled, limit the maximum amount of concurrent
+#   sessions allowed. Values between 1 and 1024 are allowed.
+maximum_cached_sessions = 64
 
 # pkcs11 features: comma separated list of following keywords:
 #   aes-gcm-zero-iv       Supply zero IV for aes gcm encrypt
@@ -96,3 +102,51 @@ session_cache_lifetime = ""
 #   exact-key-search-only Indicate that only key search by ID is supported
 #   explicit-no-export    Explicitly define keys as non-extractable on creation
 features = ""
+
+# If local instance secret is enabled, then the instance secret will be created
+# locally on PrivX and encrypted using the HSM.
+#
+# THIS CANNOT BE CHANGED AFTER INSTALLATION!
+local_instance_secret = false
+
+# Asymmetric key storage is a list of key names or key name prefixes and their
+# associated storage locations. The two supported storage locations are "local"
+# and "remote". Locally stored keys are stored on the PrivX database in encrypted
+# form and decrypted before use. Remotely stored keys are stored on the HSM
+# provider and all cryptographic operations are performed remotely. Remote keys
+# are never exported to PrivX.
+#
+# Keys will use the configuration of the longest matching prefix by /-separated
+# elements. An example configuration:
+#
+# /               local
+# /ca             remote
+# /ca/accessgroup local
+#
+# With the above configuration, all Access Group CA keys would be stored locally
+# while all other CA keys would be stored remotely. All non-CA keys would then
+# be stored locally.
+#
+# Changing this setting will not affect pre-existing keys, but will affect newly
+# created keys. So to change an Access Group CA from one storage location to
+# another, you need to change this setting appropriately, restart keyvault
+# service and finally rotate the Access Group CA.
+#
+# The default location is indicated by the '/' path and must always be set.
+asymmetric_key_storage = '''
+/ remote # Default asymmetric key storage location
+'''
+
+# Symmetric key storage configures the storage for symmetric keys; see the above
+# field for more information on the syntax.
+symmetric_key_storage = '''
+/ remote # Default symmetric key storage location
+'''
+
+# FSVault asymmetric key storage configures the storage for filesystem-backed
+# asymmetric keys. See above 'asymmetric_key_storage' comment for more information.
+fsvault_asymmetric_key_storage = "remote"
+
+# FSVault symmetric key storage configures the storage for filesystem-backed
+# symmetric keys. See above 'asymmetric_key_storage' comment for more information.
+fsvault_symmetric_key_storage = "remote"
