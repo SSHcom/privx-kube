@@ -1,4 +1,4 @@
-# **Breaking Changes**:
+# **Breaking Changes in PrivX 45.X**:
 
 The nginx port behavior has changed in PrivX 45 to fix client certificate authentication.
 Because of this, rollback to PrivX 44 or older may fail if the old `nginx-config`
