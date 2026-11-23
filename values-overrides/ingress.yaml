@@ -6,7 +6,7 @@ tcp:
   2322: "privx/extender-service:2322"
   3389: "privx/rdp-mitm:3389"
   1080: "privx/ssh-mitm:1080"
-  8443: "privx/nginx:8443"
+  8444: "privx/nginx:8444"
   20080: "privx/api-proxy:20080"
 
 addHeaders:

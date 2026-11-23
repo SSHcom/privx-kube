@@ -7,7 +7,7 @@ features to work correctly:
 - 1080 (Needed by SSH Bastion for SOCKS proxy connections)
 - 2222 (Needed by SSH Bastion for SSH native connections)
 - 3389 (Needed by RDP Bastion for RDP native connections)
-- 8443 (Needed by Authorizer for client certification authentication endpoints)
+- 8444 (Needed by Authorizer for client certification authentication endpoints)
 - 2322 (Needed by the Extender Service)
 - 20080 (Needed by API Proxy for REST based connections)
 
