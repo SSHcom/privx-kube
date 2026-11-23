@@ -2822,7 +2822,7 @@ ms:
     image:
       name: nginx
       repository: ~
-      tag: ~
+      tag: "43.2.LTS.2-1"
       pullPolicy: ~
 
     imagePullSecrets:
