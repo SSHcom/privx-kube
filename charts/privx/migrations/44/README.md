@@ -94,7 +94,7 @@ Also replace the environment variable `PREVIOUS_VERSION` in [restore.yaml](../re
 
 Take the value from the name of your backup folder.
 
-If your backup folder was named `privx-backup-PPPPP_YYYY-MM-DD-hhmm_43.X.X` then your `PREVIOUS_VERSION` will be `43.X.X`.
+If your backup folder was named `privx-backup-PPPPP_YYYY-MM-DD-hhmm_35.X.X` then your `PREVIOUS_VERSION` will be `35.X.X`.
 
 4. Restore PrivX settings using the following command:
 ```

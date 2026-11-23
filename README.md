@@ -1,4 +1,4 @@
-# **Breaking Changes in PrivX 44.X**
+# **Breaking Changes in PrivX 44.0**
 
 - PrivX Kubernetes ingress defaults were changed from the NGINX Ingress
 Controller to the HAProxy Ingress Controller. Before upgrading to PrivX 44.0,
