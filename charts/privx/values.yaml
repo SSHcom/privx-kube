@@ -2854,7 +2854,7 @@ ms:
     image:
       name: nginx
       repository: ~
-      tag: ~
+      tag: "45.0-1"
       pullPolicy: ~
 
     imagePullSecrets:
